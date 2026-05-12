@@ -1,0 +1,71 @@
+[
+  {
+    "id": 0,
+    "name": "Track 0: Shared Infrastructure",
+    "short_name": "Shared Infrastructure",
+    "mission": "Build the foundation that all other tracks depend on. First 2 hours: build. Rest of day: helpdesk.",
+    "team": {
+      "engineers": 4,
+      "analysts": 2
+    }
+  },
+  {
+    "id": 1,
+    "name": "Track 1: GIAS Audit Planning Pipeline",
+    "short_name": "GIAS Audit Planning Pipeline",
+    "mission": "Run the full UC1-UC9 audit planning pipeline against synthetic data and produce a complete RCM + Work Program.",
+    "team": {
+      "auditors": 3,
+      "vaktechniek": 2,
+      "analysts": 2,
+      "engineers": 1
+    }
+  },
+  {
+    "id": 2,
+    "name": "Track 2: Evidence Collection & Extraction",
+    "short_name": "Evidence Collection & Extraction",
+    "mission": "Build and test evidence extraction pipelines for 4 different evidence types.",
+    "team": {
+      "auditors": 2,
+      "vaktechniek": 1,
+      "analysts": 2,
+      "engineers": 1
+    }
+  },
+  {
+    "id": 3,
+    "name": "Track 3: Compliance & Regulatory Assessment",
+    "short_name": "Compliance & Regulatory Assessment",
+    "mission": "Run framework-specific compliance assessments against synthetic data. Produce gap reports with regulatory citations.",
+    "team": {
+      "auditors": 2,
+      "vaktechniek": 3,
+      "analysts": 2,
+      "engineers": 1
+    }
+  },
+  {
+    "id": 4,
+    "name": "Track 4: Reporting & Visualization",
+    "short_name": "Reporting & Visualization",
+    "mission": "Convert raw findings from Tracks 1-3 into polished audit reports and visual dashboards.",
+    "team": {
+      "auditors": 2,
+      "analysts": 2,
+      "engineers": 2
+    }
+  },
+  {
+    "id": 5,
+    "name": "Track 5: AI Governance & Quality Assurance",
+    "short_name": "AI Governance & Quality Assurance",
+    "mission": "Be the second pair of eyes for every other track. Test agents for security, validate findings for accuracy.",
+    "team": {
+      "auditors": 1,
+      "vaktechniek": 2,
+      "analysts": 1,
+      "engineers": 2
+    }
+  }
+]

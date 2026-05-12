@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-bg: #020617;
+  --color-surface: #0F172A;
+  --color-surface2: #1E1B4B;
+  --color-border: #1E293B;
+  --color-text: #E2E8F0;
+  --color-muted: #94A3B8;
+  --color-accent: #818CF8;
+  --color-accent-hover: #6366F1;
+  --color-saaf-green: #4ADE80;
+  --color-saaf-yellow: #FBBF24;
+  --color-saaf-red: #F87171;
+  --color-saaf-purple: #C084FC;
+  --color-saaf-orange: #FB923C;
+  --color-indigo-600: #4F46E5;
+  --color-indigo-700: #4338CA;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--color-border);
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-indigo-600);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.4);
+}

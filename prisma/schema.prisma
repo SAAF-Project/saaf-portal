@@ -1,0 +1,39 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+model User {
+  id                String   @id @default(cuid())
+  githubId          Int      @unique
+  githubUsername     String   @unique
+  name              String?
+  email             String?
+  avatarUrl         String?
+  organisation      String?
+  role              String?
+  preferredTrack    String?
+  secondTrack       String?
+  skillPrompts      Int      @default(3)
+  skillTools        Int      @default(3)
+  skillRegulatory   Int      @default(3)
+  skillOutputs      Int      @default(3)
+  companyLogoUrl    String?
+  showLogoOnWebsite Boolean  @default(false)
+  registrationIssue Int?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model SignupRequest {
+  id             String    @id @default(cuid())
+  githubUsername  String
+  email          String?
+  status         String    @default("pending")
+  createdAt      DateTime  @default(now())
+  processedAt    DateTime?
+}

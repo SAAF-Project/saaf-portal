@@ -1,0 +1,251 @@
+[
+  {
+    "name": "Anonymous",
+    "plans": [
+      "anonymous-audit-rep-analysis"
+    ]
+  },
+  {
+    "name": "AuditFlow AI team (anonymous)",
+    "plans": [
+      "auditflow-ai"
+    ]
+  },
+  {
+    "name": "Bart Loow",
+    "plans": [
+      "the-control-freaks-uc7-rcm-builder"
+    ]
+  },
+  {
+    "name": "Diyve Garg",
+    "plans": [
+      "diyve-garg-pbc-assistant-isabelle"
+    ]
+  },
+  {
+    "name": "Ellert van der Vecht",
+    "plans": [
+      "ellert-van-der-vecht-llm-owasp",
+      "ellert-van-der-vecht-multi-model-validation"
+    ]
+  },
+  {
+    "name": "Floris Stokkers",
+    "plans": [
+      "floris-stokkers-work-program-agent"
+    ]
+  },
+  {
+    "name": "Francois Marais",
+    "plans": [
+      "linda-nyvelius-team-hightable"
+    ]
+  },
+  {
+    "name": "Frank Heldens",
+    "plans": [
+      "frank-heldens-llm-finding-fact-check-agent"
+    ]
+  },
+  {
+    "name": "Frank Lubbers",
+    "plans": [
+      "frank-lubbers-ai-finding-escalation-azure-devops"
+    ]
+  },
+  {
+    "name": "Frank van Dissel & Lauren Browne",
+    "plans": [
+      "frank-van-dissel-uc1-policy-process-intake",
+      "frank-van-dissel-uc2-previous-audit-intelligence",
+      "frank-van-dissel-uc3-incident-issue-intelligence",
+      "frank-van-dissel-uc4-fraud-risk-assessment",
+      "frank-van-dissel-uc5-regulatory-criteria",
+      "frank-van-dissel-uc6-it-dependency-identifier",
+      "frank-van-dissel-uc7-rcm-builder",
+      "frank-van-dissel-uc8-audit-work-program",
+      "frank-van-dissel-uc9-quality-resource-guard"
+    ]
+  },
+  {
+    "name": "Group 5 Hackers (anonymous)",
+    "plans": [
+      "group-5-hackers-ai-audit-agents"
+    ]
+  },
+  {
+    "name": "Guus Focken",
+    "plans": [
+      "the-control-freaks-uc7-rcm-builder"
+    ]
+  },
+  {
+    "name": "Ilona Hofland",
+    "plans": [
+      "the-control-freaks-uc7-rcm-builder"
+    ]
+  },
+  {
+    "name": "Imane Akhyar",
+    "plans": [
+      "the-control-freaks-uc7-rcm-builder"
+    ]
+  },
+  {
+    "name": "Inge Garretsen",
+    "plans": [
+      "inge-garretsen-audit-work-program-agent"
+    ]
+  },
+  {
+    "name": "Joey Wild",
+    "plans": [
+      "the-control-freaks-uc7-rcm-builder"
+    ]
+  },
+  {
+    "name": "JohannesIV",
+    "plans": [
+      "johannesiv-policy-to-controls-extractor"
+    ]
+  },
+  {
+    "name": "Julian",
+    "plans": [
+      "linda-nyvelius-team-hightable"
+    ]
+  },
+  {
+    "name": "Juriën Huisman",
+    "plans": [
+      "diyve-garg-pbc-assistant-isabelle"
+    ]
+  },
+  {
+    "name": "KOEKENPAN",
+    "plans": [
+      "koekenpan-ia-fieldwork-preparation"
+    ]
+  },
+  {
+    "name": "Karim Zemouri",
+    "plans": [
+      "diyve-garg-pbc-assistant-isabelle"
+    ]
+  },
+  {
+    "name": "Linda Nyvelius",
+    "plans": [
+      "linda-nyvelius-team-hightable"
+    ]
+  },
+  {
+    "name": "Mathijs Schouten",
+    "plans": [
+      "ai-agent-visibility-scanner",
+      "ai-audit-explainability-framework",
+      "always-on-audit-agent",
+      "audit-agent-gamified-ui",
+      "audit-automation-overview",
+      "audit-evidence-visualization",
+      "audit-loop-orchestration-sdk",
+      "audit-memory-knowledge-system",
+      "audit-report-generator-from-work-program",
+      "audit-skills-transformation-curriculum",
+      "audit-subagent-coordination-framework",
+      "audit-workflow-automation-levels",
+      "cli-audit-system-wrapper",
+      "document-evidence-extraction-agent",
+      "eu-ai-act-compliance-monitor",
+      "llm-hallucination-detection-agent",
+      "n8n-audit-workflow-migration",
+      "on-premise-ai-compute-decision-framework",
+      "open-source-audit-agent-framework",
+      "overnight-audit-batch-processing-agent",
+      "owasp-ai-testing-agent",
+      "power-bi-audit-dashboard-mcp",
+      "saaf-intelligence-monitor",
+      "saaf-jira-confluence-mcp",
+      "saaf-rag-knowledge-base",
+      "saaf-skills-registry-and-matching",
+      "saaf-strapi-synthetic-data"
+    ]
+  },
+  {
+    "name": "Mollie Group X (anonymous)",
+    "plans": [
+      "mollie-group-x-evidence-audit"
+    ]
+  },
+  {
+    "name": "Mourad Fakirou",
+    "plans": [
+      "diyve-garg-pbc-assistant-isabelle",
+      "the-control-freaks-uc7-rcm-builder"
+    ]
+  },
+  {
+    "name": "Peter Jongen",
+    "plans": [
+      "the-control-freaks-uc7-rcm-builder"
+    ]
+  },
+  {
+    "name": "René Volwerk",
+    "plans": [
+      "rene-volwerk-compliance-harnas-configurator"
+    ]
+  },
+  {
+    "name": "Rohan Sobha",
+    "plans": [
+      "rohan-sobha-compliance-report-generator",
+      "rohan-sobha-judging-found-controls"
+    ]
+  },
+  {
+    "name": "Schuberg Philis",
+    "plans": [
+      "grc-copilot-mindshift-agent",
+      "icfcop-control-testing-agent"
+    ]
+  },
+  {
+    "name": "Team 67 (anonymous — five specialists in IT Audit, IT Risk, Compliance, and Data Management)",
+    "plans": [
+      "team-67-intelligent-audit-agents"
+    ]
+  },
+  {
+    "name": "The RCM Rangers",
+    "plans": [
+      "the-rcm-rangers-audit-work-program-agent"
+    ]
+  },
+  {
+    "name": "TheMonteCristo",
+    "plans": [
+      "themontechristo-threewaysecurity"
+    ]
+  },
+  {
+    "name": "Yellowraptor",
+    "plans": [
+      "yellowraptor-whats-the-news"
+    ]
+  },
+  {
+    "name": "immistyle",
+    "plans": [
+      "immistyle-cuec-crosscheck-agent"
+    ]
+  },
+  {
+    "name": "robeminem94",
+    "plans": [
+      "robeminem94-gdpr-ai-audit-agent",
+      "robeminem94-vendor-guard"
+    ]
+  }
+]
