@@ -17,10 +17,17 @@ const NAV_ITEMS = [
   { href: "/agent-library", label: "Agent Library", icon: "◈" },
 ];
 
+const ADMIN_USERNAME = "MSACC";
+
 export default function Navbar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const username = (session?.user as { githubUsername?: string })?.githubUsername;
+  const isAdmin = username === ADMIN_USERNAME;
+  const navItems = isAdmin
+    ? [...NAV_ITEMS, { href: "/admin", label: "Admin", icon: "⚙" }]
+    : NAV_ITEMS;
 
   return (
     <>
@@ -42,7 +49,7 @@ export default function Navbar() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-1">
-          {NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
             const active = pathname.startsWith(item.href);
             return (
               <Link
@@ -98,7 +105,7 @@ export default function Navbar() {
       {/* Mobile nav */}
       {mobileOpen && (
         <div className="md:hidden bg-surface border-b border-border px-4 py-2">
-          {NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
             const active = pathname.startsWith(item.href);
             return (
               <Link
