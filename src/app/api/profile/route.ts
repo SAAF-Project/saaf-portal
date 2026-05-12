@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getPrisma } from "@/lib/prisma";
+import { matchCompanyLogo } from "@/lib/logo-match";
 
 async function getSessionUser() {
   const session = await getServerSession(authOptions);
@@ -83,6 +84,14 @@ export async function PUT(request: NextRequest) {
   }
   if (body.showLogoOnWebsite !== undefined)
     data.showLogoOnWebsite = Boolean(body.showLogoOnWebsite);
+
+  if (data.organisation && !body.companyLogoUrl) {
+    const logo = matchCompanyLogo(data.organisation as string);
+    if (logo) {
+      data.companyLogoUrl = logo;
+      data.showLogoOnWebsite = true;
+    }
+  }
 
   const updated = await getPrisma().user.update({
     where: { id: user.id },
