@@ -19,7 +19,7 @@ export const authOptions: NextAuthOptions = {
       if (!username) return false;
 
       const isMember = await isOrgMember(username);
-      if (!isMember) return "/login?error=not-member";
+      if (!isMember) return `/login?error=not-member&username=${encodeURIComponent(username)}`;
 
       const existingUser = await getPrisma().user.findUnique({
         where: { githubUsername: username },

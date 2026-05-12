@@ -10,8 +10,9 @@ function LoginForm() {
   const error = searchParams.get("error");
   const isNotMember = error === "not-member";
 
-  const [showSignup, setShowSignup] = useState(isNotMember);
-  const [username, setUsername] = useState("");
+  const ghUsername = searchParams.get("username") || "";
+  const [showSignup, setShowSignup] = useState(false);
+  const [username, setUsername] = useState(ghUsername);
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -90,19 +91,18 @@ function LoginForm() {
             )}
 
             {isNotMember && (
-              <div className="mt-4 p-3 bg-saaf-yellow/10 border border-saaf-yellow/30 rounded-lg text-sm">
-                <p className="text-saaf-yellow font-semibold mb-1">
-                  Not a member yet
+              <div className="mt-4 p-4 bg-saaf-red/10 border border-saaf-red/30 rounded-lg">
+                <p className="text-saaf-red font-semibold text-sm mb-2">
+                  Access denied
                 </p>
-                <p className="text-muted text-xs">
-                  Your GitHub account is not part of the SAAF-Project
-                  organization.
+                <p className="text-muted text-xs mb-3">
+                  Your GitHub account{ghUsername ? ` (@${ghUsername})` : ""} is not a member of the SAAF-Project organization. You need an invitation before you can sign in.
                 </p>
                 <button
                   onClick={() => setShowSignup(true)}
-                  className="mt-2 text-accent text-xs font-medium hover:underline cursor-pointer"
+                  className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg cursor-pointer transition-colors"
                 >
-                  Request access →
+                  Request an invitation
                 </button>
               </div>
             )}
