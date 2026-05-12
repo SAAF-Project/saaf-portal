@@ -3,25 +3,27 @@ import { getPrisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { githubUsername, email } = body;
+  const rawUsername = body.githubUsername
+    ? String(body.githubUsername).replace("@", "").trim()
+    : "";
+  const rawEmail = body.email ? String(body.email).trim() : "";
 
-  if (!githubUsername || typeof githubUsername !== "string") {
+  if (!rawUsername && !rawEmail) {
     return NextResponse.json(
-      { error: "GitHub username is required" },
+      { error: "Please provide a GitHub username or email address" },
       { status: 400 }
     );
   }
 
-  const username = githubUsername.replace("@", "").trim();
-  if (!username) {
-    return NextResponse.json(
-      { error: "Invalid username" },
-      { status: 400 }
-    );
-  }
+  const identifier = rawUsername || rawEmail;
 
   const existing = await getPrisma().signupRequest.findFirst({
-    where: { githubUsername: username, status: "pending" },
+    where: {
+      OR: [
+        ...(rawUsername ? [{ githubUsername: rawUsername, status: "pending" }] : []),
+        ...(rawEmail ? [{ email: rawEmail, status: "pending" }] : []),
+      ],
+    },
   });
 
   if (existing) {
@@ -30,8 +32,8 @@ export async function POST(request: NextRequest) {
 
   await getPrisma().signupRequest.create({
     data: {
-      githubUsername: username,
-      email: email || null,
+      githubUsername: rawUsername || identifier,
+      email: rawEmail || null,
     },
   });
 

@@ -129,9 +129,29 @@ function LoginForm() {
           <div className="bg-surface border border-border rounded-2xl p-8">
             <h2 className="text-lg font-bold mb-1">Request access</h2>
             <p className="text-muted text-xs mb-4">
-              Enter your GitHub username to request an invitation to the
-              SAAF-Project organization.
+              Fill in at least one of the fields below to request an invitation
+              to the SAAF-Project GitHub organization.
             </p>
+
+            {/* GitHub requirement */}
+            <div className="mb-4 p-3 bg-accent/8 border border-accent/20 rounded-lg text-xs leading-relaxed">
+              <p className="text-accent font-semibold mb-1">
+                A GitHub account is required
+              </p>
+              <p className="text-muted">
+                SAAF uses GitHub for collaboration. If you don&apos;t have a
+                GitHub account yet, create one for free at{" "}
+                <a
+                  href="https://github.com/signup"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent font-medium hover:underline"
+                >
+                  github.com/signup
+                </a>{" "}
+                — then come back and fill in your username below.
+              </p>
+            </div>
 
             <div className="mb-4 p-3 bg-saaf-yellow/5 border border-saaf-yellow/20 rounded-lg text-xs text-muted leading-relaxed">
               <p className="text-saaf-yellow font-semibold mb-1">Disclaimer</p>
@@ -151,20 +171,22 @@ function LoginForm() {
             <form onSubmit={handleSignup}>
               <div className="mb-3">
                 <label className="block text-xs text-muted font-medium mb-1">
-                  GitHub username *
+                  GitHub username
                 </label>
                 <input
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="@username"
-                  required
                   className="w-full px-3 py-2 bg-bg border border-border rounded-lg text-sm text-text focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30"
                 />
+                <p className="text-[11px] text-muted mt-1">
+                  Your GitHub username (e.g. @johndoe)
+                </p>
               </div>
-              <div className="mb-4">
+              <div className="mb-1">
                 <label className="block text-xs text-muted font-medium mb-1">
-                  Email (optional)
+                  Email linked to GitHub
                 </label>
                 <input
                   type="email"
@@ -173,10 +195,16 @@ function LoginForm() {
                   placeholder="you@example.com"
                   className="w-full px-3 py-2 bg-bg border border-border rounded-lg text-sm text-text focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30"
                 />
+                <p className="text-[11px] text-muted mt-1">
+                  The email address linked to (or to be linked to) your GitHub account
+                </p>
               </div>
+              <p className="text-[11px] text-muted mb-4">
+                Fill in at least one of the above.
+              </p>
               <button
                 type="submit"
-                disabled={submitting || !username.trim()}
+                disabled={submitting || (!username.trim() && !email.trim())}
                 className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-semibold py-2.5 px-6 rounded-xl transition-all cursor-pointer"
               >
                 {submitting ? "Submitting..." : "Request access"}
