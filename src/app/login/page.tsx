@@ -170,8 +170,8 @@ function LoginForm() {
 
             <form onSubmit={handleSignup}>
               <div className="mb-3">
-                <label className="block text-xs text-muted font-medium mb-1">
-                  GitHub username
+                <label className="block text-xs font-semibold text-text mb-1">
+                  Option 1: GitHub username
                 </label>
                 <input
                   type="text"
@@ -181,12 +181,19 @@ function LoginForm() {
                   className="w-full px-3 py-2 bg-bg border border-border rounded-lg text-sm text-text focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30"
                 />
                 <p className="text-[11px] text-muted mt-1">
-                  Your GitHub username (e.g. @johndoe)
+                  Preferred — we&apos;ll send the invite directly to this account
                 </p>
               </div>
-              <div className="mb-1">
-                <label className="block text-xs text-muted font-medium mb-1">
-                  Email linked to GitHub
+
+              <div className="flex items-center gap-3 my-3">
+                <div className="flex-1 h-px bg-border" />
+                <span className="text-xs text-muted font-semibold">OR</span>
+                <div className="flex-1 h-px bg-border" />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-xs font-semibold text-text mb-1">
+                  Option 2: Email linked to GitHub
                 </label>
                 <input
                   type="email"
@@ -196,12 +203,9 @@ function LoginForm() {
                   className="w-full px-3 py-2 bg-bg border border-border rounded-lg text-sm text-text focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30"
                 />
                 <p className="text-[11px] text-muted mt-1">
-                  The email address linked to (or to be linked to) your GitHub account
+                  The email linked to your GitHub account — we&apos;ll look up your username
                 </p>
               </div>
-              <p className="text-[11px] text-muted mb-4">
-                Fill in at least one of the above.
-              </p>
               <button
                 type="submit"
                 disabled={submitting || (!username.trim() && !email.trim())}
