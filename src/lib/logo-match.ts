@@ -96,10 +96,39 @@ const BASE_URL = "https://saafproject.com/assets/logos/";
 export function matchCompanyLogo(organisation: string | null | undefined): string | null {
   if (!organisation) return null;
   const key = organisation.toLowerCase().trim();
+  if (!key) return null;
   const file = LOGOS[key];
   if (file) return `${BASE_URL}${file}`;
   for (const [k, v] of Object.entries(LOGOS)) {
     if (key.includes(k) || k.includes(key)) return `${BASE_URL}${v}`;
   }
   return null;
+}
+
+export interface OrgSuggestion {
+  name: string;
+  logoUrl: string;
+}
+
+export function suggestOrganisations(query: string): OrgSuggestion[] {
+  if (!query || query.length < 2) return [];
+  const q = query.toLowerCase().trim();
+  const seen = new Set<string>();
+  const results: OrgSuggestion[] = [];
+
+  for (const [key, file] of Object.entries(LOGOS)) {
+    if (key.includes(q) || q.includes(key)) {
+      const url = `${BASE_URL}${file}`;
+      if (!seen.has(url)) {
+        seen.add(url);
+        const name = key
+          .split(/[-\s]/)
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(" ");
+        results.push({ name, logoUrl: url });
+      }
+    }
+  }
+
+  return results.slice(0, 5);
 }

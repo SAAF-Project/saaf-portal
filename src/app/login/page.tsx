@@ -66,9 +66,22 @@ function LoginForm() {
               Sign in with GitHub
             </button>
 
-            <p className="text-muted text-xs text-center mt-4">
-              You must be a member of the SAAF-Project GitHub organization.
-            </p>
+            <div className="mt-4 p-3 bg-surface2 border border-border rounded-lg text-xs text-muted leading-relaxed">
+              <p className="mb-2">
+                <strong className="text-text">Already a SAAF member?</strong>{" "}
+                Sign in with the GitHub account that is part of the SAAF-Project organization.
+              </p>
+              <p>
+                <strong className="text-text">Not a member yet?</strong>{" "}
+                <button
+                  onClick={() => setShowSignup(true)}
+                  className="text-accent font-medium hover:underline cursor-pointer"
+                >
+                  Request access here
+                </button>{" "}
+                — you will receive a GitHub organization invite after approval.
+              </p>
+            </div>
 
             {error && !isNotMember && (
               <div className="mt-4 p-3 bg-saaf-red/10 border border-saaf-red/30 rounded-lg text-sm text-saaf-red">

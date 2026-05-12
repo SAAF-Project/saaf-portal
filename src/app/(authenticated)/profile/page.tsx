@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import UserAvatar from "@/components/UserAvatar";
 import SkillSliders from "@/components/SkillSliders";
 import { ROLES, TRACK_OPTIONS } from "@/lib/constants";
+import { suggestOrganisations, type OrgSuggestion } from "@/lib/logo-match";
 import type { UserProfile } from "@/types";
 
 export default function ProfilePage() {
@@ -11,6 +12,7 @@ export default function ProfilePage() {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<Partial<UserProfile>>({});
+  const [orgSuggestions, setOrgSuggestions] = useState<OrgSuggestion[]>([]);
 
   useEffect(() => {
     fetch("/api/profile")
@@ -101,12 +103,49 @@ export default function ProfilePage() {
             </Field>
             <Field label="Organisation" editing={editing}>
               {editing ? (
-                <input
-                  type="text"
-                  value={form.organisation || ""}
-                  onChange={(e) => setForm({ ...form, organisation: e.target.value })}
-                  className="w-full px-3 py-2 bg-bg border border-border rounded-lg text-sm text-text focus:outline-none focus:border-accent"
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={form.organisation || ""}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setForm({ ...form, organisation: val });
+                      setOrgSuggestions(suggestOrganisations(val));
+                    }}
+                    onBlur={() => setTimeout(() => setOrgSuggestions([]), 200)}
+                    className="w-full px-3 py-2 bg-bg border border-border rounded-lg text-sm text-text focus:outline-none focus:border-accent"
+                    placeholder="Start typing to see suggestions..."
+                  />
+                  {orgSuggestions.length > 0 && (
+                    <div className="absolute z-10 top-full left-0 right-0 mt-1 bg-surface border border-border rounded-lg shadow-lg overflow-hidden">
+                      {orgSuggestions.map((s) => (
+                        <button
+                          key={s.logoUrl}
+                          type="button"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => {
+                            setForm({
+                              ...form,
+                              organisation: s.name,
+                              companyLogoUrl: s.logoUrl,
+                              showLogoOnWebsite: true,
+                            });
+                            setOrgSuggestions([]);
+                          }}
+                          className="w-full flex items-center gap-3 px-3 py-2 hover:bg-accent/10 cursor-pointer text-left"
+                        >
+                          <img
+                            src={s.logoUrl}
+                            alt={s.name}
+                            className="h-6 w-6 object-contain"
+                            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                          />
+                          <span className="text-sm">{s.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               ) : (
                 <span>{profile.organisation || "-"}</span>
               )}
