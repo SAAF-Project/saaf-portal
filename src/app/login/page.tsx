@@ -19,7 +19,7 @@ function LoginForm() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username.trim()) return;
+    if (!username.trim() && !email.trim()) return;
     setSubmitting(true);
     try {
       const res = await fetch("/api/signup", {
