@@ -74,18 +74,15 @@ export default function DashboardPage() {
       {/* Quick stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         <div className="bg-surface border border-border rounded-xl p-4">
-          <div className="text-muted text-xs font-medium mb-1">Your Score</div>
+          <div className="text-muted text-xs font-medium mb-1">Score</div>
           <div className="text-2xl font-black">{loading ? "..." : myScore?.total ?? 0}</div>
         </div>
         <div className="bg-surface border border-border rounded-xl p-4 relative">
-          <div className="text-muted text-xs font-medium mb-1">Your Rank</div>
+          <div className="text-muted text-xs font-medium mb-1">Rank</div>
           <div className="text-2xl font-black">
             {loading ? "..." : myRank !== undefined && myRank >= 0 ? `#${myRank + 1}` : "-"}
           </div>
-          <Link
-            href="/leaderboard"
-            className="absolute bottom-3 right-3 text-[10px] text-accent hover:underline no-underline"
-          >
+          <Link href="/leaderboard" className="absolute bottom-3 right-3 text-[10px] text-accent hover:underline no-underline">
             Leaderboard →
           </Link>
         </div>
@@ -94,56 +91,13 @@ export default function DashboardPage() {
           <div className="text-2xl font-black">{loading ? "..." : myScore?.prs ?? 0}</div>
         </div>
         <div className="bg-surface border border-border rounded-xl p-4">
-          <div className="text-muted text-xs font-medium mb-1">Observability</div>
+          <div className="text-muted text-xs font-medium mb-1">Observability checks</div>
           <div className="text-2xl font-black">{loading ? "..." : achievement?.observabilityCount ?? 0}</div>
+          <div className="text-[10px] text-muted mt-0.5">submitted via Tracks</div>
         </div>
       </div>
 
-      {/* My Plans */}
-      {!loading && myPlans.length > 0 && (
-        <div className="mb-6 bg-surface border border-saaf-green/20 rounded-xl p-4">
-          <h2 className="text-xs font-bold text-saaf-green uppercase tracking-wider mb-3">
-            My Plans ({myPlans.length})
-          </h2>
-          <div className="space-y-2">
-            {myPlans.map((plan) => (
-              <div key={plan.slug} className="flex items-center gap-3">
-                <div className="flex-1 min-w-0">
-                  <a
-                    href={plan.github_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm font-medium text-accent hover:underline block truncate"
-                  >
-                    {plan.title || plan.slug}
-                  </a>
-                  <div className="flex gap-1.5 mt-0.5 flex-wrap">
-                    {plan.type && (
-                      <span className="text-[10px] px-1 py-0.5 rounded bg-accent/10 text-accent font-semibold">{plan.type}</span>
-                    )}
-                    {Object.entries(plan.pdca || {}).map(([phase, status]) => {
-                      const cls = status === "complete" ? "text-saaf-green" : status === "in_progress" ? "text-saaf-yellow" : "text-muted";
-                      return (
-                        <span key={phase} className={`text-[10px] ${cls}`}>
-                          {phase.charAt(0).toUpperCase()}: {status === "complete" ? "✓" : status === "in_progress" ? "..." : "○"}
-                        </span>
-                      );
-                    })}
-                  </div>
-                </div>
-                <Link
-                  href="/tracks"
-                  className="text-xs text-muted hover:text-accent no-underline shrink-0"
-                >
-                  Check →
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid md:grid-cols-2 gap-6 mb-6">
         {/* Quick links */}
         <div>
           <h2 className="text-xs font-bold text-muted uppercase tracking-wider mb-3">Quick links</h2>
@@ -199,6 +153,47 @@ export default function DashboardPage() {
           )}
         </div>
       </div>
+
+      {/* My Plans — at the bottom */}
+      {!loading && myPlans.length > 0 && (
+        <div className="bg-surface border border-saaf-green/20 rounded-xl p-4">
+          <h2 className="text-xs font-bold text-saaf-green uppercase tracking-wider mb-3">
+            My Plans ({myPlans.length})
+          </h2>
+          <div className="space-y-2">
+            {myPlans.map((plan) => (
+              <div key={plan.slug} className="flex items-center gap-3">
+                <div className="flex-1 min-w-0">
+                  <a
+                    href={plan.github_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium text-accent hover:underline block truncate"
+                  >
+                    {plan.title || plan.slug}
+                  </a>
+                  <div className="flex gap-1.5 mt-0.5 flex-wrap">
+                    {plan.type && (
+                      <span className="text-[10px] px-1 py-0.5 rounded bg-accent/10 text-accent font-semibold">{plan.type}</span>
+                    )}
+                    {Object.entries(plan.pdca || {}).map(([phase, status]) => {
+                      const cls = status === "complete" ? "text-saaf-green" : status === "in_progress" ? "text-saaf-yellow" : "text-muted";
+                      return (
+                        <span key={phase} className={`text-[10px] ${cls}`}>
+                          {phase.charAt(0).toUpperCase()}: {status === "complete" ? "✓" : status === "in_progress" ? "..." : "○"}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+                <Link href="/tracks" className="text-xs text-muted hover:text-accent no-underline shrink-0">
+                  View in Tracks →
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

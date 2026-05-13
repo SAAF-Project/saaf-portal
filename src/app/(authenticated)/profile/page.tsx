@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import UserAvatar from "@/components/UserAvatar";
 import SkillSliders from "@/components/SkillSliders";
+import AchievementBadge from "@/components/AchievementBadge";
 import { ROLES, TRACK_OPTIONS } from "@/lib/constants";
 import { suggestOrganisations, type OrgSuggestion } from "@/lib/logo-match";
-import type { UserProfile } from "@/types";
+import type { UserProfile, Achievement } from "@/types";
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -13,14 +14,16 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<Partial<UserProfile>>({});
   const [orgSuggestions, setOrgSuggestions] = useState<OrgSuggestion[]>([]);
+  const [achievement, setAchievement] = useState<Achievement | null>(null);
 
   useEffect(() => {
     fetch("/api/profile")
       .then((r) => r.json())
-      .then((data) => {
-        setProfile(data);
-        setForm(data);
-      });
+      .then((data) => { setProfile(data); setForm(data); });
+    fetch("/api/achievements")
+      .then((r) => r.json())
+      .then(setAchievement)
+      .catch(() => {});
   }, []);
 
   const handleSave = async () => {
@@ -223,6 +226,15 @@ export default function ProfilePage() {
               disabled={!editing}
             />
           </div>
+
+          {/* Achievement badge */}
+          {achievement !== null && (
+            <AchievementBadge
+              level={achievement.observabilityLevel}
+              count={achievement.observabilityCount}
+              nextLevelAt={achievement.nextLevelAt}
+            />
+          )}
 
           <div className="grid grid-cols-2 gap-4">
             <Field label="Company Logo URL" editing={editing}>

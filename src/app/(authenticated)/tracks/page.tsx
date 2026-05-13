@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import type { Track, Plan, Submitter, UserProfile } from "@/types";
 import PlanMarkdownViewer from "@/components/PlanMarkdownViewer";
-import ObservabilityModal from "@/components/ObservabilityModal";
+import ObservabilityPanel from "@/components/ObservabilityPanel";
 import Link from "next/link";
 import { getUserPlans } from "@/lib/plan-match";
 
@@ -39,13 +39,12 @@ function PdcaPill({ phase, status }: { phase: string; status: string }) {
 function ExpandablePlan({
   plan,
   isYours,
-  onObservability,
 }: {
   plan: Plan;
   isYours: boolean;
-  onObservability: (plan: Plan) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const [showObservability, setShowObservability] = useState(false);
 
   return (
     <div className={`border rounded-xl mb-2 transition-all ${isYours ? "border-saaf-green/40 bg-saaf-green/5" : "border-border bg-surface"}`}>
@@ -82,24 +81,35 @@ function ExpandablePlan({
 
       {expanded && (
         <div className="border-t border-border">
-          <div className="flex items-center gap-3 px-4 py-2.5 border-b border-border">
-            <a
-              href={plan.github_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-accent hover:underline"
-            >
+          {/* Toolbar */}
+          <div className="flex items-center gap-3 px-4 py-2 border-b border-border bg-surface2/30">
+            <a href={plan.github_url} target="_blank" rel="noopener noreferrer" className="text-xs text-accent hover:underline">
               View on GitHub ↗
             </a>
             <div className="flex-1" />
             <button
-              onClick={(e) => { e.stopPropagation(); onObservability(plan); }}
-              className="text-xs px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold cursor-pointer transition-colors"
+              onClick={() => setShowObservability(!showObservability)}
+              className={`text-xs px-3 py-1.5 rounded-lg font-semibold cursor-pointer transition-colors border ${
+                showObservability
+                  ? "border-accent bg-accent/10 text-accent"
+                  : "border-border text-muted hover:text-text hover:border-accent/30"
+              }`}
             >
-              + Observability Check
+              {showObservability ? "Hide observability" : "Observability notes"}
             </button>
           </div>
-          <PlanMarkdownViewer session={plan.session} slug={plan.slug} />
+
+          {/* Content: plan markdown + optionally observability side by side */}
+          <div className={showObservability ? "grid grid-cols-1 lg:grid-cols-2" : ""}>
+            <div className={showObservability ? "border-r border-border overflow-y-auto max-h-[600px]" : ""}>
+              <PlanMarkdownViewer session={plan.session} slug={plan.slug} />
+            </div>
+            {showObservability && (
+              <div className="overflow-y-auto max-h-[600px]">
+                <ObservabilityPanel planSlug={plan.slug} />
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
@@ -111,8 +121,6 @@ export default function TracksPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [submitters, setSubmitters] = useState<Submitter[]>([]);
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [observabilityPlan, setObservabilityPlan] = useState<Plan | null>(null);
-  const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -131,11 +139,6 @@ export default function TracksPage() {
   const userPlans = profile ? getUserPlans(plans, profile, submitters) : [];
   const userPlanSlugs = new Set(userPlans.map((p) => p.slug));
   const enrolledTrackId = profile?.preferredTrack;
-
-  const showToast = (msg: string) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), 4000);
-  };
 
   if (!tracks.length) {
     return <div className="text-muted text-center py-12">Loading...</div>;
@@ -254,7 +257,6 @@ export default function TracksPage() {
                     key={plan.slug}
                     plan={plan}
                     isYours={userPlanSlugs.has(plan.slug)}
-                    onObservability={setObservabilityPlan}
                   />
                 ))}
               </div>
@@ -263,23 +265,6 @@ export default function TracksPage() {
         );
       })}
 
-      {observabilityPlan && (
-        <ObservabilityModal
-          planSlug={observabilityPlan.slug}
-          planTitle={observabilityPlan.title || observabilityPlan.slug}
-          onClose={() => setObservabilityPlan(null)}
-          onSubmitted={(count) => {
-            setObservabilityPlan(null);
-            showToast(`✓ Observability check submitted! Total checks: ${count}`);
-          }}
-        />
-      )}
-
-      {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-saaf-green text-bg px-5 py-3 rounded-xl font-semibold text-sm shadow-lg z-50 whitespace-nowrap">
-          {toast}
-        </div>
-      )}
     </div>
   );
 }

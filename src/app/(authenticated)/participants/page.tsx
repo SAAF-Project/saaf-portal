@@ -41,13 +41,21 @@ export default function ParticipantsPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const orgs = [...new Set(participants.map((p) => p.organisation).filter(Boolean))].sort() as string[];
+  // Normalize org names: group by lowercase for deduplication in filter
+  const orgMap = new Map<string, string>();
+  participants.forEach((p) => {
+    if (p.organisation) {
+      const key = p.organisation.toLowerCase().trim();
+      if (!orgMap.has(key)) orgMap.set(key, p.organisation);
+    }
+  });
+  const orgs = [...orgMap.values()].sort();
   const roles = ["Auditor", "Vaktechniek", "Analyst", "Engineer"];
 
   const filtered = participants.filter((p) => {
     if (filterRole && p.role !== filterRole) return false;
     if (filterTrack && p.preferredTrack !== filterTrack) return false;
-    if (filterOrg && p.organisation !== filterOrg) return false;
+    if (filterOrg && p.organisation?.toLowerCase().trim() !== filterOrg.toLowerCase().trim()) return false;
     if (search) {
       const q = search.toLowerCase();
       return (

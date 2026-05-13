@@ -15,7 +15,7 @@ export default function PlanMarkdownViewer({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const url = `https://raw.githubusercontent.com/SAAF-Project/SAAF-Project/main/plans/${session}/${slug}.md`;
+    const url = `/api/plan-content?session=${encodeURIComponent(session)}&slug=${encodeURIComponent(slug)}`;
     fetch(url)
       .then((r) => {
         if (!r.ok) throw new Error("Not found");
@@ -48,6 +48,7 @@ export default function PlanMarkdownViewer({
         >
           View on GitHub ↗
         </a>
+        <span className="text-xs text-muted ml-2">(plan might be in a sub-directory)</span>
       </div>
     );
   }
