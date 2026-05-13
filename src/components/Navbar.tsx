@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: "◆" },
   { href: "/profile", label: "Profile", icon: "●" },
   { href: "/leaderboard", label: "Leaderboard", icon: "★" },
+  { href: "/participants", label: "Participants", icon: "👥" },
   { href: "/tracks", label: "Tracks", icon: "▶" },
   { href: "/my-repos", label: "My Repos", icon: "◇" },
   { href: "/onboarding", label: "How to Contribute", icon: "→" },

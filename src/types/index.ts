@@ -76,3 +76,26 @@ export interface UserProfile {
 export interface TrackTasks {
   [trackId: number]: { time: string; task: string }[];
 }
+
+export interface Participant {
+  id: string;
+  githubUsername: string;
+  name: string | null;
+  avatarUrl: string | null;
+  organisation: string | null;
+  companyLogoUrl: string | null;
+  role: string | null;
+  preferredTrack: string | null;
+  skillPrompts: number;
+  skillTools: number;
+  skillRegulatory: number;
+  skillOutputs: number;
+}
+
+export interface Achievement {
+  observabilityCount: number;
+  observabilityLevel: number;
+  observabilityLabel: string;
+  observabilityIcon: string;
+  nextLevelAt: number | null;
+}

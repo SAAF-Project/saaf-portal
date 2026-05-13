@@ -72,47 +72,30 @@ export async function fetchMergedPRs(): Promise<PRCache> {
 }
 
 export async function fetchUserOrgRepos(username: string): Promise<OrgRepo[]> {
-  const repos: OrgRepo[] = [];
-  let page = 1;
+  const res = await githubFetch(
+    `${API}/search/repositories?q=org:${ORG}+involves:${username}&per_page=30&sort=updated`
+  );
+  const data = await res.json();
 
-  while (true) {
-    const res = await githubFetch(
-      `${API}/orgs/${ORG}/repos?per_page=100&page=${page}`
-    );
-    const data = await res.json();
-    if (!Array.isArray(data) || data.length === 0) break;
+  if (!Array.isArray(data?.items)) return [];
 
-    for (const repo of data) {
-      if (repo.owner?.login === username || repo.fork) {
-        const contribRes = await githubFetch(
-          `${API}/repos/${ORG}/${repo.name}/contributors`
-        );
-        const contributors = await contribRes.json();
-        if (
-          Array.isArray(contributors) &&
-          contributors.some(
-            (c: { login: string }) =>
-              c.login.toLowerCase() === username.toLowerCase()
-          )
-        ) {
-          repos.push({
-            name: repo.name,
-            description: repo.description,
-            language: repo.language,
-            updated_at: repo.updated_at,
-            html_url: repo.html_url,
-            stargazers_count: repo.stargazers_count,
-            fork: repo.fork,
-          });
-        }
-      }
-    }
-
-    if (data.length < 100) break;
-    page++;
-  }
-
-  return repos;
+  return data.items.map((repo: {
+    name: string;
+    description: string | null;
+    language: string | null;
+    updated_at: string;
+    html_url: string;
+    stargazers_count: number;
+    fork: boolean;
+  }) => ({
+    name: repo.name,
+    description: repo.description,
+    language: repo.language,
+    updated_at: repo.updated_at,
+    html_url: repo.html_url,
+    stargazers_count: repo.stargazers_count,
+    fork: repo.fork,
+  }));
 }
 
 interface GitHubPR {
