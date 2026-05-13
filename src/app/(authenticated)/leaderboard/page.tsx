@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import LeaderboardCard from "@/components/LeaderboardCard";
 import ActivityFeed from "@/components/ActivityFeed";
 import type { ScoreEntry, ActivityEntry } from "@/types";
@@ -17,6 +17,8 @@ export default function LeaderboardPage() {
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<ScoreEntry | null>(null);
+  const [tooltip, setTooltip] = useState<string | null>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -47,22 +49,45 @@ export default function LeaderboardPage() {
       </div>
 
       {/* Scoring rules */}
-      <div className="flex items-center gap-1.5 flex-wrap p-2 px-3 bg-surface border border-accent/12 rounded-lg mb-4 text-xs">
-        <span className="text-[11px] font-bold text-muted uppercase tracking-wider mr-1">
-          Score
-        </span>
-        <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-saaf-green/12 text-saaf-green font-bold">
-          +10 Merged PR <small className="font-normal opacity-70">max 5</small>
-        </span>
-        <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-accent/15 text-accent font-bold">
-          +15 New plan <small className="font-normal opacity-70">max 3</small>
-        </span>
-        <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-saaf-purple/12 text-saaf-purple font-bold">
-          +5 Plan update <small className="font-normal opacity-70">no cap</small>
-        </span>
-        <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-saaf-yellow/12 text-saaf-yellow font-bold">
-          +5 Claim <small className="font-normal opacity-70">max 2</small>
-        </span>
+      <div className="relative flex items-center gap-1.5 flex-wrap p-2 px-3 bg-surface border border-accent/12 rounded-lg mb-4 text-xs">
+        <span className="text-[11px] font-bold text-muted uppercase tracking-wider mr-1">Score</span>
+        {[
+          {
+            label: "+10 Merged PR", cap: "max 5", color: "bg-saaf-green/12 text-saaf-green",
+            info: "Open a PR to the SAAF-Project/SAAF-Project repo and get it merged. Fork the repo, make your changes, and submit via gh pr create. Each merged PR = 10 pts (capped at 5 PRs = 50 pts)."
+          },
+          {
+            label: "+15 New plan", cap: "max 3", color: "bg-accent/15 text-accent",
+            info: "Add a new plan file to plans/hackathon-X/ in your PR. Copy the template from docs/plans/plan-template.md and fill in at least sections 1–3. Each new plan file = 15 pts (capped at 3 = 45 pts)."
+          },
+          {
+            label: "+5 Plan update", cap: "no cap", color: "bg-saaf-purple/12 text-saaf-purple",
+            info: "Edit an existing plan file in your PR — update the PDCA status, improve sections, add prompts or findings. Each unique plan file updated = 5 pts (no cap)."
+          },
+          {
+            label: "+5 Claim", cap: "max 2", color: "bg-saaf-yellow/12 text-saaf-yellow",
+            info: "Signal that you are implementing a plan at your organisation. Open any plan file, find the 'Claimed By' field in Section 1 metadata, and set it to your name. This prevents duplication and shows the community what's being built. Each claim = 5 pts (capped at 2 = 10 pts)."
+          },
+        ].map((item) => (
+          <span key={item.label} className="relative group">
+            <span className={`flex items-center gap-1 px-2 py-0.5 rounded font-bold cursor-default ${item.color}`}>
+              {item.label}
+              <small className="font-normal opacity-70">{item.cap}</small>
+              <button
+                className="ml-0.5 opacity-50 hover:opacity-100 cursor-pointer text-[10px] leading-none"
+                onMouseEnter={() => setTooltip(item.label)}
+                onMouseLeave={() => setTooltip(null)}
+              >
+                ⓘ
+              </button>
+            </span>
+            {tooltip === item.label && (
+              <div className="absolute bottom-full left-0 mb-2 w-64 p-3 bg-surface2 border border-border rounded-xl text-[11px] text-muted leading-relaxed z-50 shadow-xl font-normal">
+                {item.info}
+              </div>
+            )}
+          </span>
+        ))}
       </div>
 
       {loading ? (
