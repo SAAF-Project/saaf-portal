@@ -227,15 +227,6 @@ export default function ProfilePage() {
             />
           </div>
 
-          {/* Achievement badge */}
-          {achievement !== null && (
-            <AchievementBadge
-              level={achievement.observabilityLevel}
-              count={achievement.observabilityCount}
-              nextLevelAt={achievement.nextLevelAt}
-            />
-          )}
-
           <div className="grid grid-cols-2 gap-4">
             <Field label="Company Logo URL" editing={editing}>
               {editing ? (
@@ -295,6 +286,22 @@ export default function ProfilePage() {
             >
               {saving ? "Saving..." : "Save"}
             </button>
+          </div>
+        )}
+      </div>
+
+      {/* Achievements — separate section */}
+      <div className="mt-6">
+        <h2 className="text-lg font-extrabold mb-3">Achievements</h2>
+        {achievement !== null ? (
+          <AchievementBadge
+            level={achievement.observabilityLevel}
+            count={achievement.observabilityCount}
+            nextLevelAt={achievement.nextLevelAt}
+          />
+        ) : (
+          <div className="bg-surface border border-border rounded-xl p-4 text-muted text-sm">
+            Loading achievements...
           </div>
         )}
       </div>
