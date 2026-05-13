@@ -74,6 +74,7 @@ export async function fetchMergedPRs(): Promise<PRCache> {
 export async function fetchUserOrgRepos(username: string): Promise<OrgRepo[]> {
   const repos: OrgRepo[] = [];
   let page = 1;
+  const usernameLower = username.toLowerCase();
 
   while (true) {
     const res = await githubFetch(
@@ -83,17 +84,39 @@ export async function fetchUserOrgRepos(username: string): Promise<OrgRepo[]> {
     if (!Array.isArray(data) || data.length === 0) break;
 
     for (const repo of data) {
+      // Check multiple signals for user contribution: contributors, recent commits, PRs
+      let contributed = false;
+      let prCount = 0;
+
+      // Signal 1: Contributors API
       const contribRes = await githubFetch(
         `${API}/repos/${ORG}/${repo.name}/contributors?per_page=100`
       );
-      if (!contribRes.ok) continue;
-      const contributors = await contribRes.json();
-      if (
-        Array.isArray(contributors) &&
-        contributors.some(
-          (c: { login: string }) => c.login.toLowerCase() === username.toLowerCase()
-        )
-      ) {
+      if (contribRes.ok) {
+        const contributors = await contribRes.json();
+        if (
+          Array.isArray(contributors) &&
+          contributors.some((c: { login: string }) => c.login.toLowerCase() === usernameLower)
+        ) {
+          contributed = true;
+        }
+      }
+
+      // Signal 2: PRs by this user (catches PRs that haven't been merged yet)
+      if (!contributed) {
+        const prRes = await githubFetch(
+          `${API}/search/issues?q=repo:${ORG}/${repo.name}+author:${username}+type:pr&per_page=1`
+        );
+        if (prRes.ok) {
+          const prData = await prRes.json();
+          if (prData?.total_count > 0) {
+            contributed = true;
+            prCount = prData.total_count;
+          }
+        }
+      }
+
+      if (contributed) {
         repos.push({
           name: repo.name,
           description: repo.description,
@@ -102,6 +125,7 @@ export async function fetchUserOrgRepos(username: string): Promise<OrgRepo[]> {
           html_url: repo.html_url,
           stargazers_count: repo.stargazers_count,
           fork: repo.fork,
+          prCount,
         });
       }
     }
@@ -144,4 +168,5 @@ export interface OrgRepo {
   html_url: string;
   stargazers_count: number;
   fork: boolean;
+  prCount?: number;
 }
