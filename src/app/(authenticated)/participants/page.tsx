@@ -122,9 +122,9 @@ export default function ParticipantsPage() {
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
           {filtered.map((p) => (
-            <div key={p.id} className={`border rounded-xl p-4 transition-all ${p.isPlaceholder ? "bg-surface/50 border-border/50 opacity-75" : "bg-surface border-border hover:border-accent/30"}`}>
+            <div key={p.id} className={`border rounded-xl p-4 transition-all ${p.githubId < 0 ? "bg-surface/50 border-border/50 opacity-75" : "bg-surface border-border hover:border-accent/30"}`}>
               <div className="flex items-center gap-3 mb-3">
-                {p.isPlaceholder ? (
+                {p.githubId < 0 ? (
                   <div className="w-10 h-10 rounded-full bg-surface2 border border-border shrink-0 flex items-center justify-center text-muted text-lg">
                     ?
                   </div>
@@ -138,7 +138,7 @@ export default function ParticipantsPage() {
                 )}
                 <div className="min-w-0 flex-1">
                   <div className="font-semibold text-sm truncate">{p.name || p.githubUsername}</div>
-                  {p.isPlaceholder ? (
+                  {p.githubId < 0 ? (
                     <div className="text-[10px] text-muted italic">No GitHub account linked</div>
                   ) : (
                     <div className="text-muted text-xs">@{p.githubUsername}</div>

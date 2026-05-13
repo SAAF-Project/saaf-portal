@@ -21,7 +21,7 @@ export async function GET() {
       skillTools: true,
       skillRegulatory: true,
       skillOutputs: true,
-      isPlaceholder: true,
+      githubId: true,
     },
     orderBy: [{ name: "asc" }],
   });

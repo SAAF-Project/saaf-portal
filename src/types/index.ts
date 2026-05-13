@@ -90,7 +90,7 @@ export interface Participant {
   skillTools: number;
   skillRegulatory: number;
   skillOutputs: number;
-  isPlaceholder: boolean;
+  githubId: number;
 }
 
 export interface Achievement {

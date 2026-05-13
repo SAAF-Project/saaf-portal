@@ -1,4 +1,5 @@
 import { config } from "dotenv";
+config({ path: ".env.production.local" });
 config({ path: ".env.local" });
 
 import { Octokit } from "@octokit/rest";
@@ -123,7 +124,6 @@ async function main() {
             skillRegulatory: reg.skills.regulatory,
             skillOutputs: reg.skills.outputs,
             registrationIssue: reg.issueNum,
-            isPlaceholder: true,
             ...(logo ? { companyLogoUrl: logo, showLogoOnWebsite: true } : {}),
           },
           create: {
@@ -138,7 +138,6 @@ async function main() {
             skillRegulatory: reg.skills.regulatory,
             skillOutputs: reg.skills.outputs,
             registrationIssue: reg.issueNum,
-            isPlaceholder: true,
             ...(logo ? { companyLogoUrl: logo, showLogoOnWebsite: true } : {}),
           },
         });
@@ -170,7 +169,6 @@ async function main() {
             skillRegulatory: reg.skills.regulatory,
             skillOutputs: reg.skills.outputs,
             registrationIssue: reg.issueNum,
-            isPlaceholder: true,
             ...(logo ? { companyLogoUrl: logo, showLogoOnWebsite: true } : {}),
           },
           create: {
@@ -185,7 +183,6 @@ async function main() {
             skillRegulatory: reg.skills.regulatory,
             skillOutputs: reg.skills.outputs,
             registrationIssue: reg.issueNum,
-            isPlaceholder: true,
             ...(logo ? { companyLogoUrl: logo, showLogoOnWebsite: true } : {}),
           },
         });
