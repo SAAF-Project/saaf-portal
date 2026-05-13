@@ -54,7 +54,12 @@ export default function ParticipantsPage() {
 
   const filtered = participants.filter((p) => {
     if (filterRole && p.role !== filterRole) return false;
-    if (filterTrack && p.preferredTrack !== filterTrack) return false;
+    if (filterTrack) {
+      const t = p.preferredTrack || "";
+      const match = t === filterTrack ||
+        (filterTrack.startsWith(t) && t.length > 0 && /^\d+$/.test(t));
+      if (!match) return false;
+    }
     if (filterOrg && p.organisation?.toLowerCase().trim() !== filterOrg.toLowerCase().trim()) return false;
     if (search) {
       const q = search.toLowerCase();
