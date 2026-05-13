@@ -122,17 +122,27 @@ export default function ParticipantsPage() {
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
           {filtered.map((p) => (
-            <div key={p.id} className="bg-surface border border-border rounded-xl p-4 hover:border-accent/30 transition-all">
+            <div key={p.id} className={`border rounded-xl p-4 transition-all ${p.isPlaceholder ? "bg-surface/50 border-border/50 opacity-75" : "bg-surface border-border hover:border-accent/30"}`}>
               <div className="flex items-center gap-3 mb-3">
-                <img
-                  src={p.avatarUrl || `https://github.com/${p.githubUsername}.png?size=96`}
-                  alt={p.name || p.githubUsername}
-                  className="w-10 h-10 rounded-full border border-border shrink-0"
-                  onError={(e) => { (e.target as HTMLImageElement).src = `https://github.com/${p.githubUsername}.png?size=96`; }}
-                />
+                {p.isPlaceholder ? (
+                  <div className="w-10 h-10 rounded-full bg-surface2 border border-border shrink-0 flex items-center justify-center text-muted text-lg">
+                    ?
+                  </div>
+                ) : (
+                  <img
+                    src={p.avatarUrl || `https://github.com/${p.githubUsername}.png?size=96`}
+                    alt={p.name || p.githubUsername}
+                    className="w-10 h-10 rounded-full border border-border shrink-0"
+                    onError={(e) => { (e.target as HTMLImageElement).src = `https://github.com/${p.githubUsername}.png?size=96`; }}
+                  />
+                )}
                 <div className="min-w-0 flex-1">
                   <div className="font-semibold text-sm truncate">{p.name || p.githubUsername}</div>
-                  <div className="text-muted text-xs">@{p.githubUsername}</div>
+                  {p.isPlaceholder ? (
+                    <div className="text-[10px] text-muted italic">No GitHub account linked</div>
+                  ) : (
+                    <div className="text-muted text-xs">@{p.githubUsername}</div>
+                  )}
                 </div>
                 {p.companyLogoUrl && (
                   <img

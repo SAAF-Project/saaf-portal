@@ -25,6 +25,7 @@ model User {
   companyLogoUrl       String?
   showLogoOnWebsite    Boolean              @default(false)
   registrationIssue    Int?
+  isPlaceholder        Boolean              @default(false)
   createdAt            DateTime             @default(now())
   updatedAt            DateTime             @updatedAt
   observabilityChecks  ObservabilityCheck[]

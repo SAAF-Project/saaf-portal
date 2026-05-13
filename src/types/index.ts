@@ -90,6 +90,7 @@ export interface Participant {
   skillTools: number;
   skillRegulatory: number;
   skillOutputs: number;
+  isPlaceholder: boolean;
 }
 
 export interface Achievement {

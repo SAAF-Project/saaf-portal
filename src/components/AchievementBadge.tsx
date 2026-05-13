@@ -70,7 +70,7 @@ export default function AchievementBadge({
           <div className="h-1.5 bg-border rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full bg-gradient-to-r from-accent to-saaf-purple transition-all`}
-              style={{ width: `${Math.min(100, ((count - THRESHOLDS[level]) / (nextLevelAt - THRESHOLDS[level])) * 100)}%` }}
+              style={{ width: `${level > 0 ? Math.max(4, Math.min(100, ((count - THRESHOLDS[level]) / (nextLevelAt - THRESHOLDS[level])) * 100)) : 0}%` }}
             />
           </div>
         </div>

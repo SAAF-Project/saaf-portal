@@ -21,6 +21,7 @@ export async function GET() {
       skillTools: true,
       skillRegulatory: true,
       skillOutputs: true,
+      isPlaceholder: true,
     },
     orderBy: [{ name: "asc" }],
   });

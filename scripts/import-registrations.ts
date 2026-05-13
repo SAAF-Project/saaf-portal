@@ -104,22 +104,100 @@ async function main() {
       user: issue.user ? { login: issue.user.login } : null,
     });
 
-    if (!reg.github) {
-      failures.push(`#${issue.number}: No GitHub username found`);
-      failed++;
+    const logo = matchCompanyLogo(reg.org);
+
+    // If no valid GitHub username, create a placeholder entry
+    if (!reg.github || !reg.github.match(/^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/)) {
+      const placeholderUsername = `_placeholder_${issue.number}`;
+      const placeholderId = -(issue.number);
+      try {
+        await prisma.user.upsert({
+          where: { githubId: placeholderId },
+          update: {
+            name: reg.name || undefined,
+            organisation: reg.org || undefined,
+            role: reg.role || undefined,
+            preferredTrack: reg.subtrack || undefined,
+            skillPrompts: reg.skills.prompts,
+            skillTools: reg.skills.tools,
+            skillRegulatory: reg.skills.regulatory,
+            skillOutputs: reg.skills.outputs,
+            registrationIssue: reg.issueNum,
+            isPlaceholder: true,
+            ...(logo ? { companyLogoUrl: logo, showLogoOnWebsite: true } : {}),
+          },
+          create: {
+            githubId: placeholderId,
+            githubUsername: placeholderUsername,
+            name: reg.name,
+            organisation: reg.org,
+            role: reg.role,
+            preferredTrack: reg.subtrack,
+            skillPrompts: reg.skills.prompts,
+            skillTools: reg.skills.tools,
+            skillRegulatory: reg.skills.regulatory,
+            skillOutputs: reg.skills.outputs,
+            registrationIssue: reg.issueNum,
+            isPlaceholder: true,
+            ...(logo ? { companyLogoUrl: logo, showLogoOnWebsite: true } : {}),
+          },
+        });
+        imported++;
+        console.log(`  ✓ #${issue.number}: ${reg.name} (placeholder, no GitHub) → ${reg.subtrack || "no track"}`);
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        failures.push(`#${issue.number}: placeholder DB error: ${msg}`);
+        failed++;
+      }
       continue;
     }
 
     const githubId = await resolveGithubId(reg.github);
     if (!githubId) {
-      failures.push(
-        `#${issue.number}: Could not resolve GitHub user "${reg.github}"`
-      );
-      failed++;
+      // Try to create placeholder with the name we have
+      const placeholderUsername = `_placeholder_${issue.number}`;
+      const placeholderId = -(issue.number);
+      try {
+        await prisma.user.upsert({
+          where: { githubId: placeholderId },
+          update: {
+            name: reg.name || undefined,
+            organisation: reg.org || undefined,
+            role: reg.role || undefined,
+            preferredTrack: reg.subtrack || undefined,
+            skillPrompts: reg.skills.prompts,
+            skillTools: reg.skills.tools,
+            skillRegulatory: reg.skills.regulatory,
+            skillOutputs: reg.skills.outputs,
+            registrationIssue: reg.issueNum,
+            isPlaceholder: true,
+            ...(logo ? { companyLogoUrl: logo, showLogoOnWebsite: true } : {}),
+          },
+          create: {
+            githubId: placeholderId,
+            githubUsername: placeholderUsername,
+            name: reg.name,
+            organisation: reg.org,
+            role: reg.role,
+            preferredTrack: reg.subtrack,
+            skillPrompts: reg.skills.prompts,
+            skillTools: reg.skills.tools,
+            skillRegulatory: reg.skills.regulatory,
+            skillOutputs: reg.skills.outputs,
+            registrationIssue: reg.issueNum,
+            isPlaceholder: true,
+            ...(logo ? { companyLogoUrl: logo, showLogoOnWebsite: true } : {}),
+          },
+        });
+        imported++;
+        console.log(`  ✓ #${issue.number}: ${reg.name} (placeholder, unresolved: "${reg.github}") → ${reg.subtrack || "no track"}`);
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        failures.push(`#${issue.number}: placeholder DB error: ${msg}`);
+        failed++;
+      }
       continue;
     }
-
-    const logo = matchCompanyLogo(reg.org);
 
     try {
       await prisma.user.upsert({
