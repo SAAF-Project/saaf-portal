@@ -2,29 +2,30 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getPrisma } from "@/lib/prisma";
+import { computeBadge, BADGE_KEYS } from "@/lib/achievements";
+import { fetchMergedPRs } from "@/lib/github";
+import { calculateScores } from "@/lib/scoring";
+import type { Plan } from "@/types";
+import { readFileSync } from "fs";
+import { join } from "path";
 
-export function getObservabilityLevel(count: number): number {
-  if (count >= 36) return 5;
-  if (count >= 21) return 4;
-  if (count >= 11) return 3;
-  if (count >= 6) return 2;
-  if (count >= 1) return 1;
-  return 0;
+let cachedScores: { data: ReturnType<typeof calculateScores>; ts: number } | null = null;
+const CACHE_TTL = 60_000;
+
+async function getScores() {
+  if (cachedScores && Date.now() - cachedScores.ts < CACHE_TTL) {
+    return cachedScores.data;
+  }
+  const prCache = await fetchMergedPRs();
+  let plansData: Plan[] = [];
+  try {
+    const filePath = join(process.cwd(), "public", "data", "plans.json");
+    plansData = JSON.parse(readFileSync(filePath, "utf-8"));
+  } catch {}
+  const data = calculateScores(prCache, plansData, "all");
+  cachedScores = { data, ts: Date.now() };
+  return data;
 }
-
-export function getNextLevelAt(count: number): number | null {
-  if (count < 1) return 1;
-  if (count < 6) return 6;
-  if (count < 11) return 11;
-  if (count < 21) return 21;
-  if (count < 36) return 36;
-  return null;
-}
-
-const LEVEL_LABELS = ["None", "Bronze", "Silver", "Gold", "Platinum", "Diamond"];
-const LEVEL_ICONS = ["", "🥉", "🥈", "🥇", "💎", "🏆"];
-
-export { LEVEL_LABELS, LEVEL_ICONS };
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -34,15 +35,23 @@ export async function GET() {
   const user = await getPrisma().user.findUnique({ where: { githubUsername: username } });
   if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-  const count = await getPrisma().observabilityCheck.count({ where: { userId: user.id } });
-  const level = getObservabilityLevel(count);
-  const nextLevelAt = getNextLevelAt(count);
+  const observabilityCount = await getPrisma().observabilityCheck.count({ where: { userId: user.id } });
 
-  return NextResponse.json({
-    observabilityCount: count,
-    observabilityLevel: level,
-    observabilityLabel: LEVEL_LABELS[level],
-    observabilityIcon: LEVEL_ICONS[level],
-    nextLevelAt,
-  });
+  let scoreEntry: ReturnType<typeof calculateScores>[0] | undefined;
+  try {
+    const scores = await getScores();
+    scoreEntry = scores.find((s) => s.login === username);
+  } catch {}
+
+  const counts: Record<string, number> = {
+    observability: observabilityCount,
+    mergedPRs: scoreEntry?.prs ?? 0,
+    newPlans: scoreEntry?.newPlans ?? 0,
+    planUpdates: scoreEntry?.updateCount ?? 0,
+    claims: scoreEntry?.claims ?? 0,
+  };
+
+  const badges = BADGE_KEYS.map((key) => computeBadge(key, counts[key]));
+
+  return NextResponse.json({ badges });
 }

@@ -93,10 +93,26 @@ export interface Participant {
   githubId: number;
 }
 
+export interface BadgeLevel {
+  level: number;
+  label: string;
+  icon: string;
+  threshold: number;
+  colorClass: string;
+}
+
+export interface Badge {
+  key: string;
+  title: string;
+  description: string;
+  howToEarn: string;
+  count: number;
+  level: number;
+  currentLevelData: BadgeLevel | null;
+  nextLevelData: BadgeLevel | null;
+  levels: BadgeLevel[];
+}
+
 export interface Achievement {
-  observabilityCount: number;
-  observabilityLevel: number;
-  observabilityLabel: string;
-  observabilityIcon: string;
-  nextLevelAt: number | null;
+  badges: Badge[];
 }

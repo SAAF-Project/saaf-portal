@@ -61,13 +61,14 @@ export default function DashboardPage() {
           </h1>
           <p className="text-muted text-sm">@{username}</p>
         </div>
-        {achievement && achievement.observabilityLevel > 0 && (
-          <AchievementBadge
-            level={achievement.observabilityLevel}
-            count={achievement.observabilityCount}
-            nextLevelAt={achievement.nextLevelAt}
-            compact
-          />
+        {achievement && (
+          <div className="flex flex-wrap gap-1.5 max-w-md justify-end">
+            {achievement.badges
+              .filter((b) => b.level > 0)
+              .map((badge) => (
+                <AchievementBadge key={badge.key} badge={badge} compact />
+              ))}
+          </div>
         )}
       </div>
 
@@ -92,7 +93,7 @@ export default function DashboardPage() {
         </div>
         <div className="bg-surface border border-border rounded-xl p-4">
           <div className="text-muted text-xs font-medium mb-1">Observability checks</div>
-          <div className="text-2xl font-black">{loading ? "..." : achievement?.observabilityCount ?? 0}</div>
+          <div className="text-2xl font-black">{loading ? "..." : achievement?.badges.find((b) => b.key === "observability")?.count ?? 0}</div>
           <div className="text-[10px] text-muted mt-0.5">submitted via Tracks</div>
         </div>
       </div>

@@ -292,13 +292,16 @@ export default function ProfilePage() {
 
       {/* Achievements — separate section */}
       <div className="mt-6">
-        <h2 className="text-lg font-extrabold mb-3">Achievements</h2>
+        <h2 className="text-lg font-extrabold mb-1">Achievements</h2>
+        <p className="text-muted text-sm mb-4">
+          Earn badges by contributing to SAAF. Each badge has 5 levels (or fewer for capped categories).
+        </p>
         {achievement !== null ? (
-          <AchievementBadge
-            level={achievement.observabilityLevel}
-            count={achievement.observabilityCount}
-            nextLevelAt={achievement.nextLevelAt}
-          />
+          <div className="space-y-3">
+            {achievement.badges.map((badge) => (
+              <AchievementBadge key={badge.key} badge={badge} />
+            ))}
+          </div>
         ) : (
           <div className="bg-surface border border-border rounded-xl p-4 text-muted text-sm">
             Loading achievements...
