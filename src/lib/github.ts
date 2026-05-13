@@ -76,15 +76,25 @@ export async function fetchUserOrgRepos(username: string): Promise<OrgRepo[]> {
   let page = 1;
   const usernameLower = username.toLowerCase();
 
+  async function safeJson(res: Response): Promise<unknown> {
+    if (!res.ok || res.status === 204) return null;
+    const text = await res.text();
+    if (!text) return null;
+    try {
+      return JSON.parse(text);
+    } catch {
+      return null;
+    }
+  }
+
   while (true) {
     const res = await githubFetch(
       `${API}/orgs/${ORG}/repos?per_page=100&page=${page}&sort=updated`
     );
-    const data = await res.json();
+    const data = await safeJson(res);
     if (!Array.isArray(data) || data.length === 0) break;
 
     for (const repo of data) {
-      // Check multiple signals for user contribution: contributors, recent commits, PRs
       let contributed = false;
       let prCount = 0;
 
@@ -92,26 +102,25 @@ export async function fetchUserOrgRepos(username: string): Promise<OrgRepo[]> {
       const contribRes = await githubFetch(
         `${API}/repos/${ORG}/${repo.name}/contributors?per_page=100`
       );
-      if (contribRes.ok) {
-        const contributors = await contribRes.json();
-        if (
-          Array.isArray(contributors) &&
-          contributors.some((c: { login: string }) => c.login.toLowerCase() === usernameLower)
-        ) {
-          contributed = true;
-        }
+      const contributors = await safeJson(contribRes);
+      if (
+        Array.isArray(contributors) &&
+        contributors.some((c: { login: string }) => c.login?.toLowerCase() === usernameLower)
+      ) {
+        contributed = true;
       }
 
-      // Signal 2: PRs by this user (catches PRs that haven't been merged yet)
+      // Signal 2: PRs by this user
       if (!contributed) {
         const prRes = await githubFetch(
           `${API}/search/issues?q=repo:${ORG}/${repo.name}+author:${username}+type:pr&per_page=1`
         );
-        if (prRes.ok) {
-          const prData = await prRes.json();
-          if (prData?.total_count > 0) {
+        const prData = await safeJson(prRes);
+        if (prData && typeof prData === "object" && "total_count" in prData) {
+          const tc = (prData as { total_count: number }).total_count;
+          if (tc > 0) {
             contributed = true;
-            prCount = prData.total_count;
+            prCount = tc;
           }
         }
       }
