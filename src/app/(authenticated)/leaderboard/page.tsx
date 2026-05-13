@@ -68,8 +68,8 @@ export default function LeaderboardPage() {
             label: "+5 Claim", cap: "max 2", color: "bg-saaf-yellow/12 text-saaf-yellow",
             info: "Signal that you are implementing a plan at your organisation. Open any plan file, find the 'Claimed By' field in Section 1 metadata, and set it to your name. This prevents duplication and shows the community what's being built. Each claim = 5 pts (capped at 2 = 10 pts)."
           },
-        ].map((item) => (
-          <span key={item.label} className="relative group">
+        ].map((item, idx, arr) => (
+          <span key={item.label} className="relative">
             <span className={`flex items-center gap-1 px-2 py-0.5 rounded font-bold cursor-default ${item.color}`}>
               {item.label}
               <small className="font-normal opacity-70">{item.cap}</small>
@@ -82,7 +82,7 @@ export default function LeaderboardPage() {
               </button>
             </span>
             {tooltip === item.label && (
-              <div className="absolute bottom-full left-0 mb-2 w-64 p-3 bg-surface2 border border-border rounded-xl text-[11px] text-muted leading-relaxed z-50 shadow-xl font-normal">
+              <div className={`absolute bottom-full mb-2 w-64 p-3 bg-surface2 border border-border rounded-xl text-[11px] text-muted leading-relaxed z-50 shadow-xl font-normal ${idx >= arr.length - 2 ? "right-0" : "left-0"}`}>
                 {item.info}
               </div>
             )}
