@@ -79,12 +79,28 @@ export const AGENT_LIBRARY_REVIEWED: Record<string, ReviewedAgent> = {
   },
 };
 
-async function githubFetch(url: string, acceptOverride?: string): Promise<Response> {
+// Cache TTLs in seconds — tuned per endpoint type
+export const CACHE_TTL = {
+  REPOS_LIST: 600,        // 10 min  — repo list rarely changes
+  README: 3600,           // 1 hour  — READMEs change infrequently
+  CONTRIBUTORS: 1800,     // 30 min  — contributors change slowly
+  PRS_CLOSED: 120,        // 2 min   — leaderboard wants near-real-time
+  PR_FILES: 86400,        // 1 day   — immutable after merge
+  USER_LOOKUP: 86400,     // 1 day   — user IDs are immutable
+  ORG_MEMBER: 300,        // 5 min   — quick reflect new joins
+  SEARCH: 300,            // 5 min   — search results
+};
+
+async function githubFetch(
+  url: string,
+  opts?: { revalidate?: number; accept?: string }
+): Promise<Response> {
   return fetch(url, {
     headers: {
       Authorization: `Bearer ${GITHUB_PAT}`,
-      Accept: acceptOverride || "application/vnd.github+json",
+      Accept: opts?.accept || "application/vnd.github+json",
     },
+    next: opts?.revalidate !== undefined ? { revalidate: opts.revalidate } : undefined,
   });
 }
 
@@ -114,7 +130,8 @@ export async function fetchAgentLibrary(): Promise<AgentRepo[]> {
 
   while (true) {
     const res = await githubFetch(
-      `${API}/orgs/${ORG}/repos?per_page=100&page=${page}&sort=pushed`
+      `${API}/orgs/${ORG}/repos?per_page=100&page=${page}&sort=pushed`,
+      { revalidate: CACHE_TTL.REPOS_LIST }
     );
     if (!res.ok) break;
     const data = await res.json();
@@ -131,7 +148,7 @@ export async function fetchAgentLibrary(): Promise<AgentRepo[]> {
       try {
         const readmeRes = await githubFetch(
           `${API}/repos/${ORG}/${repo.name}/readme`,
-          "application/vnd.github.raw+json"
+          { accept: "application/vnd.github.raw+json", revalidate: CACHE_TTL.README }
         );
         if (readmeRes.ok) {
           const text = await readmeRes.text();
@@ -225,7 +242,9 @@ function extractExcerpt(markdown: string, maxChars = 400): string {
 }
 
 export async function isOrgMember(username: string): Promise<boolean> {
-  const res = await githubFetch(`${API}/orgs/${ORG}/members/${username}`);
+  const res = await githubFetch(`${API}/orgs/${ORG}/members/${username}`, {
+    revalidate: CACHE_TTL.ORG_MEMBER,
+  });
   return res.status === 204;
 }
 
@@ -235,7 +254,8 @@ export async function fetchMergedPRs(): Promise<PRCache> {
 
   while (true) {
     const res = await githubFetch(
-      `${API}/repos/${REPO}/pulls?state=closed&per_page=100&page=${page}`
+      `${API}/repos/${REPO}/pulls?state=closed&per_page=100&page=${page}`,
+      { revalidate: CACHE_TTL.PRS_CLOSED }
     );
     const prs = await res.json();
     if (!Array.isArray(prs) || prs.length === 0) break;
@@ -247,7 +267,8 @@ export async function fetchMergedPRs(): Promise<PRCache> {
     const fileResults = await Promise.allSettled(
       merged.map(async (pr: GitHubPR) => {
         const filesRes = await githubFetch(
-          `${API}/repos/${REPO}/pulls/${pr.number}/files`
+          `${API}/repos/${REPO}/pulls/${pr.number}/files`,
+          { revalidate: CACHE_TTL.PR_FILES }
         );
         const files = await filesRes.json();
         return {
@@ -281,7 +302,17 @@ export async function fetchMergedPRs(): Promise<PRCache> {
   return cache;
 }
 
+// Per-user in-memory cache for My Repos (10 min TTL).
+// Survives warm container starts, reduces GitHub API load during hackathon.
+const userReposCache = new Map<string, { data: OrgRepo[]; ts: number }>();
+const USER_REPOS_TTL = 10 * 60 * 1000;
+
 export async function fetchUserOrgRepos(username: string): Promise<OrgRepo[]> {
+  const cached = userReposCache.get(username);
+  if (cached && Date.now() - cached.ts < USER_REPOS_TTL) {
+    return cached.data;
+  }
+
   const repos: OrgRepo[] = [];
   let page = 1;
   const usernameLower = username.toLowerCase();
@@ -299,7 +330,8 @@ export async function fetchUserOrgRepos(username: string): Promise<OrgRepo[]> {
 
   while (true) {
     const res = await githubFetch(
-      `${API}/orgs/${ORG}/repos?per_page=100&page=${page}&sort=updated`
+      `${API}/orgs/${ORG}/repos?per_page=100&page=${page}&sort=updated`,
+      { revalidate: CACHE_TTL.REPOS_LIST }
     );
     const data = await safeJson(res);
     if (!Array.isArray(data) || data.length === 0) break;
@@ -309,7 +341,8 @@ export async function fetchUserOrgRepos(username: string): Promise<OrgRepo[]> {
       let prCount = 0;
 
       const contribRes = await githubFetch(
-        `${API}/repos/${ORG}/${repo.name}/contributors?per_page=100`
+        `${API}/repos/${ORG}/${repo.name}/contributors?per_page=100`,
+        { revalidate: CACHE_TTL.CONTRIBUTORS }
       );
       const contributors = await safeJson(contribRes);
       if (
@@ -321,7 +354,8 @@ export async function fetchUserOrgRepos(username: string): Promise<OrgRepo[]> {
 
       if (!contributed) {
         const prRes = await githubFetch(
-          `${API}/search/issues?q=repo:${ORG}/${repo.name}+author:${username}+type:pr&per_page=1`
+          `${API}/search/issues?q=repo:${ORG}/${repo.name}+author:${username}+type:pr&per_page=1`,
+          { revalidate: CACHE_TTL.SEARCH }
         );
         const prData = await safeJson(prRes);
         if (prData && typeof prData === "object" && "total_count" in prData) {
@@ -351,6 +385,7 @@ export async function fetchUserOrgRepos(username: string): Promise<OrgRepo[]> {
     page++;
   }
 
+  userReposCache.set(username, { data: repos, ts: Date.now() });
   return repos;
 }
 
