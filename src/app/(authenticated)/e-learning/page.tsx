@@ -24,6 +24,21 @@ const CCFE_MODULES = [
   { title: "Mini Lessons", desc: "Specialised workflows: Ross Mike techniques, advanced approaches, Vin Obsidian integrations.", duration: "Varies" },
 ];
 
+const FORHUMANITY_TRACKS = [
+  { title: "Foundations of Independent Audit of AI Systems (IAAIS)", desc: "Foundation course required for all ForHumanity certification paths.", category: "Foundation" },
+  { title: "CORE AAA Governance", desc: "16 foundational pillars for AI systems governance.", category: "Governance" },
+  { title: "EU AI Act certification", desc: "Auditor certification for the EU AI Act compliance regime.", category: "Regulation" },
+  { title: "Digital Services Act (DSA)", desc: "Audit certification for DSA-regulated platforms.", category: "Regulation" },
+  { title: "UK GDPR / India DPDPA", desc: "Jurisdiction-specific data protection auditor tracks.", category: "Regulation" },
+  { title: "Automated Employment Decision Tools (AEDT)", desc: "Specialised auditor program for hiring/HR AI systems.", category: "Specialised" },
+  { title: "Disability Inclusion & Accessibility (DI&A)", desc: "Auditor track for accessibility-focused AI assessments.", category: "Specialised" },
+  { title: "Children's Code Supplemental", desc: "Add-on for auditors working with systems used by children.", category: "Specialised" },
+  { title: "Cybersecurity (modular augmentation)", desc: "Cybersecurity-focused module for AI audit work.", category: "Specialised" },
+  { title: "Risk Management Framework (RMF)", desc: "AI risk management auditor certification.", category: "Risk" },
+  { title: "Algorithm Ethics (Expert accreditation)", desc: "Expert-level accreditation in algorithmic ethics.", category: "Ethics" },
+  { title: "Cognitive Bias", desc: "26 lectures on cognitive bias in AI systems.", category: "Ethics" },
+];
+
 export default function ELearningPage() {
   return (
     <div className="max-w-3xl mx-auto">
@@ -149,6 +164,59 @@ export default function ELearningPage() {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* ForHumanity */}
+      <div className="bg-surface border border-border rounded-2xl p-6 mb-6">
+        <div className="flex items-start gap-3 mb-3">
+          <span className="text-3xl shrink-0">🎯</span>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="text-lg font-bold">ForHumanity AI Education and Training Center</h3>
+              <span className="text-[10px] px-1.5 py-0.5 rounded font-semibold bg-saaf-yellow/15 text-saaf-yellow">
+                External · Certification
+              </span>
+            </div>
+            <p className="text-muted text-sm mt-1">
+              Non-profit public charity offering certifications for AI auditors. The most directly
+              relevant body of work for SAAF participants — covers EU AI Act, GDPR, governance,
+              and specialised auditor tracks. Awards the <strong className="text-text">ForHumanity
+              Certified Auditor (FHCA)</strong> designation.
+            </p>
+            <a
+              href="https://forhumanity.center/forhumanity-ai-education-and-training-center/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 mt-2 text-sm text-accent font-semibold hover:underline"
+            >
+              forhumanity.center ↗
+            </a>
+          </div>
+        </div>
+
+        <div className="mt-4 pt-4 border-t border-border">
+          <h4 className="text-xs font-bold text-muted uppercase tracking-wider mb-3">
+            Certification tracks ({FORHUMANITY_TRACKS.length})
+          </h4>
+          <div className="space-y-2">
+            {FORHUMANITY_TRACKS.map((c) => (
+              <div key={c.title} className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-white/3 transition-colors">
+                <span className="text-saaf-green text-xs mt-1 shrink-0">✓</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-baseline gap-2 flex-wrap">
+                    <span className="font-semibold text-sm">{c.title}</span>
+                    <span className="text-[10px] text-muted">· {c.category}</span>
+                  </div>
+                  <p className="text-xs text-muted mt-0.5">{c.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-[11px] text-muted mt-4 italic">
+            Audience: organisational compliance professionals, independent auditors, ethics
+            committee members, AI system developers. Pricing not listed publicly on the site.
+          </p>
         </div>
       </div>
 
