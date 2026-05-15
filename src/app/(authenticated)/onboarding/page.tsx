@@ -210,15 +210,39 @@ export default function OnboardingPage() {
             Open the plan&apos;s markdown file on GitHub (use the &ldquo;View on GitHub&rdquo; link in Tracks)
           </li>
           <li>
-            Edit the metadata section at the top — find the <code className="bg-surface2 px-1.5 py-0.5 rounded text-xs text-text">Claimed By</code> field
+            Find the <strong className="text-text">Section 1 Metadata</strong> table at the top of the file
           </li>
           <li>
-            Set it to your name: <code className="bg-surface2 px-1.5 py-0.5 rounded text-xs text-text">| **Claimed By** | Mathijs Schouten |</code>
+            <strong className="text-text">If the &ldquo;Claimed By&rdquo; row exists</strong> (newer plans from
+            the template), set it to your name. <strong className="text-text">If the row doesn&apos;t
+            exist yet</strong> (most existing plans), add it as a new row in the metadata table:
+            <pre className="bg-surface2 rounded-lg p-3 text-xs text-text font-mono mt-2 overflow-x-auto">
+{`| Field           | Value           |
+|-----------------|-----------------|
+| ... existing rows ...           |
+| **Claimed By**  | Mathijs Schouten |`}
+            </pre>
           </li>
           <li>
-            Open a PR — when merged, your claim shows up on the plan&apos;s card in Tracks
+            Open a PR — when merged, your claim shows up on the plan&apos;s card in Tracks after the
+            data regeneration job runs
           </li>
         </ol>
+
+        <div className="p-3 bg-accent/5 border border-accent/20 rounded-lg text-xs text-muted leading-relaxed mb-4">
+          <strong className="text-text">Heads-up:</strong> only ~1 in 33 hackathon-3 plans currently
+          has the &ldquo;Claimed By&rdquo; row. If you&apos;re claiming an older plan you&apos;ll
+          almost certainly need to add the row yourself. The plan template{" "}
+          <a
+            href="https://github.com/SAAF-Project/SAAF-Project/blob/main/docs/plans/plan-template.md"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent"
+          >
+            (docs/plans/plan-template.md)
+          </a>{" "}
+          shows the full metadata structure.
+        </div>
 
         <div className="flex items-center gap-2 p-3 bg-saaf-yellow/5 border border-saaf-yellow/20 rounded-lg">
           <span className="text-saaf-yellow text-lg">🏆</span>
