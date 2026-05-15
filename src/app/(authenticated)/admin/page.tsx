@@ -50,7 +50,8 @@ export default function AdminPage() {
   const username = (session?.user as { githubUsername?: string })?.githubUsername;
 
   useEffect(() => {
-    if (session && username !== "MSACC") {
+    if (!session) return; // wait for session before deciding
+    if (username !== "MSACC") {
       router.push("/dashboard");
       return;
     }
@@ -79,6 +80,8 @@ export default function AdminPage() {
   const pendingSignups = requests.filter((r) => r.status === "pending");
   const newFeedback = feedback.filter((f) => f.status === "new");
 
+  // Don't render anything until we know if user is admin (avoids brief loading state for non-admins)
+  if (!session || username !== "MSACC") return null;
   if (loading) return <div className="text-muted text-center py-12">Loading...</div>;
   if (error) return <div className="text-saaf-red text-center py-12">Access denied</div>;
 
@@ -146,7 +149,7 @@ function SignupsTab({ requests, pendingCount }: { requests: SignupRequest[]; pen
       {pending.length > 0 && (
         <div className="mb-8">
           <h2 className="text-xs font-bold text-muted uppercase tracking-wider mb-3">Pending</h2>
-          <div className="bg-surface border border-border rounded-xl overflow-hidden">
+          <div className="bg-surface border border-border rounded-xl overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border text-left text-xs text-muted">
@@ -176,7 +179,7 @@ function SignupsTab({ requests, pendingCount }: { requests: SignupRequest[]; pen
           <h2 className="text-xs font-bold text-muted uppercase tracking-wider mb-3">
             Processed ({processed.length})
           </h2>
-          <div className="bg-surface border border-border rounded-xl overflow-hidden">
+          <div className="bg-surface border border-border rounded-xl overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border text-left text-xs text-muted">

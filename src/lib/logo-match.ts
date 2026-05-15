@@ -93,14 +93,37 @@ const LOGOS: Record<string, string> = {
 
 const BASE_URL = "https://saafproject.com/assets/logos/";
 
+function tokenize(s: string): Set<string> {
+  return new Set(
+    s
+      .toLowerCase()
+      .split(/[\s\-,&/().]+/)
+      .map((w) => w.trim())
+      .filter((w) => w.length > 0)
+  );
+}
+
 export function matchCompanyLogo(organisation: string | null | undefined): string | null {
   if (!organisation) return null;
   const key = organisation.toLowerCase().trim();
   if (!key) return null;
-  const file = LOGOS[key];
-  if (file) return `${BASE_URL}${file}`;
+
+  // 1. Exact match on full key
+  if (LOGOS[key]) return `${BASE_URL}${LOGOS[key]}`;
+
+  // 2. Word-boundary match — every word in the logo key must appear as a whole word in the user's input
+  const userWords = tokenize(organisation);
   for (const [k, v] of Object.entries(LOGOS)) {
-    if (key.includes(k) || k.includes(key)) return `${BASE_URL}${v}`;
+    const logoWords = tokenize(k);
+    if (logoWords.size === 0) continue;
+    let allMatch = true;
+    for (const w of logoWords) {
+      if (!userWords.has(w)) {
+        allMatch = false;
+        break;
+      }
+    }
+    if (allMatch) return `${BASE_URL}${v}`;
   }
   return null;
 }

@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import UserAvatar from "@/components/UserAvatar";
 import ActivityFeed from "@/components/ActivityFeed";
-import AchievementBadge from "@/components/AchievementBadge";
 import ProfileCompletenessBanner from "@/components/ProfileCompletenessBanner";
 import ActivityStatsBanner from "@/components/ActivityStatsBanner";
 import SuggestedPlans from "@/components/SuggestedPlans";
@@ -30,13 +29,19 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const loadAll = async () => {
-      const [lb, plans, submitters, prof, ach] = await Promise.all([
-        fetch("/api/leaderboard?filter=all").then((r) => r.json()).catch(() => null),
-        fetch("/data/plans.json").then((r) => r.json()).catch(() => []),
-        fetch("/data/submitters.json").then((r) => r.json()).catch(() => []),
-        fetch("/api/profile").then((r) => r.json()).catch(() => null),
-        fetch("/api/achievements").then((r) => r.json()).catch(() => null),
+      const results = await Promise.allSettled([
+        fetch("/api/leaderboard?filter=all").then((r) => r.json()),
+        fetch("/data/plans.json").then((r) => r.json()),
+        fetch("/data/submitters.json").then((r) => r.json()),
+        fetch("/api/profile").then((r) => r.json()),
+        fetch("/api/achievements").then((r) => r.json()),
       ]);
+      const [lbR, plansR, subR, profR, achR] = results;
+      const lb = lbR.status === "fulfilled" ? lbR.value : null;
+      const plans = plansR.status === "fulfilled" ? plansR.value : [];
+      const submitters = subR.status === "fulfilled" ? subR.value : [];
+      const prof = profR.status === "fulfilled" ? profR.value : null;
+      const ach = achR.status === "fulfilled" ? achR.value : null;
       setLeaderboard(lb);
       setAchievement(ach);
       setProfile(prof);
@@ -55,6 +60,8 @@ export default function DashboardPage() {
   const quickLinks = [
     { href: "/tracks", label: "Tracks", desc: "Explore tracks & submit observability checks", icon: "▶" },
     { href: "/participants", label: "Participants", desc: "Find a colleague to collaborate with", icon: "👥" },
+    { href: "/agent-library", label: "Agent Library", desc: "Browse SAAF community AI audit agents", icon: "◈" },
+    { href: "/e-learning", label: "E-Learning", desc: "Recommended external AI fluency courses", icon: "▣" },
     { href: "/onboarding", label: "How to Contribute", desc: "Make your first PR", icon: "→" },
     { href: "/about", label: "What is SAAF", desc: "Understand the mission and pillars", icon: "ℹ" },
   ];
@@ -88,12 +95,14 @@ export default function DashboardPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         <div className="bg-surface border border-border rounded-xl p-4">
           <div className="text-muted text-xs font-medium mb-1">Score</div>
-          <div className="text-2xl font-black">{loading ? "..." : myScore?.total ?? 0}</div>
+          <div className="text-2xl font-black">
+            {loading ? "..." : leaderboard ? myScore?.total ?? 0 : "—"}
+          </div>
         </div>
         <div className="bg-surface border border-border rounded-xl p-4 relative">
           <div className="text-muted text-xs font-medium mb-1">Rank</div>
           <div className="text-2xl font-black">
-            {loading ? "..." : myRank !== undefined && myRank >= 0 ? `#${myRank + 1}` : "-"}
+            {loading ? "..." : !leaderboard ? "—" : myRank !== undefined && myRank >= 0 ? `#${myRank + 1}` : "-"}
           </div>
           <Link href="/leaderboard" className="absolute bottom-3 right-3 text-[10px] text-accent hover:underline no-underline">
             Leaderboard →
@@ -101,12 +110,14 @@ export default function DashboardPage() {
         </div>
         <div className="bg-surface border border-border rounded-xl p-4">
           <div className="text-muted text-xs font-medium mb-1">Merged PRs</div>
-          <div className="text-2xl font-black">{loading ? "..." : myScore?.prs ?? 0}</div>
+          <div className="text-2xl font-black">
+            {loading ? "..." : leaderboard ? myScore?.prs ?? 0 : "—"}
+          </div>
         </div>
         <div className="bg-surface border border-border rounded-xl p-4">
           <div className="text-muted text-xs font-medium mb-1">Observability checks</div>
           <div className="text-2xl font-black">
-            {loading ? "..." : achievement?.badges.find((b) => b.key === "observability")?.count ?? 0}
+            {loading ? "..." : achievement ? achievement.badges.find((b) => b.key === "observability")?.count ?? 0 : "—"}
           </div>
           <div className="text-[10px] text-muted mt-0.5">submitted via Tracks</div>
         </div>
@@ -175,28 +186,6 @@ export default function DashboardPage() {
             ))}
           </div>
 
-          <div className="mt-3 space-y-2">
-            {[
-              { href: "/e-learning", icon: "▣", label: "E-Learning", desc: "Interactive learning modules" },
-              { href: "/agent-library", icon: "◈", label: "Agent Library", desc: "Browse community AI audit agents" },
-            ].map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="block bg-surface border border-border rounded-xl p-4 opacity-60 no-underline"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-accent text-lg opacity-50">{item.icon}</span>
-                  <div>
-                    <div className="font-semibold text-sm">
-                      {item.label} <span className="text-xs text-accent font-normal ml-1">coming soon</span>
-                    </div>
-                    <div className="text-muted text-xs">{item.desc}</div>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
         </div>
 
         {/* Recent activity */}

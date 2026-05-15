@@ -10,7 +10,7 @@ export default function FeedbackButton() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-full shadow-lg shadow-indigo-600/30 cursor-pointer transition-all hover:scale-105"
+        className="fixed bottom-6 right-6 z-30 flex items-center gap-2 px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-full shadow-lg shadow-indigo-600/30 cursor-pointer transition-all hover:scale-105"
         title="Give feedback"
       >
         <span className="text-base">💬</span>

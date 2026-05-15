@@ -122,7 +122,7 @@ export default function OnboardingWizard({ profile }: { profile: UserProfile | n
   const current = steps[step - 1];
 
   return (
-    <div className="fixed inset-0 bg-bg/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 bg-bg/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
       <div className="bg-surface border border-border rounded-2xl w-full max-w-lg shadow-2xl">
         <div className="flex items-center justify-between p-4 border-b border-border">
           <div className="flex gap-1.5">
@@ -135,13 +135,13 @@ export default function OnboardingWizard({ profile }: { profile: UserProfile | n
           </div>
           <button
             onClick={skip}
-            className="text-muted text-xs hover:text-text cursor-pointer"
+            className="px-3 py-1 text-xs text-muted hover:text-text border border-border rounded-lg cursor-pointer"
           >
             Skip for now
           </button>
         </div>
         <div className="p-6">
-          <h2 className="text-lg font-bold mb-3">{current.title}</h2>
+          <h2 id="onboarding-title" className="text-lg font-bold mb-3">{current.title}</h2>
           {current.content}
         </div>
         <div className="flex gap-2 p-4 border-t border-border">

@@ -230,7 +230,7 @@ export default function OnboardingPage() {
         </ol>
 
         <div className="p-3 bg-accent/5 border border-accent/20 rounded-lg text-xs text-muted leading-relaxed mb-4">
-          <strong className="text-text">Heads-up:</strong> only ~1 in 33 hackathon-3 plans currently
+          <strong className="text-text">Heads-up:</strong>{" "}only ~1 in 33 hackathon-3 plans currently
           has the &ldquo;Claimed By&rdquo; row. If you&apos;re claiming an older plan you&apos;ll
           almost certainly need to add the row yourself. The plan template{" "}
           <a

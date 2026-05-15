@@ -9,19 +9,30 @@ export default function SuggestedPlans() {
   const [plans, setPlans] = useState<SuggestedPlanWithReasons[]>([]);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    Promise.all([
-      fetch("/api/suggestions").then((r) => r.json()).catch(() => []),
-      fetch("/api/profile").then((r) => r.json()).catch(() => null),
-    ]).then(([s, p]) => {
+    Promise.allSettled([
+      fetch("/api/suggestions").then((r) => r.json()),
+      fetch("/api/profile").then((r) => r.json()),
+    ]).then(([sR, pR]) => {
+      const s = sR.status === "fulfilled" ? sR.value : null;
+      const p = pR.status === "fulfilled" ? pR.value : null;
       if (Array.isArray(s)) setPlans(s);
       if (p && !p.error) setProfile(p);
+      if (sR.status === "rejected" && pR.status === "rejected") setError(true);
       setLoading(false);
     });
   }, []);
 
   if (loading) return null;
+  if (error) {
+    return (
+      <div className="mb-6 p-3 bg-saaf-yellow/5 border border-saaf-yellow/20 rounded-xl text-xs text-muted">
+        Couldn&apos;t load suggestions — refresh to try again.
+      </div>
+    );
+  }
   if (plans.length === 0 && !profile) return null;
 
   const completeness = profile ? profileCompleteness(profile) : null;

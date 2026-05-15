@@ -172,7 +172,7 @@ export default function ProfilePage() {
                 <span>{profile.role || "-"}</span>
               )}
             </Field>
-            <Field label="Preferred Track" editing={editing}>
+            <Field label="Preferred track" editing={editing}>
               {editing ? (
                 <select
                   value={form.preferredTrack || ""}
@@ -192,7 +192,7 @@ export default function ProfilePage() {
             </Field>
           </div>
 
-          <Field label="Second Track" editing={editing}>
+          <Field label="Second track" editing={editing}>
             {editing ? (
               <select
                 value={form.secondTrack || ""}

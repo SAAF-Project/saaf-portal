@@ -124,6 +124,16 @@ export default function ParticipantsPage() {
 
       {loading ? (
         <div className="text-muted text-center py-12">Loading participants...</div>
+      ) : filtered.length === 0 ? (
+        <div className="bg-surface border border-border rounded-xl p-8 text-center">
+          <p className="text-muted text-sm mb-3">No participants match your filters.</p>
+          <button
+            onClick={() => { setFilterRole(""); setFilterTrack(""); setFilterOrg(""); setSearch(""); }}
+            className="px-4 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold cursor-pointer"
+          >
+            Clear all filters
+          </button>
+        </div>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
           {filtered.map((p) => (

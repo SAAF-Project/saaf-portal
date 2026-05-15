@@ -38,6 +38,10 @@ export default function FeedbackModal({ onClose }: { onClose: () => void }) {
   return (
     <div
       className="fixed inset-0 bg-bg/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Give feedback"
+      data-feedback-modal
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div className="bg-surface border border-border rounded-2xl w-full max-w-lg shadow-2xl">
