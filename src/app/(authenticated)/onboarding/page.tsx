@@ -144,9 +144,9 @@ export default function OnboardingPage() {
       </div>
 
       {/* Observability checks deep-dive */}
-      <h2 id="observability" className="text-xl font-extrabold mb-3 flex items-center gap-2">
-        <span className="text-saaf-green">🔍</span>
-        About observability checks
+      <h2 id="observability" className="text-xl font-extrabold mb-3 flex items-start gap-2 flex-wrap">
+        <span className="text-saaf-green shrink-0">🔍</span>
+        <span>About observability checks</span>
       </h2>
       <div className="bg-surface border border-border rounded-2xl p-6 mb-8">
         <p className="text-sm text-muted leading-relaxed mb-4">
@@ -186,9 +186,9 @@ export default function OnboardingPage() {
       </div>
 
       {/* Plan claiming deep-dive */}
-      <h2 id="claiming" className="text-xl font-extrabold mb-3 flex items-center gap-2">
-        <span className="text-saaf-yellow">✋</span>
-        About claiming plans
+      <h2 id="claiming" className="text-xl font-extrabold mb-3 flex items-start gap-2 flex-wrap">
+        <span className="text-saaf-yellow shrink-0">✋</span>
+        <span>About claiming plans</span>
       </h2>
       <div className="bg-surface border border-border rounded-2xl p-6 mb-8">
         <p className="text-sm text-muted leading-relaxed mb-4">
@@ -259,9 +259,9 @@ export default function OnboardingPage() {
       </div>
 
       {/* Git workflow */}
-      <h2 id="new-plan" className="text-xl font-extrabold mb-3 flex items-center gap-2">
-        <span className="text-accent">⚙</span>
-        Git workflow — for any PR to the SAAF-Project repo
+      <h2 id="new-plan" className="text-xl font-extrabold mb-3 flex items-start gap-2 flex-wrap">
+        <span className="text-accent shrink-0">⚙</span>
+        <span>Git workflow — for any PR to the SAAF-Project repo</span>
       </h2>
       <p className="text-muted text-sm mb-4">
         These steps apply to any contribution that needs a pull request to{" "}
@@ -334,7 +334,7 @@ export default function OnboardingPage() {
             <div className="shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-accent to-saaf-purple flex items-center justify-center font-extrabold text-sm text-white">
               {i + 1}
             </div>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <h4 className="font-bold text-[15px] mb-1">{step.title}</h4>
               {step.desc && <p className="text-sm text-muted mb-2">{step.desc}</p>}
               {step.code && (
