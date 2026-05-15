@@ -3,13 +3,116 @@ const API = "https://api.github.com";
 const ORG = "SAAF-Project";
 const REPO = "SAAF-Project/SAAF-Project";
 
-async function githubFetch(url: string): Promise<Response> {
+// Repos that aren't agents (meta repos)
+const META_REPOS = new Set(["saaf-portal", "SAAF-Project", "website"]);
+
+// Allowlist: repos approved for the Agent Library.
+// To add a repo: verify its README is meaningful, agent works as described,
+// and it's something the community can learn from. Then add the repo name here.
+// Optionally tag with categories for filtering.
+export const AGENT_LIBRARY_ALLOWLIST: Record<string, { category: string; tags?: string[] }> = {
+  // Add manually after review, e.g.:
+  // "GDPR-AI-Audit-Agent": { category: "Compliance", tags: ["GDPR", "DPIA"] },
+};
+
+async function githubFetch(url: string, acceptOverride?: string): Promise<Response> {
   return fetch(url, {
     headers: {
       Authorization: `Bearer ${GITHUB_PAT}`,
-      Accept: "application/vnd.github+json",
+      Accept: acceptOverride || "application/vnd.github+json",
     },
   });
+}
+
+export interface AgentRepo {
+  name: string;
+  description: string | null;
+  language: string | null;
+  updatedAt: string;
+  pushedAt: string;
+  htmlUrl: string;
+  stars: number;
+  isPrivate: boolean;
+  readmeExcerpt: string | null;
+  category: string;
+  tags: string[];
+}
+
+export async function fetchAgentLibrary(): Promise<AgentRepo[]> {
+  const repos: AgentRepo[] = [];
+  const allowedNames = Object.keys(AGENT_LIBRARY_ALLOWLIST);
+  if (allowedNames.length === 0) return repos;
+
+  for (const name of allowedNames) {
+    const meta = AGENT_LIBRARY_ALLOWLIST[name];
+    try {
+      const repoRes = await githubFetch(`${API}/repos/${ORG}/${name}`);
+      if (!repoRes.ok) continue;
+      const repo = await repoRes.json();
+      if (META_REPOS.has(repo.name) || repo.archived) continue;
+
+      let readmeExcerpt: string | null = null;
+      try {
+        const readmeRes = await githubFetch(
+          `${API}/repos/${ORG}/${name}/readme`,
+          "application/vnd.github.raw+json"
+        );
+        if (readmeRes.ok) {
+          const text = await readmeRes.text();
+          readmeExcerpt = extractExcerpt(text);
+        }
+      } catch {}
+
+      repos.push({
+        name: repo.name,
+        description: repo.description,
+        language: repo.language,
+        updatedAt: repo.updated_at,
+        pushedAt: repo.pushed_at,
+        htmlUrl: repo.html_url,
+        stars: repo.stargazers_count,
+        isPrivate: repo.private,
+        readmeExcerpt,
+        category: meta.category,
+        tags: meta.tags || [],
+      });
+    } catch {}
+  }
+
+  return repos.sort((a, b) => new Date(b.pushedAt).getTime() - new Date(a.pushedAt).getTime());
+}
+
+function extractExcerpt(markdown: string, maxChars = 400): string {
+  // Remove HTML comments, badges (image links), code blocks, and frontmatter
+  let text = markdown
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/^---[\s\S]*?---\n/m, "")
+    .replace(/```[\s\S]*?```/g, "")
+    .replace(/!\[.*?\]\(.*?\)/g, "")
+    .replace(/\[!\[.*?\]\(.*?\)\]\(.*?\)/g, "");
+
+  // Skip leading H1 title
+  text = text.replace(/^#\s+.*$/m, "").trim();
+
+  // Take first paragraph after the title — usually the description
+  const paragraphs = text.split(/\n\s*\n/).filter((p) => p.trim().length > 30);
+  let excerpt = paragraphs[0] || "";
+
+  // Strip remaining markdown
+  excerpt = excerpt
+    .replace(/^#+\s*/gm, "")
+    .replace(/\*\*(.+?)\*\*/g, "$1")
+    .replace(/\*(.+?)\*/g, "$1")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/\[(.+?)\]\(.+?\)/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (excerpt.length > maxChars) {
+    excerpt = excerpt.slice(0, maxChars).replace(/\s+\S*$/, "") + "…";
+  }
+
+  return excerpt || "";
 }
 
 export async function isOrgMember(username: string): Promise<boolean> {
