@@ -6,13 +6,77 @@ const REPO = "SAAF-Project/SAAF-Project";
 // Repos that aren't agents (meta repos)
 const META_REPOS = new Set(["saaf-portal", "SAAF-Project", "website"]);
 
-// Allowlist: repos approved for the Agent Library.
-// To add a repo: verify its README is meaningful, agent works as described,
-// and it's something the community can learn from. Then add the repo name here.
-// Optionally tag with categories for filtering.
-export const AGENT_LIBRARY_ALLOWLIST: Record<string, { category: string; tags?: string[] }> = {
-  // Add manually after review, e.g.:
-  // "GDPR-AI-Audit-Agent": { category: "Compliance", tags: ["GDPR", "DPIA"] },
+export interface ReviewedAgent {
+  category: string;
+  tags?: string[];
+  quality: {
+    hasTests: boolean;
+    testCount?: number;
+    hasSamples: boolean;
+    notes?: string;
+  };
+}
+
+// Curated agents — manually reviewed for code quality.
+export const AGENT_LIBRARY_REVIEWED: Record<string, ReviewedAgent> = {
+  "GDPR-AI-Audit-Agent": {
+    category: "Compliance",
+    tags: ["GDPR", "PII", "DPIA"],
+    quality: {
+      hasTests: true,
+      testCount: 10,
+      hasSamples: true,
+      notes: "Full Python package + Streamlit UI. Includes official GDPR text as reference data.",
+    },
+  },
+  "Vendor_Guard": {
+    category: "Compliance",
+    tags: ["Vendor Risk", "DORA", "ISO 27001", "EU AI Act"],
+    quality: {
+      hasTests: true,
+      testCount: 8,
+      hasSamples: true,
+      notes: "Multi-agent architecture: 6 specialised agents + 4 synthesisers across 8 frameworks.",
+    },
+  },
+  "RCM-Builder": {
+    category: "Risk & Controls",
+    tags: ["RCM", "GIAS", "UC7"],
+    quality: {
+      hasTests: true,
+      testCount: 2,
+      hasSamples: false,
+      notes: "Three-stage pipeline (normalise → design → IT validation) with thorough test coverage.",
+    },
+  },
+  "Track-2-Evidence-Collection-Extraction": {
+    category: "Evidence",
+    tags: ["Compliance", "GIAS", "PDF"],
+    quality: {
+      hasTests: true,
+      testCount: 1,
+      hasSamples: false,
+      notes: "CLI + Streamlit web UI. GIAS v2024 8-step reasoning trail.",
+    },
+  },
+  "llm_owasp": {
+    category: "AI Security",
+    tags: ["OWASP", "LLM", "Red-team"],
+    quality: {
+      hasTests: false,
+      hasSamples: true,
+      notes: "Audits other AI agents. Includes CLI + Claude Code slash command integration.",
+    },
+  },
+  "CUEC_Crosscheck": {
+    category: "Compliance",
+    tags: ["CUEC", "ISAE 3402", "SOC 2"],
+    quality: {
+      hasTests: false,
+      hasSamples: true,
+      notes: "Single-file MVP — focused use case. Sample inputs included.",
+    },
+  },
 };
 
 async function githubFetch(url: string, acceptOverride?: string): Promise<Response> {
@@ -24,6 +88,8 @@ async function githubFetch(url: string, acceptOverride?: string): Promise<Respon
   });
 }
 
+export type AgentStatus = "reviewed" | "work-in-progress" | "needs-readme" | "not-reviewed";
+
 export interface AgentRepo {
   name: string;
   description: string | null;
@@ -34,34 +100,62 @@ export interface AgentRepo {
   stars: number;
   isPrivate: boolean;
   readmeExcerpt: string | null;
-  category: string;
+  readmeSize: number;
+  status: AgentStatus;
+  category: string | null;
   tags: string[];
+  quality: ReviewedAgent["quality"] | null;
+  recentlyUpdated: boolean;
 }
 
 export async function fetchAgentLibrary(): Promise<AgentRepo[]> {
   const repos: AgentRepo[] = [];
-  const allowedNames = Object.keys(AGENT_LIBRARY_ALLOWLIST);
-  if (allowedNames.length === 0) return repos;
+  let page = 1;
 
-  for (const name of allowedNames) {
-    const meta = AGENT_LIBRARY_ALLOWLIST[name];
-    try {
-      const repoRes = await githubFetch(`${API}/repos/${ORG}/${name}`);
-      if (!repoRes.ok) continue;
-      const repo = await repoRes.json();
+  while (true) {
+    const res = await githubFetch(
+      `${API}/orgs/${ORG}/repos?per_page=100&page=${page}&sort=pushed`
+    );
+    if (!res.ok) break;
+    const data = await res.json();
+    if (!Array.isArray(data) || data.length === 0) break;
+
+    for (const repo of data) {
       if (META_REPOS.has(repo.name) || repo.archived) continue;
 
+      const reviewed = AGENT_LIBRARY_REVIEWED[repo.name];
+
+      // Fetch README
       let readmeExcerpt: string | null = null;
+      let readmeSize = 0;
       try {
         const readmeRes = await githubFetch(
-          `${API}/repos/${ORG}/${name}/readme`,
+          `${API}/repos/${ORG}/${repo.name}/readme`,
           "application/vnd.github.raw+json"
         );
         if (readmeRes.ok) {
           const text = await readmeRes.text();
+          readmeSize = text.length;
           readmeExcerpt = extractExcerpt(text);
         }
       } catch {}
+
+      // Determine status
+      let status: AgentStatus;
+      if (reviewed) {
+        status = "reviewed";
+      } else if (readmeSize === 0) {
+        status = "needs-readme";
+      } else if (readmeSize < 200) {
+        status = "work-in-progress";
+      } else {
+        status = "not-reviewed";
+      }
+
+      // Recently updated = pushed in last 60 days
+      const daysSincePush =
+        (Date.now() - new Date(repo.pushed_at).getTime()) / (1000 * 60 * 60 * 24);
+      const recentlyUpdated = daysSincePush <= 60;
 
       repos.push({
         name: repo.name,
@@ -73,17 +167,35 @@ export async function fetchAgentLibrary(): Promise<AgentRepo[]> {
         stars: repo.stargazers_count,
         isPrivate: repo.private,
         readmeExcerpt,
-        category: meta.category,
-        tags: meta.tags || [],
+        readmeSize,
+        status,
+        category: reviewed?.category || null,
+        tags: reviewed?.tags || [],
+        quality: reviewed?.quality || null,
+        recentlyUpdated,
       });
-    } catch {}
+    }
+
+    if (data.length < 100) break;
+    page++;
   }
 
-  return repos.sort((a, b) => new Date(b.pushedAt).getTime() - new Date(a.pushedAt).getTime());
+  // Sort: reviewed first, then by pushedAt desc
+  return repos.sort((a, b) => {
+    const order: Record<AgentStatus, number> = {
+      reviewed: 0,
+      "not-reviewed": 1,
+      "work-in-progress": 2,
+      "needs-readme": 3,
+    };
+    if (order[a.status] !== order[b.status]) {
+      return order[a.status] - order[b.status];
+    }
+    return new Date(b.pushedAt).getTime() - new Date(a.pushedAt).getTime();
+  });
 }
 
 function extractExcerpt(markdown: string, maxChars = 400): string {
-  // Remove HTML comments, badges (image links), code blocks, and frontmatter
   let text = markdown
     .replace(/<!--[\s\S]*?-->/g, "")
     .replace(/^---[\s\S]*?---\n/m, "")
@@ -91,14 +203,11 @@ function extractExcerpt(markdown: string, maxChars = 400): string {
     .replace(/!\[.*?\]\(.*?\)/g, "")
     .replace(/\[!\[.*?\]\(.*?\)\]\(.*?\)/g, "");
 
-  // Skip leading H1 title
   text = text.replace(/^#\s+.*$/m, "").trim();
 
-  // Take first paragraph after the title — usually the description
   const paragraphs = text.split(/\n\s*\n/).filter((p) => p.trim().length > 30);
   let excerpt = paragraphs[0] || "";
 
-  // Strip remaining markdown
   excerpt = excerpt
     .replace(/^#+\s*/gm, "")
     .replace(/\*\*(.+?)\*\*/g, "$1")
@@ -116,9 +225,7 @@ function extractExcerpt(markdown: string, maxChars = 400): string {
 }
 
 export async function isOrgMember(username: string): Promise<boolean> {
-  const res = await githubFetch(
-    `${API}/orgs/${ORG}/members/${username}`
-  );
+  const res = await githubFetch(`${API}/orgs/${ORG}/members/${username}`);
   return res.status === 204;
 }
 
@@ -201,7 +308,6 @@ export async function fetchUserOrgRepos(username: string): Promise<OrgRepo[]> {
       let contributed = false;
       let prCount = 0;
 
-      // Signal 1: Contributors API
       const contribRes = await githubFetch(
         `${API}/repos/${ORG}/${repo.name}/contributors?per_page=100`
       );
@@ -213,7 +319,6 @@ export async function fetchUserOrgRepos(username: string): Promise<OrgRepo[]> {
         contributed = true;
       }
 
-      // Signal 2: PRs by this user
       if (!contributed) {
         const prRes = await githubFetch(
           `${API}/search/issues?q=repo:${ORG}/${repo.name}+author:${username}+type:pr&per_page=1`
