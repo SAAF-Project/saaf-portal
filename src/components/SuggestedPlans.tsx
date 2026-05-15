@@ -2,21 +2,30 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import type { SuggestedPlanWithReasons } from "@/types";
+import type { SuggestedPlanWithReasons, UserProfile } from "@/types";
+import { profileCompleteness } from "@/lib/profile-completeness";
 
 export default function SuggestedPlans() {
   const [plans, setPlans] = useState<SuggestedPlanWithReasons[]>([]);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/suggestions")
-      .then((r) => r.json())
-      .then((d) => { if (Array.isArray(d)) setPlans(d); })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    Promise.all([
+      fetch("/api/suggestions").then((r) => r.json()).catch(() => []),
+      fetch("/api/profile").then((r) => r.json()).catch(() => null),
+    ]).then(([s, p]) => {
+      if (Array.isArray(s)) setPlans(s);
+      if (p && !p.error) setProfile(p);
+      setLoading(false);
+    });
   }, []);
 
-  if (loading || plans.length === 0) return null;
+  if (loading) return null;
+  if (plans.length === 0 && !profile) return null;
+
+  const completeness = profile ? profileCompleteness(profile) : null;
+  const profileIncomplete = completeness && completeness.percent < 100;
 
   return (
     <div className="mb-6">
@@ -25,7 +34,8 @@ export default function SuggestedPlans() {
         <Link href="/tracks" className="text-xs text-accent hover:underline">Browse all tracks →</Link>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {plans.slice(0, 3).map((plan) => (
+        {/* First 2 plans */}
+        {plans.slice(0, 2).map((plan) => (
           <a
             key={plan.slug}
             href={plan.github_url}
@@ -53,6 +63,56 @@ export default function SuggestedPlans() {
             </ul>
           </a>
         ))}
+
+        {/* Profile reminder card — always shown, color-coded by completeness */}
+        {profile && (
+          <Link
+            href="/profile"
+            className={`block border rounded-xl p-4 transition-all no-underline group ${
+              profileIncomplete
+                ? "bg-saaf-yellow/5 border-saaf-yellow/30 hover:border-saaf-yellow/50"
+                : "bg-surface border-border hover:border-accent/40"
+            }`}
+          >
+            <div className="flex items-start gap-2 mb-2">
+              <span className={`text-sm font-semibold transition-colors flex-1 min-w-0 ${
+                profileIncomplete ? "text-saaf-yellow" : "text-text group-hover:text-accent"
+              }`}>
+                {profileIncomplete ? "Complete your profile" : "Keep your profile fresh"}
+              </span>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase shrink-0 ${
+                profileIncomplete ? "bg-saaf-yellow/20 text-saaf-yellow" : "bg-accent/15 text-accent"
+              }`}>
+                You
+              </span>
+            </div>
+            <ul className="space-y-0.5">
+              {profileIncomplete ? (
+                <>
+                  <li className="text-[11px] text-muted flex items-start gap-1">
+                    <span className="text-saaf-yellow shrink-0">!</span>
+                    <span>{completeness.percent}% complete — missing {completeness.missing.map(m => m.label).join(", ")}</span>
+                  </li>
+                  <li className="text-[11px] text-muted flex items-start gap-1">
+                    <span className="text-saaf-green shrink-0">✓</span>
+                    <span>Better suggestions when filled</span>
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li className="text-[11px] text-muted flex items-start gap-1">
+                    <span className="text-saaf-green shrink-0">✓</span>
+                    <span>Update your skills as you learn</span>
+                  </li>
+                  <li className="text-[11px] text-muted flex items-start gap-1">
+                    <span className="text-saaf-green shrink-0">✓</span>
+                    <span>Adjust your track if you switch focus</span>
+                  </li>
+                </>
+              )}
+            </ul>
+          </Link>
+        )}
       </div>
     </div>
   );
