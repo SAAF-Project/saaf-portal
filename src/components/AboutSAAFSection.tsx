@@ -32,7 +32,7 @@ export default function AboutSAAFSection() {
         </span>
       </h3>
       <p className="text-sm text-muted leading-relaxed mb-3 max-w-3xl">
-        The <strong className="text-text">Shared Audit Agents Framework</strong> brings 45+ organisations together
+        The <strong className="text-text">Shared Audit Agents Framework</strong> brings organisations together
         to co-create AI agents for internal & IT audit. We build reusable components around four pillars
         — Prompts, Tools, Regulatory, and Outputs — across hackathons throughout 2026.
       </p>

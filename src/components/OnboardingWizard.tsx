@@ -41,7 +41,7 @@ export default function OnboardingWizard({ profile }: { profile: UserProfile | n
         <div>
           <p className="text-muted text-sm mb-3">
             You&apos;re part of the <strong className="text-text">Shared Audit Agents Framework</strong> —
-            45+ organisations co-creating AI audit agents.
+            organisations co-creating AI audit agents.
           </p>
           <p className="text-muted text-sm">
             Let&apos;s set you up in 3 quick steps so you can get the most out of the portal.

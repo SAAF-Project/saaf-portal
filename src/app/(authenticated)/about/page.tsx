@@ -34,13 +34,6 @@ const TIMELINE = [
   { label: "Hackathon 4", desc: "Build on H3 infrastructure — ongoing", date: "May 2026" },
 ];
 
-const STATS = [
-  { value: "45+", label: "organisations" },
-  { value: "76", label: "participants" },
-  { value: "74", label: "plans" },
-  { value: "20+", label: "agent repos" },
-];
-
 export default function AboutPage() {
   return (
     <div className="max-w-4xl mx-auto">
@@ -52,21 +45,9 @@ export default function AboutPage() {
           </span>
         </h1>
         <p className="text-lg text-muted max-w-2xl mx-auto leading-relaxed">
-          The <strong className="text-text">Shared Audit Agents Framework</strong> brings 45+ organisations
+          The <strong className="text-text">Shared Audit Agents Framework</strong> brings organisations
           together to co-create AI agents for internal & IT audit — a vendor-agnostic, open-source initiative.
         </p>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
-        {STATS.map((s) => (
-          <div key={s.label} className="bg-surface border border-border rounded-xl p-4 text-center">
-            <div className="text-2xl font-black bg-gradient-to-r from-accent to-saaf-purple bg-clip-text text-transparent">
-              {s.value}
-            </div>
-            <div className="text-xs text-muted mt-1">{s.label}</div>
-          </div>
-        ))}
       </div>
 
       {/* 4 Pillars */}
@@ -125,7 +106,7 @@ export default function AboutPage() {
           </li>
           <li>
             <strong className="text-text">Open PRs</strong> — propose new plans, update existing ones,
-            or contribute code to one of the 20+ agent repos in the SAAF-Project organisation.
+            or contribute code to one of the agent repos in the SAAF-Project organisation.
           </li>
         </ol>
         <div className="mt-5 flex gap-2 flex-wrap">
