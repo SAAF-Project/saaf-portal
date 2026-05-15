@@ -16,5 +16,6 @@ export const config = {
     "/agent-library/:path*",
     "/admin/:path*",
     "/participants/:path*",
+    "/about/:path*",
   ],
 };

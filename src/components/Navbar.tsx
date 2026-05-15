@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { href: "/tracks", label: "Tracks", icon: "▶" },
   { href: "/my-repos", label: "My Repos", icon: "◇" },
   { href: "/onboarding", label: "How to Contribute", icon: "→" },
+  { href: "/about", label: "About SAAF", icon: "ℹ" },
   { href: "/e-learning", label: "E-Learning", icon: "▣" },
   { href: "/agent-library", label: "Agent Library", icon: "◈" },
 ];

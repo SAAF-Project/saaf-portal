@@ -28,6 +28,17 @@ model User {
   createdAt            DateTime             @default(now())
   updatedAt            DateTime             @updatedAt
   observabilityChecks  ObservabilityCheck[]
+  feedback             Feedback[]
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  category  String?
+  text      String
+  status    String   @default("new")
+  createdAt DateTime @default(now())
 }
 
 model SignupRequest {

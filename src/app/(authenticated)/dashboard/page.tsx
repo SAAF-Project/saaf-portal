@@ -6,6 +6,12 @@ import Link from "next/link";
 import UserAvatar from "@/components/UserAvatar";
 import ActivityFeed from "@/components/ActivityFeed";
 import AchievementBadge from "@/components/AchievementBadge";
+import ProfileCompletenessBanner from "@/components/ProfileCompletenessBanner";
+import ActivityStatsBanner from "@/components/ActivityStatsBanner";
+import SuggestedPlans from "@/components/SuggestedPlans";
+import AboutSAAFSection from "@/components/AboutSAAFSection";
+import OnboardingWizard from "@/components/OnboardingWizard";
+import { profileCompleteness } from "@/lib/profile-completeness";
 import { getUserPlans } from "@/lib/plan-match";
 import type { ScoreEntry, ActivityEntry, Plan, Submitter, Achievement, UserProfile } from "@/types";
 
@@ -18,6 +24,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [myPlans, setMyPlans] = useState<Plan[]>([]);
   const [achievement, setAchievement] = useState<Achievement | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
 
   const username = (session?.user as { githubUsername?: string })?.githubUsername;
 
@@ -32,6 +39,7 @@ export default function DashboardPage() {
       ]);
       setLeaderboard(lb);
       setAchievement(ach);
+      setProfile(prof);
       if (prof) {
         setMyPlans(getUserPlans(plans as Plan[], prof as UserProfile, submitters as Submitter[]));
       }
@@ -42,16 +50,26 @@ export default function DashboardPage() {
 
   const myScore = leaderboard?.scores.find((s) => s.login === username);
   const myRank = leaderboard?.scores.findIndex((s) => s.login === username);
+  const completeness = profile ? profileCompleteness(profile) : null;
 
   const quickLinks = [
-    { href: "/profile", label: "Profile", desc: "View & edit your profile", icon: "●" },
-    { href: "/participants", label: "Participants", desc: "See all members and their skills", icon: "👥" },
     { href: "/tracks", label: "Tracks", desc: "Explore tracks & submit observability checks", icon: "▶" },
-    { href: "/my-repos", label: "My Repos", desc: "Your org repositories", icon: "◇" },
+    { href: "/participants", label: "Participants", desc: "Find a colleague to collaborate with", icon: "👥" },
+    { href: "/onboarding", label: "How to Contribute", desc: "Make your first PR", icon: "→" },
+    { href: "/about", label: "What is SAAF", desc: "Understand the mission and pillars", icon: "ℹ" },
   ];
 
   return (
     <div>
+      {/* Onboarding wizard for new users */}
+      <OnboardingWizard profile={profile} />
+
+      {/* Profile completeness banner */}
+      {completeness && <ProfileCompletenessBanner completeness={completeness} />}
+
+      {/* About SAAF section (dismissible) */}
+      <AboutSAAFSection />
+
       {/* Greeting */}
       <div className="flex items-center gap-4 mb-6">
         <UserAvatar src={session?.user?.image} alt={session?.user?.name || username} size={56} />
@@ -61,16 +79,10 @@ export default function DashboardPage() {
           </h1>
           <p className="text-muted text-sm">@{username}</p>
         </div>
-        {achievement && (
-          <div className="flex flex-wrap gap-1.5 max-w-md justify-end">
-            {achievement.badges
-              .filter((b) => b.level > 0)
-              .map((badge) => (
-                <AchievementBadge key={badge.key} badge={badge} compact />
-              ))}
-          </div>
-        )}
       </div>
+
+      {/* Activity stats banner */}
+      <ActivityStatsBanner />
 
       {/* Quick stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
@@ -93,10 +105,47 @@ export default function DashboardPage() {
         </div>
         <div className="bg-surface border border-border rounded-xl p-4">
           <div className="text-muted text-xs font-medium mb-1">Observability checks</div>
-          <div className="text-2xl font-black">{loading ? "..." : achievement?.badges.find((b) => b.key === "observability")?.count ?? 0}</div>
+          <div className="text-2xl font-black">
+            {loading ? "..." : achievement?.badges.find((b) => b.key === "observability")?.count ?? 0}
+          </div>
           <div className="text-[10px] text-muted mt-0.5">submitted via Tracks</div>
         </div>
       </div>
+
+      {/* Achievements card */}
+      {achievement && achievement.badges.length > 0 && (
+        <div className="mb-6 bg-surface border border-border rounded-2xl p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xs font-bold text-muted uppercase tracking-wider">Your achievements</h2>
+            <Link href="/profile" className="text-xs text-accent hover:underline">View all →</Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+            {achievement.badges.map((badge) => {
+              const earned = badge.level > 0;
+              const data = badge.currentLevelData;
+              return (
+                <div
+                  key={badge.key}
+                  className={`text-center p-3 rounded-xl border ${
+                    earned && data ? data.colorClass : "text-border border-border bg-surface2"
+                  }`}
+                >
+                  <div className="text-2xl mb-1">{earned && data ? data.icon : "○"}</div>
+                  <div className="text-[10px] font-semibold uppercase tracking-wider opacity-80">
+                    {badge.title}
+                  </div>
+                  <div className="text-[10px] mt-1 opacity-70">
+                    {earned && data ? `Level ${badge.level}` : `0 / ${badge.levels[0].threshold}`}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Suggested for you */}
+      <SuggestedPlans />
 
       <div className="grid md:grid-cols-2 gap-6 mb-6">
         {/* Quick links */}

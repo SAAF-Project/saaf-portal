@@ -116,3 +116,16 @@ export interface Badge {
 export interface Achievement {
   badges: Badge[];
 }
+
+export interface ActivityStats {
+  mergedPRs: number;
+  newPlans: number;
+  observabilityChecks: number;
+  newParticipants: number;
+  contributorCount: number;
+}
+
+export interface SuggestedPlanWithReasons extends Plan {
+  score: number;
+  reasons: string[];
+}
