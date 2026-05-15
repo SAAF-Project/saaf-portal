@@ -36,6 +36,9 @@ yarn-error.log*
 # prisma
 /src/generated/
 
+# database backups (local only — contains user data)
+/backups/
+
 # vercel
 .vercel
 
