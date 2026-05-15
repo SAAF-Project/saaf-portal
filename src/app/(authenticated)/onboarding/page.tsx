@@ -237,10 +237,13 @@ export default function OnboardingPage() {
       {/* Git workflow */}
       <h2 id="new-plan" className="text-xl font-extrabold mb-3 flex items-center gap-2">
         <span className="text-accent">⚙</span>
-        Git workflow — for plan PRs
+        Git workflow — for any PR to the SAAF-Project repo
       </h2>
       <p className="text-muted text-sm mb-4">
-        For claiming, updating, or writing a plan — these are the steps. If you&apos;re stuck, ask
+        These steps apply to any contribution that needs a pull request to{" "}
+        <code className="px-1.5 py-0.5 bg-surface2 rounded text-xs text-text">SAAF-Project/SAAF-Project</code>{" "}
+        — claiming a plan, updating a plan, writing a new plan, or any other change to the repo
+        (prompts, tools, regulatory mappings, output schemas, scripts). If you&apos;re stuck, ask
         Mathijs or Eduward, or open a GitHub Discussion.
       </p>
 
