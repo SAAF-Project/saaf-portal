@@ -126,16 +126,22 @@ export default function DashboardPage() {
               return (
                 <div
                   key={badge.key}
-                  className={`text-center p-3 rounded-xl border ${
-                    earned && data ? data.colorClass : "text-border border-border bg-surface2"
+                  className={`text-center p-3 rounded-xl border transition-all ${
+                    earned && data
+                      ? data.colorClass
+                      : "text-muted border-border bg-surface2/40 grayscale opacity-60"
                   }`}
                 >
-                  <div className="text-2xl mb-1">{earned && data ? data.icon : "○"}</div>
-                  <div className="text-[10px] font-semibold uppercase tracking-wider opacity-80">
+                  <div className="text-2xl mb-1 grayscale-0">
+                    {earned && data ? data.icon : "🔒"}
+                  </div>
+                  <div className="text-[10px] font-semibold uppercase tracking-wider">
                     {badge.title}
                   </div>
-                  <div className="text-[10px] mt-1 opacity-70">
-                    {earned && data ? `Level ${badge.level}` : `0 / ${badge.levels[0].threshold}`}
+                  <div className="text-[10px] mt-1 opacity-80">
+                    {earned && data
+                      ? `Level ${badge.level}`
+                      : `${badge.count} / ${badge.levels[0].threshold}`}
                   </div>
                 </div>
               );
