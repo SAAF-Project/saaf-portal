@@ -44,6 +44,7 @@ export interface ScoreEntry {
   total: number;
   prList: { num: number; title: string; merged_at: string; url: string }[];
   firstMergedAt: string | null;
+  lastMergedAt: string | null;
 }
 
 export interface ActivityEntry {

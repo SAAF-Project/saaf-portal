@@ -28,6 +28,7 @@ export function calculateScores(
       total: number;
       prList: { num: number; title: string; merged_at: string; url: string }[];
       firstMergedAt: string | null;
+      lastMergedAt: string | null;
     }
   > = {};
 
@@ -41,6 +42,7 @@ export function calculateScores(
         total: 0,
         prList: [],
         firstMergedAt: null,
+        lastMergedAt: null,
       };
     }
   };
@@ -64,6 +66,9 @@ export function calculateScores(
     });
     if (!s.firstMergedAt || pr.merged_at < s.firstMergedAt) {
       s.firstMergedAt = pr.merged_at;
+    }
+    if (!s.lastMergedAt || pr.merged_at > s.lastMergedAt) {
+      s.lastMergedAt = pr.merged_at;
     }
 
     for (const f of pr.files) {
@@ -115,11 +120,13 @@ export function calculateScores(
       total: s.total,
       prList: s.prList,
       firstMergedAt: s.firstMergedAt,
+      lastMergedAt: s.lastMergedAt,
     }))
     .sort(
       (a, b) =>
         b.total - a.total ||
-        (a.firstMergedAt || "").localeCompare(b.firstMergedAt || "")
+        // Tiebreaker: whoever reached this score first (i.e. last PR earliest) ranks higher
+        (a.lastMergedAt || "").localeCompare(b.lastMergedAt || "")
     );
 }
 
