@@ -39,6 +39,9 @@ yarn-error.log*
 # database backups (local only — contains user data)
 /backups/
 
+# leaderboard audit output
+/audits/
+
 # vercel
 .vercel
 
