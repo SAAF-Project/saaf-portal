@@ -21,14 +21,18 @@ export const authOptions: NextAuthOptions = {
       const isMember = await isOrgMember(username);
       if (!isMember) return `/login?error=not-member&username=${encodeURIComponent(username)}`;
 
-      const existingUser = await getPrisma().user.findUnique({
-        where: { githubUsername: username },
-      });
+      const githubId = Number(account?.providerAccountId);
+
+      // Look up by githubId first (immutable), then fall back to username.
+      // Username lookup alone breaks when someone renames their GitHub account.
+      let existingUser =
+        await getPrisma().user.findUnique({ where: { githubId } }) ??
+        await getPrisma().user.findUnique({ where: { githubUsername: username } });
 
       if (!existingUser) {
         await getPrisma().user.create({
           data: {
-            githubId: Number(account?.providerAccountId),
+            githubId,
             githubUsername: username,
             name: user.name || username,
             email: user.email,
@@ -37,9 +41,10 @@ export const authOptions: NextAuthOptions = {
         });
       } else {
         const updates: Record<string, unknown> = {};
-        if (!existingUser.avatarUrl && user.image) {
-          updates.avatarUrl = user.image;
-        }
+        // Sync githubId / username in case either changed
+        if (existingUser.githubId !== githubId) updates.githubId = githubId;
+        if (existingUser.githubUsername !== username) updates.githubUsername = username;
+        if (!existingUser.avatarUrl && user.image) updates.avatarUrl = user.image;
         if (!existingUser.companyLogoUrl && existingUser.organisation) {
           const logo = matchCompanyLogo(existingUser.organisation);
           if (logo) {
@@ -49,7 +54,7 @@ export const authOptions: NextAuthOptions = {
         }
         if (Object.keys(updates).length > 0) {
           await getPrisma().user.update({
-            where: { githubUsername: username },
+            where: { id: existingUser.id },
             data: updates,
           });
         }
