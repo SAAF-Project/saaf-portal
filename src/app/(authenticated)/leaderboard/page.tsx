@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import LeaderboardCard from "@/components/LeaderboardCard";
 import ActivityFeed from "@/components/ActivityFeed";
 import type { ScoreEntry, ActivityEntry } from "@/types";
@@ -19,7 +19,6 @@ export default function LeaderboardPage() {
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<ScoreEntry | null>(null);
   const [tooltip, setTooltip] = useState<string | null>(null);
-  const tooltipRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -87,8 +86,9 @@ export default function LeaderboardPage() {
               </button>
             </span>
             {tooltip === item.label && (
-              <div className={`absolute bottom-full mb-2 w-64 p-3 bg-surface2 border border-border rounded-xl text-[11px] text-muted leading-relaxed z-50 shadow-xl font-normal ${idx >= arr.length - 2 ? "right-0" : "left-0"}`}>
-                {item.info}
+              <div className={`absolute top-full mt-2 w-72 max-w-[85vw] p-3 bg-surface2 border border-border rounded-xl text-[11px] text-muted leading-relaxed z-50 shadow-xl font-normal ${idx >= arr.length - 2 ? "right-0" : "left-0"}`}>
+                <span className={`absolute -top-1.5 w-3 h-3 bg-surface2 border-l border-t border-border rotate-45 ${idx >= arr.length - 2 ? "right-4" : "left-4"}`} />
+                <span className="relative block">{item.info}</span>
               </div>
             )}
           </span>
