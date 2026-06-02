@@ -14,6 +14,7 @@ export default function LeaderboardPage() {
     mergedPRs: number;
     planFilesTouched: number;
     totalPlans: number;
+    agentBuilders: number;
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<ScoreEntry | null>(null);
@@ -67,6 +68,10 @@ export default function LeaderboardPage() {
           {
             label: "+5 Claim", cap: "max 2", color: "bg-saaf-yellow/12 text-saaf-yellow",
             info: "Signal that you are implementing a plan at your organisation. Open any plan file, find the 'Claimed By' field in Section 1 metadata, and set it to your name. This prevents duplication and shows the community what's being built. Each claim = 5 pts (capped at 2 = 10 pts)."
+          },
+          {
+            label: "+8 Agent repo", cap: "max 2", color: "bg-saaf-orange/12 text-saaf-orange",
+            info: "Build an agent in your own SAAF-Project org repo. A repo with a real README earns +8 (your best 2 count); a reviewed agent earns +20. Plus a small bonus for lines changed in your repos (capped at +10). Quality-gated: empty or work-in-progress repos earn nothing. Reflects your current repo portfolio across all filters."
           },
         ].map((item, idx, arr) => (
           <span key={item.label} className="relative">
@@ -145,6 +150,10 @@ export default function LeaderboardPage() {
             <strong className="text-text">{stats.totalPlans}</strong> plans in
             portfolio
           </span>
+          <span>
+            <strong className="text-text">{stats.agentBuilders}</strong> agent
+            builders
+          </span>
         </div>
       )}
 
@@ -181,7 +190,8 @@ export default function LeaderboardPage() {
               </div>
             </div>
 
-            {selectedUser.prList.length === 0 ? (
+            {selectedUser.prList.length === 0 &&
+            selectedUser.agentPoints === 0 ? (
               <p className="text-muted text-sm">
                 No scored contributions yet.
               </p>
@@ -240,6 +250,28 @@ export default function LeaderboardPage() {
                     <span className="text-muted">
                       {selectedUser.claims} claim
                       {selectedUser.claims !== 1 ? "s" : ""}
+                    </span>
+                  </div>
+                )}
+                {selectedUser.agentPoints > 0 && (
+                  <div className="flex items-start gap-3 py-2 border-t border-white/4 text-sm">
+                    <span className="text-saaf-orange font-extrabold min-w-[40px] text-right">
+                      +{selectedUser.agentPoints}
+                    </span>
+                    <span className="text-muted">
+                      Agent Builder: {selectedUser.agentRepos.length} repo
+                      {selectedUser.agentRepos.length !== 1 ? "s" : ""}
+                      <span className="block text-[11px] mt-0.5">
+                        {selectedUser.agentRepos.map((r, i) => (
+                          <span key={r.name}>
+                            {i > 0 && ", "}
+                            {r.name}
+                            {r.reviewed && (
+                              <span className="text-saaf-green"> ✓</span>
+                            )}
+                          </span>
+                        ))}
+                      </span>
                     </span>
                   </div>
                 )}

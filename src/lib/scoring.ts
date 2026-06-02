@@ -1,4 +1,4 @@
-import type { PRCache } from "./github";
+import type { PRCache, AgentContributions } from "./github";
 import type { Plan, ScoreEntry, ActivityEntry } from "@/types";
 
 const LIMITS = { maxPRs: 5, maxNewPlans: 3, maxClaims: 2 };
@@ -7,6 +7,58 @@ export const SESSION_DATES: Record<string, string> = {
   h2: "2026-03-24T00:00:00Z",
 };
 
+// Agent Builder bonus — rewards quality agent repos in the org, gated on the
+// README/reviewed flag rather than raw commit count. Tune freely.
+const AGENT_LIMITS = {
+  maxRepos: 2, // only your best N qualifying repos count
+  perRepo: 8, // points for a repo that clears the README quality gate
+  reviewedBonus: 12, // extra if the repo is "reviewed" → reviewed repo = 20
+  volumeCap: 10, // hard cap on the lines-changed sub-bonus
+};
+// Lines-changed tiers (summed across your quality repos). Tiered + hard-capped
+// so a single large/generated file can't dominate the leaderboard.
+const VOLUME_TIERS = [
+  { lines: 6000, pts: 10 },
+  { lines: 1500, pts: 6 },
+  { lines: 200, pts: 3 },
+];
+
+// Central-repo max: 5×10 (PRs) + 3×15 (new plans) + 2×5 (claims) = 105.
+// Plan updates are uncapped; 105 is the baseline used for the progress bar.
+const CENTRAL_MAX = 105;
+export const MAX_SCORE =
+  CENTRAL_MAX +
+  AGENT_LIMITS.maxRepos * (AGENT_LIMITS.perRepo + AGENT_LIMITS.reviewedBonus) +
+  AGENT_LIMITS.volumeCap; // = 155
+
+function volumePoints(lines: number): number {
+  for (const t of VOLUME_TIERS) if (lines >= t.lines) return t.pts;
+  return 0;
+}
+
+// Computes a contributor's Agent Builder bonus: their best `maxRepos` qualifying
+// repos (reviewed ones counted first since they're worth more), plus a capped
+// lines-changed volume bonus.
+function agentBonus(contrib: AgentContributions[string] | undefined): {
+  points: number;
+  repos: { name: string; reviewed: boolean }[];
+} {
+  if (!contrib || contrib.repos.length === 0) return { points: 0, repos: [] };
+  const ranked = [...contrib.repos].sort(
+    (a, b) => Number(b.reviewed) - Number(a.reviewed)
+  );
+  let points = 0;
+  for (const r of ranked.slice(0, AGENT_LIMITS.maxRepos)) {
+    points += AGENT_LIMITS.perRepo;
+    if (r.reviewed) points += AGENT_LIMITS.reviewedBonus;
+  }
+  points += Math.min(AGENT_LIMITS.volumeCap, volumePoints(contrib.linesChanged));
+  return {
+    points,
+    repos: ranked.map((r) => ({ name: r.name, reviewed: r.reviewed })),
+  };
+}
+
 function isPlanFile(filename: string): boolean {
   return /^plans\/.*\.md$/.test(filename) && !filename.endsWith("README.md");
 }
@@ -14,7 +66,8 @@ function isPlanFile(filename: string): boolean {
 export function calculateScores(
   prCache: PRCache,
   plansData: Plan[],
-  filter: string = "all"
+  filter: string = "all",
+  agentContributions: AgentContributions = {}
 ): ScoreEntry[] {
   const sinceDate = SESSION_DATES[filter] || null;
 
@@ -29,6 +82,8 @@ export function calculateScores(
       prList: { num: number; title: string; merged_at: string; url: string }[];
       firstMergedAt: string | null;
       lastMergedAt: string | null;
+      agentPoints: number;
+      agentRepos: { name: string; reviewed: boolean }[];
     }
   > = {};
 
@@ -43,6 +98,8 @@ export function calculateScores(
         prList: [],
         firstMergedAt: null,
         lastMergedAt: null,
+        agentPoints: 0,
+        agentRepos: [],
       };
     }
   };
@@ -110,6 +167,19 @@ export function calculateScores(
     }
   }
 
+  // Agent Builder bonus — reflects each person's current org agent-repo
+  // portfolio. Applied on every filter (it's a portfolio measure, not a
+  // time-windowed event stream). Adds new logins who only built agents.
+  for (const [login, contrib] of Object.entries(agentContributions)) {
+    const { points, repos } = agentBonus(contrib);
+    if (points === 0) continue;
+    ensure(login);
+    const s = scores[login];
+    s.agentPoints = points;
+    s.agentRepos = repos;
+    s.total += points;
+  }
+
   return Object.entries(scores)
     .map(([login, s]) => ({
       login,
@@ -121,6 +191,8 @@ export function calculateScores(
       prList: s.prList,
       firstMergedAt: s.firstMergedAt,
       lastMergedAt: s.lastMergedAt,
+      agentPoints: s.agentPoints,
+      agentRepos: s.agentRepos,
     }))
     .sort(
       (a, b) =>

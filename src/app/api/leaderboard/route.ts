@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { fetchMergedPRs, type PRCache } from "@/lib/github";
+import {
+  fetchMergedPRs,
+  fetchAgentContributions,
+  type PRCache,
+  type AgentContributions,
+} from "@/lib/github";
 import { calculateScores, buildActivity } from "@/lib/scoring";
 import type { Plan } from "@/types";
 import { readFileSync } from "fs";
@@ -9,6 +14,11 @@ import { join } from "path";
 
 let cachedData: {
   prCache: PRCache;
+  timestamp: number;
+} | null = null;
+
+let cachedAgent: {
+  data: AgentContributions;
   timestamp: number;
 } | null = null;
 
@@ -21,6 +31,15 @@ async function getCachedPRs(): Promise<PRCache> {
   const prCache = await fetchMergedPRs();
   cachedData = { prCache, timestamp: Date.now() };
   return prCache;
+}
+
+async function getCachedAgentContributions(): Promise<AgentContributions> {
+  if (cachedAgent && Date.now() - cachedAgent.timestamp < CACHE_TTL) {
+    return cachedAgent.data;
+  }
+  const data = await fetchAgentContributions();
+  cachedAgent = { data, timestamp: Date.now() };
+  return data;
 }
 
 function loadPlansData(): Plan[] {
@@ -41,9 +60,17 @@ export async function GET(request: NextRequest) {
   const filter = request.nextUrl.searchParams.get("filter") || "all";
 
   try {
-    const prCache = await getCachedPRs();
+    const [prCache, agentContributions] = await Promise.all([
+      getCachedPRs(),
+      getCachedAgentContributions(),
+    ]);
     const plansData = loadPlansData();
-    const scores = calculateScores(prCache, plansData, filter);
+    const scores = calculateScores(
+      prCache,
+      plansData,
+      filter,
+      agentContributions
+    );
     const activity = buildActivity(prCache, filter);
 
     const totalPlanFiles = new Set<string>();
@@ -66,6 +93,7 @@ export async function GET(request: NextRequest) {
         mergedPRs: Object.keys(prCache).length,
         planFilesTouched: totalPlanFiles.size,
         totalPlans: plansData.length,
+        agentBuilders: scores.filter((s) => s.agentPoints > 0).length,
       },
     });
   } catch (e) {

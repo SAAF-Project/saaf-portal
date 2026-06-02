@@ -245,10 +245,11 @@ export default function AgentLibraryPage() {
       <div className="mt-4 p-4 bg-accent/5 border border-accent/20 rounded-xl text-xs text-muted leading-relaxed">
         <p className="text-accent font-semibold mb-1">For maintainers</p>
         <p>
-          To mark an agent as reviewed: edit{" "}
-          <code className="bg-surface2 px-1.5 py-0.5 rounded text-text">AGENT_LIBRARY_REVIEWED</code>{" "}
-          in <code className="bg-surface2 px-1.5 py-0.5 rounded text-text">src/lib/github.ts</code>{" "}
-          with category, tags, and quality flags. Other repos in the org appear automatically with
+          To mark an agent as reviewed: add a record with{" "}
+          <code className="bg-surface2 px-1.5 py-0.5 rounded text-text">verdict: &quot;reviewed&quot;</code>{" "}
+          to <code className="bg-surface2 px-1.5 py-0.5 rounded text-text">public/data/agent-reviews.json</code>{" "}
+          with category, tags, and quality flags (full analysis lives in{" "}
+          <code className="bg-surface2 px-1.5 py-0.5 rounded text-text">reviews/agents/&lt;repo&gt;.md</code>). Other repos in the org appear automatically with
           their auto-detected status.
         </p>
       </div>

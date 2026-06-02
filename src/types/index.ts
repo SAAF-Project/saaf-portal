@@ -45,6 +45,8 @@ export interface ScoreEntry {
   prList: { num: number; title: string; merged_at: string; url: string }[];
   firstMergedAt: string | null;
   lastMergedAt: string | null;
+  agentPoints: number;
+  agentRepos: { name: string; reviewed: boolean }[];
 }
 
 export interface ActivityEntry {

@@ -1,6 +1,5 @@
 import type { ScoreEntry } from "@/types";
-
-const MAX_SCORE = 105;
+import { MAX_SCORE } from "@/lib/scoring";
 
 function rankIcon(rank: number): string {
   if (rank === 0) return "🥇";
@@ -85,6 +84,12 @@ export default function LeaderboardCard({
           {entry.claims > 0 && (
             <span className="text-[10px] px-1.5 py-0.5 rounded bg-saaf-yellow/12 text-saaf-yellow font-semibold">
               {entry.claims} claim{entry.claims !== 1 ? "s" : ""}
+            </span>
+          )}
+          {entry.agentRepos.length > 0 && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-saaf-orange/12 text-saaf-orange font-semibold">
+              🤖 {entry.agentRepos.length} agent
+              {entry.agentRepos.length !== 1 ? "s" : ""}
             </span>
           )}
         </div>

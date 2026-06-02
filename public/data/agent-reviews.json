@@ -1,0 +1,228 @@
+{
+  "_comment": "Agent review registry — source of truth for the agent-library 'reviewed' badge AND the leaderboard Agent Builder bonus. The app reads records with verdict:'reviewed'. Borderline/not-yet records are kept as a versioned review log. Human-readable analysis per agent lives in reviews/agents/<repo>.md.",
+  "reviews": [
+    {
+      "repo": "GDPR-AI-Audit-Agent",
+      "verdict": "reviewed",
+      "reviewer": "SAAF maintainers (initial allowlist)",
+      "category": "Compliance",
+      "tags": ["GDPR", "PII", "DPIA"],
+      "language": "Python",
+      "structure": "Python package + Streamlit UI",
+      "quality": {
+        "hasTests": true,
+        "testCount": 10,
+        "hasSamples": true,
+        "notes": "Full Python package + Streamlit UI. Includes official GDPR text as reference data."
+      }
+    },
+    {
+      "repo": "Vendor_Guard",
+      "verdict": "reviewed",
+      "reviewer": "SAAF maintainers (initial allowlist)",
+      "category": "Compliance",
+      "tags": ["Vendor Risk", "DORA", "ISO 27001", "EU AI Act"],
+      "language": "Python",
+      "structure": "Multi-agent architecture (6 specialised agents + 4 synthesisers)",
+      "quality": {
+        "hasTests": true,
+        "testCount": 8,
+        "hasSamples": true,
+        "notes": "Multi-agent architecture: 6 specialised agents + 4 synthesisers across 8 frameworks."
+      }
+    },
+    {
+      "repo": "RCM-Builder",
+      "verdict": "reviewed",
+      "reviewer": "SAAF maintainers (initial allowlist)",
+      "category": "Risk & Controls",
+      "tags": ["RCM", "GIAS", "UC7"],
+      "language": "Python",
+      "structure": "Three-stage pipeline (normalise → design → IT validation)",
+      "quality": {
+        "hasTests": true,
+        "testCount": 2,
+        "hasSamples": false,
+        "notes": "Three-stage pipeline (normalise → design → IT validation) with thorough test coverage."
+      }
+    },
+    {
+      "repo": "Track-2-Evidence-Collection-Extraction",
+      "verdict": "reviewed",
+      "reviewer": "SAAF maintainers (initial allowlist)",
+      "category": "Evidence",
+      "tags": ["Compliance", "GIAS", "PDF"],
+      "language": "Python",
+      "structure": "CLI + Streamlit web UI",
+      "quality": {
+        "hasTests": true,
+        "testCount": 1,
+        "hasSamples": false,
+        "notes": "CLI + Streamlit web UI. GIAS v2024 8-step reasoning trail."
+      }
+    },
+    {
+      "repo": "llm_owasp",
+      "verdict": "reviewed",
+      "reviewer": "SAAF maintainers (initial allowlist)",
+      "category": "AI Security",
+      "tags": ["OWASP", "LLM", "Red-team"],
+      "language": "Python",
+      "structure": "CLI + Claude Code slash command",
+      "quality": {
+        "hasTests": false,
+        "hasSamples": true,
+        "notes": "Audits other AI agents. Includes CLI + Claude Code slash command integration."
+      }
+    },
+    {
+      "repo": "CUEC_Crosscheck",
+      "verdict": "reviewed",
+      "reviewer": "SAAF maintainers (initial allowlist)",
+      "category": "Compliance",
+      "tags": ["CUEC", "ISAE 3402", "SOC 2"],
+      "language": "Python",
+      "structure": "Single-file MVP + sample inputs",
+      "quality": {
+        "hasTests": false,
+        "hasSamples": true,
+        "notes": "Single-file MVP — focused use case. Sample inputs included."
+      }
+    },
+    {
+      "repo": "WhatsTheNews",
+      "verdict": "reviewed",
+      "reviewer": "Portal agent review (approved by MSACC)",
+      "reviewedAt": "2026-06-03",
+      "category": "Evidence",
+      "tags": ["Node.js", "RSS", "news-aggregation", "regulatory"],
+      "language": "JavaScript",
+      "structure": "Single-file Node.js HTTP app (ESM) with browser UI + node:test suite",
+      "quality": {
+        "hasTests": true,
+        "testCount": 7,
+        "hasSamples": false,
+        "notes": "Dependency-free Node app that fetches and categorises DNB/AFM/FD regulatory news into a weekly HTML briefing, with a browser form UI and 7 node:test unit tests covering parsing, categorisation, and reporting."
+      },
+      "reasoning": "Clears the bar: a real, runnable app (not a plan/README) with a clear interface, exported testable functions, and a 7-test suite using Node's built-in runner. Functionally exceeds thinner reviewed entries. Only minor gap is no dedicated samples directory (fixtures are inline), which does not block reviewed."
+    },
+    {
+      "repo": "ExecGRC",
+      "verdict": "reviewed",
+      "reviewer": "Portal agent review (approved by MSACC)",
+      "reviewedAt": "2026-06-03",
+      "category": "Audit Reporting",
+      "tags": ["GRC", "Risk & Controls", "Executive Reporting", "ISO 27001"],
+      "language": "Python",
+      "structure": "Python package (src/execsummary_grc) + CLI / console-script",
+      "quality": {
+        "hasTests": true,
+        "testCount": 4,
+        "hasSamples": true,
+        "notes": "Deterministic GRC reporting agent as a proper Python package with CLI, 4 unit tests, synthetic sample datasets, and full demo outputs (HTML/JSON/markdown) plus a hash-chained audit trail."
+      },
+      "reasoning": "Real installable Python package (10 modules under src/, pyproject with a console-script entry point, stdlib-only) exposing a runnable CLI, backed by a tests/ suite covering normalisation, analysis traceability, and audit hash-chaining, with both sample inputs and sample outputs. On par with or above existing reviewed agents like RCM-Builder and CUEC_Crosscheck."
+    },
+    {
+      "repo": "Track-2---IAM-final",
+      "verdict": "reviewed",
+      "reviewer": "Portal agent review (approved by MSACC)",
+      "reviewedAt": "2026-06-03",
+      "category": "AI Security",
+      "tags": ["IAM", "Access Review", "ISO27001", "SOC2"],
+      "language": "Python",
+      "structure": "Streamlit app + standalone CLI + FastAPI web app (bart/ sub-package)",
+      "quality": {
+        "hasTests": true,
+        "testCount": 9,
+        "hasSamples": true,
+        "notes": "IAM access-review agent cross-referencing AD vs HR exports into Claude-generated findings; ships a Streamlit app plus a polished CLI/FastAPI sub-package with 9 pytest tests, sample CSV/JSON data, a finding schema, and ISO 27001 / SOC 2 / ISAE 3402 control mappings."
+      },
+      "reasoning": "Comfortably clears the bar: real runnable agent code with multiple interfaces (Streamlit + CLI + FastAPI), 9 unit tests, sample inputs and outputs, dependency manifests, and an output JSON schema. The repo also serves as the broad Track 2 hub, but the actual agent implementation is substantive and well-structured."
+    },
+    {
+      "repo": "Audit-Work-Program-Agent-UC-8-",
+      "verdict": "reviewed",
+      "reviewer": "Portal agent review (approved by MSACC)",
+      "reviewedAt": "2026-06-03",
+      "category": "Compliance",
+      "tags": ["audit", "GIAS", "work-program", "anthropic"],
+      "language": "Python",
+      "structure": "Single-file Python CLI agent (argparse) + requirements.txt",
+      "quality": {
+        "hasTests": false,
+        "hasSamples": true,
+        "notes": "Well-structured single-file CLI agent (~12 functions, batch Claude calls) turning a UC7 RCM into a GIAS-compliant work program with json/md/xlsx outputs; rich sample inputs and multi-model sample outputs (Haiku/Opus/Sonnet), but no unit tests."
+      },
+      "reasoning": "Meets the bar: a real, runnable agent with a clear CLI interface, dependency manifest, .env.example, thorough README, and strong sample inputs plus full multi-model sample outputs. Comparable to already-reviewed no-test entries like CUEC_Crosscheck and llm_owasp. Only gap is the absence of unit tests."
+    },
+    {
+      "repo": "Policy-to-Controls-Extractor",
+      "verdict": "borderline",
+      "reviewer": "Portal agent review (approved by MSACC)",
+      "reviewedAt": "2026-06-03",
+      "category": "Compliance",
+      "tags": ["compliance", "controls", "policy-extraction", "anthropic"],
+      "language": "Python",
+      "structure": "Multi-module Python package + CLI (agent orchestrator, models/prompts, services/ extractors)",
+      "quality": {
+        "hasTests": false,
+        "hasSamples": false,
+        "notes": "Clean multi-module Python CLI agent that extracts 6W-framework controls from PDF/DOCX policies via Claude with a Critic pass and JSON/XLSX output, but ships no tests, no committed sample fixtures (testdata/ is gitignored), and a stray 'docx_extractor copy.py' duplicate."
+      },
+      "reasoning": "Genuine, runnable multi-file agent — structurally stronger than some reviewed single-file MVPs — but has neither unit tests nor committed sample inputs/outputs.",
+      "pathToReviewed": "Add a couple of unit tests, commit sample policy/output fixtures, and remove the 'docx_extractor copy.py' duplicate."
+    },
+    {
+      "repo": "Track-4-Audit-Report-Generator",
+      "verdict": "borderline",
+      "reviewer": "Portal agent review (approved by MSACC)",
+      "reviewedAt": "2026-06-03",
+      "category": "Audit Reporting",
+      "tags": ["FastAPI", "Claude/Anthropic", "python-docx", "audit-reporting"],
+      "language": "Python",
+      "structure": "FastAPI app (app/main.py + 3 services) with HTML/JS UI; run.py entry point",
+      "quality": {
+        "hasTests": false,
+        "hasSamples": false,
+        "notes": "Runnable FastAPI web app that fills .docx templates via Claude with CSV/Excel ingestion, but no tests, no sample inputs/outputs, and a duplicated root-vs-app/ directory structure."
+      },
+      "reasoning": "Functional, well-structured real agent with a clear runnable interface, but no tests, no samples, and a duplicated root-level copy of the app/ package signalling unfinished cleanup.",
+      "pathToReviewed": "Add unit tests and sample inputs/outputs; remove the duplicated root-level copy of app/services/templates."
+    },
+    {
+      "repo": "Finding-analysis",
+      "verdict": "borderline",
+      "reviewer": "Portal agent review (approved by MSACC)",
+      "reviewedAt": "2026-06-03",
+      "category": "Audit Reporting",
+      "tags": ["Flask", "Anthropic", "audit-findings", "document-analysis"],
+      "language": "Python",
+      "structure": "Multi-module Python package (agent/parsers/report) + Flask web UI",
+      "quality": {
+        "hasTests": false,
+        "hasSamples": false,
+        "notes": "Substantial multi-module Flask agent that ingests historical audit reports (PDF/PPTX/XLSX/DOCX/images + SharePoint) and streams Claude-scored findings to an HTML report, but ships no tests, no sample inputs/outputs, and only a one-line README."
+      },
+      "reasoning": "Real, clearly-runnable agent with a richer codebase than several reviewed entries, but hits the 'functional but thin' combination: no tests AND no samples AND a single-sentence README.",
+      "pathToReviewed": "Add a few sample fixtures and a proper usage README; add unit tests."
+    },
+    {
+      "repo": "UC3-incident-issue-intelligence",
+      "verdict": "not-yet",
+      "reviewer": "Portal agent review (approved by MSACC)",
+      "reviewedAt": "2026-06-03",
+      "category": "Risk & Controls",
+      "tags": ["incident-intelligence", "audit-risk", "GIAS-13.2", "multi-agent"],
+      "language": "Python",
+      "structure": "Skeleton Python package (main.py + 7 workflow_steps/ modules + prompts.py) — all stubs",
+      "quality": {
+        "hasTests": false,
+        "hasSamples": true,
+        "notes": "Well-architected 7-step plan with synthetic incident/context sample inputs, but every module is a docstring stub (functions return None / NotImplementedError) — no working code, no dependency manifest, no tests, no runnable interface."
+      },
+      "reasoning": "Below the bar: the SAAF plan template plus an unimplemented skeleton. main.py imports stub modules; all workflow_steps/*.py and prompts.py contain only docstrings and functions that return None or raise NotImplementedError; no requirements/pyproject and no runnable CLI/UI.",
+      "pathToReviewed": "Implement the workflow_steps modules into working code, add a dependency manifest (requirements.txt/pyproject.toml), unit tests, and sample outputs."
+    }
+  ]
+}

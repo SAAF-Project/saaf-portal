@@ -1,3 +1,6 @@
+import { readFileSync } from "fs";
+import { join } from "path";
+
 const GITHUB_PAT = process.env.GITHUB_PAT!;
 const API = "https://api.github.com";
 const ORG = "SAAF-Project";
@@ -17,67 +20,36 @@ export interface ReviewedAgent {
   };
 }
 
-// Curated agents — manually reviewed for code quality.
-export const AGENT_LIBRARY_REVIEWED: Record<string, ReviewedAgent> = {
-  "GDPR-AI-Audit-Agent": {
-    category: "Compliance",
-    tags: ["GDPR", "PII", "DPIA"],
-    quality: {
-      hasTests: true,
-      testCount: 10,
-      hasSamples: true,
-      notes: "Full Python package + Streamlit UI. Includes official GDPR text as reference data.",
-    },
-  },
-  "Vendor_Guard": {
-    category: "Compliance",
-    tags: ["Vendor Risk", "DORA", "ISO 27001", "EU AI Act"],
-    quality: {
-      hasTests: true,
-      testCount: 8,
-      hasSamples: true,
-      notes: "Multi-agent architecture: 6 specialised agents + 4 synthesisers across 8 frameworks.",
-    },
-  },
-  "RCM-Builder": {
-    category: "Risk & Controls",
-    tags: ["RCM", "GIAS", "UC7"],
-    quality: {
-      hasTests: true,
-      testCount: 2,
-      hasSamples: false,
-      notes: "Three-stage pipeline (normalise → design → IT validation) with thorough test coverage.",
-    },
-  },
-  "Track-2-Evidence-Collection-Extraction": {
-    category: "Evidence",
-    tags: ["Compliance", "GIAS", "PDF"],
-    quality: {
-      hasTests: true,
-      testCount: 1,
-      hasSamples: false,
-      notes: "CLI + Streamlit web UI. GIAS v2024 8-step reasoning trail.",
-    },
-  },
-  "llm_owasp": {
-    category: "AI Security",
-    tags: ["OWASP", "LLM", "Red-team"],
-    quality: {
-      hasTests: false,
-      hasSamples: true,
-      notes: "Audits other AI agents. Includes CLI + Claude Code slash command integration.",
-    },
-  },
-  "CUEC_Crosscheck": {
-    category: "Compliance",
-    tags: ["CUEC", "ISAE 3402", "SOC 2"],
-    quality: {
-      hasTests: false,
-      hasSamples: true,
-      notes: "Single-file MVP — focused use case. Sample inputs included.",
-    },
-  },
-};
+// Reviewed-agent metadata drives the agent-library "reviewed" badge AND the
+// leaderboard's Agent Builder bonus. Source of truth: public/data/agent-reviews.json
+// (records with verdict:"reviewed"). Kept as versioned data — not a hardcoded
+// const — so the full review log is reusable (UI, leaderboard, saaf-pr-review skill).
+interface AgentReviewRecord extends ReviewedAgent {
+  repo: string;
+  verdict: string;
+}
+
+let reviewedCache: Record<string, ReviewedAgent> | null = null;
+
+export function getReviewedAgents(): Record<string, ReviewedAgent> {
+  if (reviewedCache) return reviewedCache;
+  const map: Record<string, ReviewedAgent> = {};
+  try {
+    const raw = readFileSync(
+      join(process.cwd(), "public", "data", "agent-reviews.json"),
+      "utf-8"
+    );
+    const data = JSON.parse(raw) as { reviews: AgentReviewRecord[] };
+    for (const r of data.reviews) {
+      if (r.verdict !== "reviewed") continue;
+      map[r.repo] = { category: r.category, tags: r.tags, quality: r.quality };
+    }
+  } catch {
+    // Missing/invalid file → no reviewed agents (keeps build & runtime green).
+  }
+  reviewedCache = map;
+  return map;
+}
 
 // Cache TTLs in seconds — tuned per endpoint type
 export const CACHE_TTL = {
@@ -124,6 +96,93 @@ export interface AgentRepo {
   recentlyUpdated: boolean;
 }
 
+const README_QUALITY_THRESHOLD = 200;
+
+// Single source of truth for an agent repo's review status. Reviewed agents
+// (allowlist) always rank highest; otherwise status is derived from README size.
+function computeStatus(
+  readmeSize: number,
+  reviewed: ReviewedAgent | undefined
+): AgentStatus {
+  if (reviewed) return "reviewed";
+  if (readmeSize === 0) return "needs-readme";
+  if (readmeSize < README_QUALITY_THRESHOLD) return "work-in-progress";
+  return "not-reviewed";
+}
+
+// A repo only earns the Agent Builder leaderboard bonus if it clears the quality
+// gate: a real README (reviewed agents always qualify). WIP / missing-README
+// repos earn nothing — this is the anti-gaming gate.
+function qualifiesForBonus(status: AgentStatus): boolean {
+  return status === "reviewed" || status === "not-reviewed";
+}
+
+function isBotLogin(login: string): boolean {
+  return /\[bot\]$/i.test(login);
+}
+
+const MANIFEST_FILES = new Set([
+  "requirements.txt",
+  "pyproject.toml",
+  "package.json",
+  "go.mod",
+  "setup.py",
+  "setup.cfg",
+  "pipfile",
+  "cargo.toml",
+  "gemfile",
+  "build.gradle",
+  "pom.xml",
+]);
+const CODE_EXT = /\.(py|ts|tsx|js|jsx|go|rb|java|rs|cs|php|ipynb|cpp|c|kt|swift)$/i;
+const CODE_BYTES_FLOOR = 15000; // manifest-less repos need real code volume to count
+
+const repoCodeCache = new Map<string, { has: boolean; ts: number }>();
+const REPO_CODE_TTL = 10 * 60 * 1000;
+
+// Stricter scoring gate: a non-reviewed repo must contain real code — a
+// dependency manifest OR a meaningful volume of code files — so a big README on
+// an empty stub (e.g. UC3) cannot earn the Agent Builder base bonus. Reviewed
+// repos bypass this (already vetted). One cached tree call per repo.
+async function repoHasCode(repoName: string): Promise<boolean> {
+  const cached = repoCodeCache.get(repoName);
+  if (cached && Date.now() - cached.ts < REPO_CODE_TTL) return cached.has;
+
+  let has = false;
+  try {
+    const repoRes = await githubFetch(`${API}/repos/${ORG}/${repoName}`, {
+      revalidate: CACHE_TTL.REPOS_LIST,
+    });
+    const meta = repoRes.ok ? await repoRes.json() : null;
+    const branch = meta?.default_branch || "main";
+    const treeRes = await githubFetch(
+      `${API}/repos/${ORG}/${repoName}/git/trees/${branch}?recursive=1`,
+      { revalidate: CACHE_TTL.REPOS_LIST }
+    );
+    if (treeRes.ok) {
+      const tree = await treeRes.json();
+      if (Array.isArray(tree?.tree)) {
+        let codeBytes = 0;
+        for (const t of tree.tree) {
+          if (t.type !== "blob" || typeof t.path !== "string") continue;
+          const base = t.path.split("/").pop()!.toLowerCase();
+          if (MANIFEST_FILES.has(base)) {
+            has = true;
+            break;
+          }
+          if (CODE_EXT.test(t.path)) {
+            codeBytes += typeof t.size === "number" ? t.size : 0;
+          }
+        }
+        if (!has && codeBytes >= CODE_BYTES_FLOOR) has = true;
+      }
+    }
+  } catch {}
+
+  repoCodeCache.set(repoName, { has, ts: Date.now() });
+  return has;
+}
+
 export async function fetchAgentLibrary(): Promise<AgentRepo[]> {
   const repos: AgentRepo[] = [];
   let page = 1;
@@ -140,7 +199,7 @@ export async function fetchAgentLibrary(): Promise<AgentRepo[]> {
     for (const repo of data) {
       if (META_REPOS.has(repo.name) || repo.archived) continue;
 
-      const reviewed = AGENT_LIBRARY_REVIEWED[repo.name];
+      const reviewed = getReviewedAgents()[repo.name];
 
       // Fetch README
       let readmeExcerpt: string | null = null;
@@ -158,16 +217,7 @@ export async function fetchAgentLibrary(): Promise<AgentRepo[]> {
       } catch {}
 
       // Determine status
-      let status: AgentStatus;
-      if (reviewed) {
-        status = "reviewed";
-      } else if (readmeSize === 0) {
-        status = "needs-readme";
-      } else if (readmeSize < 200) {
-        status = "work-in-progress";
-      } else {
-        status = "not-reviewed";
-      }
+      const status = computeStatus(readmeSize, reviewed);
 
       // Recently updated = pushed in last 60 days
       const daysSincePush =
@@ -239,6 +289,128 @@ function extractExcerpt(markdown: string, maxChars = 400): string {
   }
 
   return excerpt || "";
+}
+
+export interface AgentContributionRepo {
+  name: string;
+  status: AgentStatus;
+  reviewed: boolean;
+}
+
+export interface AgentContribution {
+  repos: AgentContributionRepo[];
+  linesChanged: number;
+}
+
+// login -> their qualifying agent-repo contributions across the org
+export type AgentContributions = Record<string, AgentContribution>;
+
+// Scans every non-meta, non-archived org repo that clears the README quality
+// gate, and attributes to each contributor (via GitHub's stats/contributors
+// endpoint) the repos they committed to plus their total lines changed
+// (additions + deletions). Feeds the leaderboard's Agent Builder bonus.
+// Bots are excluded. Lines-changed is intentionally noisy (includes generated
+// files) but the consumer hard-caps it, so accuracy isn't critical here.
+export async function fetchAgentContributions(): Promise<AgentContributions> {
+  const result: AgentContributions = {};
+  let page = 1;
+
+  while (true) {
+    const res = await githubFetch(
+      `${API}/orgs/${ORG}/repos?per_page=100&page=${page}&sort=pushed`,
+      { revalidate: CACHE_TTL.REPOS_LIST }
+    );
+    if (!res.ok) break;
+    const data = await res.json();
+    if (!Array.isArray(data) || data.length === 0) break;
+
+    for (const repo of data) {
+      if (META_REPOS.has(repo.name) || repo.archived) continue;
+      const reviewed = getReviewedAgents()[repo.name];
+
+      // Quality gate — fetch README size only (not the full excerpt).
+      let readmeSize = 0;
+      try {
+        const readmeRes = await githubFetch(
+          `${API}/repos/${ORG}/${repo.name}/readme`,
+          {
+            accept: "application/vnd.github.raw+json",
+            revalidate: CACHE_TTL.README,
+          }
+        );
+        if (readmeRes.ok) readmeSize = (await readmeRes.text()).length;
+      } catch {}
+
+      const status = computeStatus(readmeSize, reviewed);
+      if (!qualifiesForBonus(status)) continue;
+      const isReviewed = status === "reviewed";
+
+      // Non-reviewed repos must also contain real code (manifest or code
+      // volume) — closes the "big README on an empty stub" gap. Reviewed repos
+      // are already vetted and skip this extra call.
+      if (!isReviewed && !(await repoHasCode(repo.name))) continue;
+
+      // Attribution via the reliable /contributors endpoint (200, never 202).
+      // This drives the base + reviewed bonus, so it must not depend on the
+      // flaky stats endpoint below.
+      const contribRes = await githubFetch(
+        `${API}/repos/${ORG}/${repo.name}/contributors?per_page=100`,
+        { revalidate: CACHE_TTL.CONTRIBUTORS }
+      );
+      let contributors: unknown;
+      try {
+        contributors = contribRes.ok ? await contribRes.json() : null;
+      } catch {
+        contributors = null;
+      }
+      if (!Array.isArray(contributors) || contributors.length === 0) continue;
+
+      // Best-effort lines-changed via the stats endpoint. GitHub returns 202
+      // while it (re)computes — in that case volume degrades to 0 for this
+      // load (the base/reviewed bonus still applies); the Next fetch cache
+      // fills it in on a later request.
+      const linesByLogin: Record<string, number> = {};
+      const statsRes = await githubFetch(
+        `${API}/repos/${ORG}/${repo.name}/stats/contributors`,
+        { revalidate: CACHE_TTL.CONTRIBUTORS }
+      );
+      if (statsRes.ok && statsRes.status !== 202) {
+        try {
+          const stats = await statsRes.json();
+          if (Array.isArray(stats)) {
+            for (const s of stats) {
+              const l: string | undefined = s?.author?.login;
+              if (!l) continue;
+              linesByLogin[l] = Array.isArray(s.weeks)
+                ? s.weeks.reduce(
+                    (sum: number, w: { a?: number; d?: number }) =>
+                      sum + (w.a || 0) + (w.d || 0),
+                    0
+                  )
+                : 0;
+            }
+          }
+        } catch {}
+      }
+
+      for (const c of contributors) {
+        const login: string | undefined = c?.login;
+        if (!login || isBotLogin(login)) continue;
+        if (!result[login]) result[login] = { repos: [], linesChanged: 0 };
+        result[login].repos.push({
+          name: repo.name,
+          status,
+          reviewed: isReviewed,
+        });
+        result[login].linesChanged += linesByLogin[login] || 0;
+      }
+    }
+
+    if (data.length < 100) break;
+    page++;
+  }
+
+  return result;
 }
 
 export async function isOrgMember(username: string): Promise<boolean> {
