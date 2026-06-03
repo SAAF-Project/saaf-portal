@@ -42,6 +42,9 @@ yarn-error.log*
 # leaderboard audit output
 /audits/
 
+# working drafts (emails, announcements — local only)
+/drafts/
+
 # vercel
 .vercel
 
