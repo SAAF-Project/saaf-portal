@@ -1,6 +1,18 @@
 import Link from "next/link";
 
-const CONTRIBUTION_WAYS = [
+type ContribWay = {
+  icon: string;
+  title: string;
+  needsGit: boolean;
+  desc: string;
+  href?: string;
+  cta?: string;
+  external?: boolean;
+  color: string;
+  iconColor: string;
+};
+
+const CONTRIBUTION_WAYS: ContribWay[] = [
   {
     icon: "🔍",
     title: "Submit observability checks",
@@ -51,10 +63,19 @@ const CONTRIBUTION_WAYS = [
     icon: "🛠️",
     title: "Build an agent",
     needsGit: true,
-    desc: "Implement an agent in code. Create a new repo in the SAAF-Project organisation, or contribute to an existing agent repo.",
-    href: "https://github.com/orgs/SAAF-Project/repositories",
-    external: true,
-    cta: "Browse org repos ↗",
+    desc: "Building a standalone agent? Give it its own dedicated repo in the SAAF-Project org — that's the recommended home now, and it earns the Agent Builder bonus on the leaderboard.",
+    href: "#build-agent",
+    cta: "Where should it live? →",
+    color: "border-saaf-orange/30 bg-saaf-orange/5",
+    iconColor: "text-saaf-orange",
+  },
+  {
+    icon: "📦",
+    title: "Migrate your agent to its own repo",
+    needsGit: true,
+    desc: "Built your agent inside the main SAAF-Project repo earlier? Move it to a dedicated repo. You keep your original points and gain the Agent Builder bonus on top.",
+    href: "#migrate",
+    cta: "How to migrate →",
     color: "border-saaf-orange/30 bg-saaf-orange/5",
     iconColor: "text-saaf-orange",
   },
@@ -256,6 +277,163 @@ export default function OnboardingPage() {
           Note: claiming is not the only way to use a plan. You can implement an agent without
           claiming — claiming is an explicit signal of commitment.
         </p>
+      </div>
+
+      {/* Where your agent lives */}
+      <h2 id="build-agent" className="text-xl font-extrabold mb-3 flex items-start gap-2 flex-wrap">
+        <span className="text-saaf-orange shrink-0">🛠️</span>
+        <span>Where your agent lives</span>
+      </h2>
+      <div className="bg-surface border border-border rounded-2xl p-6 mb-8">
+        <p className="text-sm text-muted leading-relaxed mb-4">
+          Early on, everything lived in the single{" "}
+          <code className="px-1.5 py-0.5 bg-surface2 rounded text-xs text-text">SAAF-Project</code>{" "}
+          repo. But most of you are building{" "}
+          <strong className="text-text">standalone agents that get deployed on their own</strong> — so
+          the recommended home is now a <strong className="text-text">dedicated repo per agent</strong>{" "}
+          in the SAAF-Project organisation. The main repo becomes the shared backbone that{" "}
+          <em>references</em> your agent.
+        </p>
+        <div className="grid md:grid-cols-2 gap-3 mb-4">
+          <div className="p-3 bg-saaf-orange/5 border border-saaf-orange/20 rounded-lg">
+            <div className="font-semibold text-sm text-saaf-orange mb-1">Your own agent repo</div>
+            <p className="text-xs text-muted leading-relaxed">
+              The full agent: source code, tests, sample inputs/outputs, its own README and deploy
+              config. One repo = one agent, easy to run and review.
+            </p>
+          </div>
+          <div className="p-3 bg-accent/5 border border-accent/20 rounded-lg">
+            <div className="font-semibold text-sm text-accent mb-1">Stays in SAAF-Project</div>
+            <p className="text-xs text-muted leading-relaxed">
+              Shared building blocks: prompts, regulatory mappings, output schemas, shared utility
+              scripts (e.g. the transcription tooling), your plan, and a reference row pointing to
+              your repo.
+            </p>
+          </div>
+        </div>
+        <div className="p-3 bg-accent/5 border border-accent/20 rounded-lg text-xs text-muted leading-relaxed mb-4">
+          <strong className="text-text">Future direction:</strong> we may wire the agent repos
+          together as a monorepo (e.g. Turborepo) so they can be spun up from SAAF-Project while each
+          agent keeps its own home. For now, one dedicated repo per agent is the way.
+        </div>
+        <p className="text-sm text-muted leading-relaxed">
+          A dedicated repo also earns the{" "}
+          <Link href="/leaderboard" className="text-accent font-semibold hover:underline">
+            Agent Builder bonus
+          </Link>{" "}
+          on the leaderboard, and can be promoted to{" "}
+          <Link href="/agent-library" className="text-accent font-semibold hover:underline">
+            reviewed
+          </Link>{" "}
+          once it has a real README, and ideally tests + sample data.
+        </p>
+      </div>
+
+      {/* Migrate an agent out of SAAF-Project */}
+      <h2 id="migrate" className="text-xl font-extrabold mb-3 flex items-start gap-2 flex-wrap">
+        <span className="text-saaf-orange shrink-0">📦</span>
+        <span>Migrate an agent out of SAAF-Project</span>
+      </h2>
+      <div className="bg-surface border border-border rounded-2xl p-6 mb-8">
+        <p className="text-sm text-muted leading-relaxed mb-4">
+          Did you build your agent <em>inside</em> the main repo (e.g. under{" "}
+          <code className="px-1.5 py-0.5 bg-surface2 rounded text-xs text-text">tools/scripts/</code>)?
+          Please move it to its own repo. This keeps the main repo clean and makes your agent easy to
+          find, run, and deploy.
+        </p>
+        <h4 className="font-bold text-sm mb-2">Steps</h4>
+        <ol className="list-decimal pl-5 space-y-2 text-sm text-muted mb-4">
+          <li>
+            Create a new repo in the <strong className="text-text">SAAF-Project</strong> org for your
+            agent and push your code there (keep the git history if you can) with a clear README.
+          </li>
+          <li>
+            Open a <strong className="text-text">removal PR</strong> on SAAF-Project that deletes your
+            agent&apos;s folder from the main repo (uses the same Git workflow below).
+          </li>
+          <li>
+            Leave a <strong className="text-text">reference</strong> behind: add or keep a row in the
+            README agent index linking to your new repo.
+          </li>
+        </ol>
+        <div className="p-3 bg-accent/5 border border-accent/20 rounded-lg text-xs text-muted leading-relaxed mb-4">
+          <strong className="text-text">Important — link the removal PR to your new repo.</strong> In
+          the PR description, link your new agent repo and list the files you moved. That lets the
+          maintainer quickly confirm that nothing more is removed than what now lives in your agent
+          repo.
+        </div>
+        <div className="flex items-start gap-2 p-3 bg-saaf-yellow/5 border border-saaf-yellow/20 rounded-lg mb-4">
+          <span className="text-saaf-yellow text-lg shrink-0">🏆</span>
+          <p className="text-xs text-muted leading-relaxed">
+            <strong className="text-text">Good for your score.</strong> You keep the points from your
+            original SAAF-Project contribution, the removal PR counts as a merged PR (+10), and your
+            new repo earns the Agent Builder bonus (a reviewed agent is worth +20). Early movers who
+            follow the rules end up ahead — a nice bonus for building in the open.
+          </p>
+        </div>
+        <h4 className="font-bold text-sm mb-2">Removal-PR checklist</h4>
+        <ul className="list-disc pl-5 space-y-1 text-sm text-muted">
+          <li>New agent repo created and pushed</li>
+          <li>PR description links the new repo and lists the moved files</li>
+          <li>Only the migrated agent&apos;s files are deleted — nothing else</li>
+          <li>A reference row to the new repo is added in the README index</li>
+        </ul>
+      </div>
+
+      {/* Make your work easy to follow */}
+      <h2 id="transparency" className="text-xl font-extrabold mb-3 flex items-start gap-2 flex-wrap">
+        <span className="text-accent shrink-0">🧭</span>
+        <span>Make your work easy to follow</span>
+      </h2>
+      <div className="bg-surface border border-border rounded-2xl p-6 mb-8">
+        <p className="text-sm text-muted leading-relaxed mb-4">
+          A recurring piece of feedback: it is not always clear what someone is working on or where
+          their code lives. A few small habits make your work easy for the community — and the
+          maintainers — to follow.
+        </p>
+        <h4 className="font-bold text-sm mb-2">Connect the dots: plan ↔ repo ↔ PR</h4>
+        <ul className="list-disc pl-5 space-y-1 text-sm text-muted mb-4">
+          <li>
+            State which <strong className="text-text">plan</strong> your agent implements, and link
+            to it.
+          </li>
+          <li>
+            Make it obvious <strong className="text-text">where the code lives</strong> — your own
+            repo, or (for now) a folder in SAAF-Project.
+          </li>
+          <li>
+            From your plan, link to the repo; from the repo README, link back to the plan and to
+            SAAF-Project.
+          </li>
+        </ul>
+        <h4 className="font-bold text-sm mb-2">A README that explains itself</h4>
+        <ul className="list-disc pl-5 space-y-1 text-sm text-muted mb-4">
+          <li>
+            <strong className="text-text">What</strong> the agent does and the audit problem it
+            solves.
+          </li>
+          <li>
+            <strong className="text-text">How to run it</strong> — install, env vars, one command to
+            try it.
+          </li>
+          <li>
+            <strong className="text-text">What each part does</strong> — a short map of the main
+            files/modules.
+          </li>
+          <li>
+            <strong className="text-text">Inputs and outputs</strong> — with a small sample of each.
+          </li>
+        </ul>
+        <div className="flex items-start gap-2 p-3 bg-saaf-green/5 border border-saaf-green/20 rounded-lg">
+          <span className="text-saaf-green text-lg shrink-0">✅</span>
+          <p className="text-xs text-muted leading-relaxed">
+            These are exactly the things that get an agent promoted to{" "}
+            <Link href="/agent-library" className="text-accent font-semibold hover:underline">
+              reviewed
+            </Link>{" "}
+            in the agent library — a real README, tests, and sample data.
+          </p>
+        </div>
       </div>
 
       {/* Git workflow */}
