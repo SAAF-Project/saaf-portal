@@ -2,9 +2,15 @@ import type { PRCache, AgentContributions } from "./github";
 import type { Plan, ScoreEntry, ActivityEntry } from "@/types";
 
 const LIMITS = { maxPRs: 5, maxNewPlans: 3, maxClaims: 2 };
+// Hackathon event dates (cutoffs for the "Since Hackathon #N" filters).
+// Source of truth: https://saafproject.com/#schedule — update here when new
+// sessions are announced. Numbering follows the schedule's session count:
+// session 1 was the alignment kick-off, so the first hackathon is "#2".
 export const SESSION_DATES: Record<string, string> = {
-  h3: "2026-04-21T00:00:00Z",
-  h2: "2026-03-24T00:00:00Z",
+  h5: "2026-05-19T00:00:00Z",
+  h4: "2026-04-21T00:00:00Z",
+  h3: "2026-03-24T00:00:00Z",
+  h2: "2026-03-10T00:00:00Z",
 };
 
 // Agent Builder bonus — rewards quality agent repos in the org, gated on the

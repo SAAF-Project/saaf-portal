@@ -43,6 +43,8 @@ export default function LeaderboardPage() {
           className="px-3 py-1.5 bg-surface border border-border rounded-lg text-sm text-text focus:outline-none focus:border-accent"
         >
           <option value="all">All time</option>
+          <option value="h5">Since Hackathon #5</option>
+          <option value="h4">Since Hackathon #4</option>
           <option value="h3">Since Hackathon #3</option>
           <option value="h2">Since Hackathon #2</option>
         </select>
