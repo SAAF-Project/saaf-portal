@@ -316,8 +316,53 @@ export default function OnboardingPage() {
           together as a monorepo (e.g. Turborepo) so they can be spun up from SAAF-Project while each
           agent keeps its own home. For now, one dedicated repo per agent is the way.
         </div>
+        <h4 className="font-bold text-sm mb-2">What the repo root should look like</h4>
+        <p className="text-sm text-muted leading-relaxed mb-2">
+          Keep it flat and clean. <strong className="text-text">Don&apos;t copy the nested folder
+          structure from SAAF-Project</strong> (no <code className="px-1.5 py-0.5 bg-surface2 rounded text-xs text-text">tools/scripts/</code> inside
+          your own repo). Put your main script at the root and only create subfolders when you have
+          a real reason.
+        </p>
+        <pre className="bg-surface2 rounded-lg p-3 text-xs text-text font-mono leading-relaxed overflow-x-auto mb-4">
+{`your-agent-repo/
+  README.md            ← required (see template below)
+  requirements.txt     ← or pyproject.toml / package.json
+  your_agent.py        ← main script at the root
+  samples/             ← example inputs and outputs
+  tests/               ← unit tests (optional but recommended)`}
+        </pre>
+        <h4 className="font-bold text-sm mb-2">Minimal README template</h4>
+        <pre className="bg-surface2 rounded-lg p-3 text-xs text-text font-mono leading-relaxed overflow-x-auto mb-4">
+{`# Agent Name
+
+One sentence: what audit problem does this solve?
+
+## How to run
+
+\`\`\`bash
+pip install -r requirements.txt
+python your_agent.py input.csv
+\`\`\`
+
+## What it does
+
+Short description of the steps the agent takes.
+
+## Input / output
+
+- Input: describe what files or data it expects
+- Output: describe what it produces
+
+## Related plan
+
+[Plan title](https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/...)
+
+## Part of SAAF Project
+
+[saaf-portal.vercel.app](https://saaf-portal.vercel.app)`}
+        </pre>
         <p className="text-sm text-muted leading-relaxed">
-          A dedicated repo also earns the{" "}
+          A repo with a real README earns the{" "}
           <Link href="/leaderboard" className="text-accent font-semibold hover:underline">
             Agent Builder bonus
           </Link>{" "}
@@ -325,7 +370,7 @@ export default function OnboardingPage() {
           <Link href="/agent-library" className="text-accent font-semibold hover:underline">
             reviewed
           </Link>{" "}
-          once it has a real README, and ideally tests + sample data.
+          once it also has a dependency manifest and, ideally, tests + sample data.
         </p>
       </div>
 
@@ -344,8 +389,13 @@ export default function OnboardingPage() {
         <h4 className="font-bold text-sm mb-2">Steps</h4>
         <ol className="list-decimal pl-5 space-y-2 text-sm text-muted mb-4">
           <li>
-            Create a new repo in the <strong className="text-text">SAAF-Project</strong> org for your
-            agent and push your code there (keep the git history if you can) with a clear README.
+            Create a new repo in the <strong className="text-text">SAAF-Project</strong> org and push
+            your code there with a README and a{" "}
+            <code className="px-1.5 py-0.5 bg-surface2 rounded text-xs text-text">requirements.txt</code>.{" "}
+            <strong className="text-text">Flatten the structure</strong> — put your main script at the
+            repo root, not inside a{" "}
+            <code className="px-1.5 py-0.5 bg-surface2 rounded text-xs text-text">tools/scripts/</code>{" "}
+            subfolder copied from the main repo.
           </li>
           <li>
             Open a <strong className="text-text">removal PR</strong> on SAAF-Project that deletes your
