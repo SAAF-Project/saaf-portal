@@ -24,7 +24,7 @@ export default function ActivityStatsBanner() {
 
   return (
     <div className="mb-6 p-3 px-4 bg-surface border border-border rounded-xl flex items-center gap-4 text-sm flex-wrap">
-      <span className="text-xs text-muted font-bold uppercase tracking-wider">📊 Last 7 days</span>
+      <span className="text-xs text-muted font-bold uppercase tracking-wider">📊 Community — last 7 days</span>
       <div className="flex items-center gap-4 flex-wrap">
         {items.map((item, i) => (
           <span key={i} className="flex items-center gap-1.5">
