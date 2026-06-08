@@ -47,9 +47,11 @@ function volumePoints(lines: number): number {
 // lines-changed volume bonus.
 function agentBonus(contrib: AgentContributions[string] | undefined): {
   points: number;
+  volumePts: number;
   repos: { name: string; reviewed: boolean }[];
 } {
-  if (!contrib || contrib.repos.length === 0) return { points: 0, repos: [] };
+  if (!contrib || contrib.repos.length === 0)
+    return { points: 0, volumePts: 0, repos: [] };
   const ranked = [...contrib.repos].sort(
     (a, b) => Number(b.reviewed) - Number(a.reviewed)
   );
@@ -58,9 +60,11 @@ function agentBonus(contrib: AgentContributions[string] | undefined): {
     points += AGENT_LIMITS.perRepo;
     if (r.reviewed) points += AGENT_LIMITS.reviewedBonus;
   }
-  points += Math.min(AGENT_LIMITS.volumeCap, volumePoints(contrib.linesChanged));
+  const volumePts = Math.min(AGENT_LIMITS.volumeCap, volumePoints(contrib.linesChanged));
+  points += volumePts;
   return {
     points,
+    volumePts,
     repos: ranked.map((r) => ({ name: r.name, reviewed: r.reviewed })),
   };
 }
@@ -89,6 +93,7 @@ export function calculateScores(
       firstMergedAt: string | null;
       lastMergedAt: string | null;
       agentPoints: number;
+      agentVolumePts: number;
       agentRepos: { name: string; reviewed: boolean }[];
     }
   > = {};
@@ -105,6 +110,7 @@ export function calculateScores(
         firstMergedAt: null,
         lastMergedAt: null,
         agentPoints: 0,
+        agentVolumePts: 0,
         agentRepos: [],
       };
     }
@@ -177,11 +183,12 @@ export function calculateScores(
   // portfolio. Applied on every filter (it's a portfolio measure, not a
   // time-windowed event stream). Adds new logins who only built agents.
   for (const [login, contrib] of Object.entries(agentContributions)) {
-    const { points, repos } = agentBonus(contrib);
+    const { points, volumePts, repos } = agentBonus(contrib);
     if (points === 0) continue;
     ensure(login);
     const s = scores[login];
     s.agentPoints = points;
+    s.agentVolumePts = volumePts;
     s.agentRepos = repos;
     s.total += points;
   }
@@ -198,6 +205,7 @@ export function calculateScores(
       firstMergedAt: s.firstMergedAt,
       lastMergedAt: s.lastMergedAt,
       agentPoints: s.agentPoints,
+      agentVolumePts: s.agentVolumePts,
       agentRepos: s.agentRepos,
     }))
     .sort(

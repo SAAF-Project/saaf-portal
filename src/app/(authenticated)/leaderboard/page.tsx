@@ -72,7 +72,7 @@ export default function LeaderboardPage() {
           },
           {
             label: "+8 Agent repo", cap: "max 2", color: "bg-saaf-orange/12 text-saaf-orange",
-            info: "Build an agent in your own SAAF-Project org repo. A repo with a real README earns +8 (your best 2 count); a reviewed agent earns +20. Plus a small bonus for lines changed in your repos (capped at +10). Quality-gated: empty or work-in-progress repos earn nothing. Reflects your current repo portfolio across all filters."
+            info: "Build an agent in your own SAAF-Project org repo. Points per repo (best 2 count): +8 base (real README required) + 12 extra if the repo is 'reviewed' = +20 per reviewed repo. Plus a lines-changed bonus: ≥200 lines → +3, ≥1 500 → +6, ≥6 000 → +10 (hard cap). Quality-gated: no README or empty repos earn nothing. Click a leaderboard card to see the per-repo breakdown."
           },
         ].map((item, idx, arr) => (
           <span key={item.label} className="relative">
@@ -260,19 +260,29 @@ export default function LeaderboardPage() {
                     <span className="text-saaf-orange font-extrabold min-w-[40px] text-right">
                       +{selectedUser.agentPoints}
                     </span>
-                    <span className="text-muted">
-                      Agent Builder: {selectedUser.agentRepos.length} repo
-                      {selectedUser.agentRepos.length !== 1 ? "s" : ""}
-                      <span className="block text-[11px] mt-0.5">
-                        {selectedUser.agentRepos.map((r, i) => (
-                          <span key={r.name}>
-                            {i > 0 && ", "}
-                            {r.name}
-                            {r.reviewed && (
-                              <span className="text-saaf-green"> ✓</span>
-                            )}
+                    <span className="text-muted flex-1">
+                      <span className="font-semibold text-text">Agent Builder</span>
+                      <span className="block text-[11px] mt-1 space-y-0.5">
+                        {selectedUser.agentRepos.map((r) => {
+                          const pts = r.reviewed ? 20 : 8;
+                          return (
+                            <span key={r.name} className="flex justify-between">
+                              <span>
+                                {r.name}
+                                {r.reviewed
+                                  ? <span className="text-saaf-green ml-1">✓ reviewed</span>
+                                  : <span className="text-muted/60 ml-1">not reviewed</span>}
+                              </span>
+                              <span className="text-saaf-orange ml-2">+{pts}</span>
+                            </span>
+                          );
+                        })}
+                        {selectedUser.agentVolumePts > 0 && (
+                          <span className="flex justify-between">
+                            <span className="text-muted/70">lines changed bonus</span>
+                            <span className="text-saaf-orange ml-2">+{selectedUser.agentVolumePts}</span>
                           </span>
-                        ))}
+                        )}
                       </span>
                     </span>
                   </div>

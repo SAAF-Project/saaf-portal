@@ -46,6 +46,7 @@ export interface ScoreEntry {
   firstMergedAt: string | null;
   lastMergedAt: string | null;
   agentPoints: number;
+  agentVolumePts: number;
   agentRepos: { name: string; reviewed: boolean }[];
 }
 
