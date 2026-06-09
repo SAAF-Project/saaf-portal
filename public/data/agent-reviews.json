@@ -177,7 +177,7 @@
       "repo": "Track-4-Audit-Report-Generator",
       "verdict": "borderline",
       "reviewer": "Portal agent review (approved by MSACC)",
-      "reviewedAt": "2026-06-03",
+      "reviewedAt": "2026-06-09",
       "category": "Audit Reporting",
       "tags": ["FastAPI", "Claude/Anthropic", "python-docx", "audit-reporting"],
       "language": "Python",
@@ -185,10 +185,10 @@
       "quality": {
         "hasTests": false,
         "hasSamples": false,
-        "notes": "Runnable FastAPI web app that fills .docx templates via Claude with CSV/Excel ingestion, but no tests, no sample inputs/outputs, and a duplicated root-vs-app/ directory structure."
+        "notes": "Runnable FastAPI web app that fills .docx templates via Claude with CSV/Excel ingestion. README is now detailed (setup + features + structure), but it still ships no tests, no sample inputs/outputs, and a duplicated root-vs-app/ directory structure."
       },
-      "reasoning": "Functional, well-structured real agent with a clear runnable interface, but no tests, no samples, and a duplicated root-level copy of the app/ package signalling unfinished cleanup.",
-      "pathToReviewed": "Add unit tests and sample inputs/outputs; remove the duplicated root-level copy of app/services/templates."
+      "reasoning": "Re-assessed 2026-06-09: README has improved to a real, detailed guide — a genuine step up. Still short of reviewed because it has neither tests nor committed samples, and the duplicated root-level copy of app/ signals unfinished cleanup.",
+      "pathToReviewed": "Add unit tests OR commit sample inputs/outputs, and remove the duplicated root-level copy of app/services/templates."
     },
     {
       "repo": "Finding-analysis",
@@ -223,6 +223,92 @@
       },
       "reasoning": "Below the bar: the SAAF plan template plus an unimplemented skeleton. main.py imports stub modules; all workflow_steps/*.py and prompts.py contain only docstrings and functions that return None or raise NotImplementedError; no requirements/pyproject and no runnable CLI/UI.",
       "pathToReviewed": "Implement the workflow_steps modules into working code, add a dependency manifest (requirements.txt/pyproject.toml), unit tests, and sample outputs."
+    },
+    {
+      "repo": "Compliance-Report-Generator",
+      "verdict": "borderline",
+      "reviewer": "Portal agent review (approved by MSACC)",
+      "reviewedAt": "2026-06-09",
+      "category": "Compliance",
+      "tags": ["EU AI Act", "compliance", "reporting", "anthropic"],
+      "language": "Python",
+      "structure": "Python CLI agent with modular core + knowledge base + output formatter",
+      "quality": {
+        "hasTests": true,
+        "testCount": null,
+        "hasSamples": false,
+        "notes": "Substantial, runnable Python agent (~107 KB across 10 files) with a knowledge base of frameworks/regulations, an output formatter, a CLI entry point, and a real test suite (tests/test_saaf.py). The one gap is a missing README — there is no documentation of what it does or how to run it."
+      },
+      "reasoning": "One of the strongest borderline repos: real code + dependency manifest + actual tests clears most of the bar. It falls short only because it has no README, so its purpose and usage are undiscoverable.",
+      "pathToReviewed": "Add a real README (purpose, how to run, inputs/outputs) — that single step would take this to reviewed, given it already has tests and a manifest."
+    },
+    {
+      "repo": "threewaysecurity",
+      "verdict": "borderline",
+      "reviewer": "Portal agent review (approved by MSACC)",
+      "reviewedAt": "2026-06-09",
+      "category": "Audit Reporting",
+      "tags": ["procurement", "3-way-match", "multi-agent", "fraud-detection"],
+      "language": "Python",
+      "structure": "Multi-agent Python pipeline (run_pipeline.py + demo_pipeline.py + src/agent, generators, evaluator)",
+      "quality": {
+        "hasTests": false,
+        "hasSamples": true,
+        "notes": "Sophisticated multi-agent procurement (3-way match + fraud) auditor with two runnable entry points and an extensive synthetic dataset (~23 files incl. ground-truth labels) plus a requirements.txt. The one gap is a missing README — the domain and how to run it live only in code docstrings and a PowerPoint."
+      },
+      "reasoning": "Strong borderline: runnable pipeline + manifest + excellent committed sample data clears the bar except for documentation — there is no README, so nothing is discoverable from the repo root.",
+      "pathToReviewed": "Add a real README (what it does, the agent architecture, how to run run_pipeline.py vs demo_pipeline.py, what synthetic data is included) — that single step would take this to reviewed."
+    },
+    {
+      "repo": "Team-HighTable",
+      "verdict": "borderline",
+      "reviewer": "Portal agent review (approved by MSACC)",
+      "reviewedAt": "2026-06-09",
+      "category": "Risk & Controls",
+      "tags": ["AI governance", "browser-extension", "embeddings", "anomaly"],
+      "language": "Python / JavaScript",
+      "structure": "Full-stack: Python backend (Claude client + embeddings + API) + Chrome browser extension UI",
+      "quality": {
+        "hasTests": false,
+        "hasSamples": true,
+        "notes": "Dual-stack agent (backend API + Chrome extension) with Claude integration, embeddings, and a governance workpaper sample, plus a backend requirements.txt. The README is a 1-line placeholder, so the project is hard to discover or run."
+      },
+      "reasoning": "Real, multi-component working code with a manifest and a sample workpaper, but held back by a placeholder README and no tests.",
+      "pathToReviewed": "Add a real README (what the backend + extension do, how to install and run both); optionally add a test."
+    },
+    {
+      "repo": "PBC-Assistant-Isabelle---IA-AI-Hackathon",
+      "verdict": "borderline",
+      "reviewer": "Portal agent review (approved by MSACC)",
+      "reviewedAt": "2026-06-09",
+      "category": "Evidence",
+      "tags": ["PBC", "document-checks", "Flask", "multi-agent"],
+      "language": "Python",
+      "structure": "Flask app with multi-agent workflow (orchestrator + document agent) + example_run.py + static UI",
+      "quality": {
+        "hasTests": false,
+        "hasSamples": true,
+        "notes": "Working Flask multi-agent PBC assistant (~53 KB across 7 files) with an orchestrator, a document agent, a runnable example_run.py, a static HTML UI, and a requirements.txt. The README is a 2-line credits placeholder."
+      },
+      "reasoning": "Functional, runnable agent with a manifest and an example runner, but the README is just a credits line, so purpose and usage are undocumented.",
+      "pathToReviewed": "Add a real README (what it does, how to run example_run.py / the Flask app, inputs/outputs)."
+    },
+    {
+      "repo": "three-way-match-audit",
+      "verdict": "not-yet",
+      "reviewer": "Portal agent review (approved by MSACC)",
+      "reviewedAt": "2026-06-09",
+      "category": "Audit Reporting",
+      "tags": ["P2P", "3-way-match", "PDF-report"],
+      "language": "Python",
+      "structure": "Single script generate_audit_report.py nested under tools/scripts/ + sample P2P CSVs",
+      "quality": {
+        "hasTests": false,
+        "hasSamples": true,
+        "notes": "A PDF audit-report generator with sample P2P CSV data, but no README, no dependency manifest, and the SAAF-Project folder structure copied verbatim (tools/scripts/) instead of a flat agent layout."
+      },
+      "reasoning": "Not yet a packaged agent: no README, no requirements.txt, and the nested tools/scripts/ layout was carried over from the main repo. The owner pushed on 2026-06-09 but the documented fixes (README + manifest + flatten) are not yet in.",
+      "pathToReviewed": "Add a README and a requirements.txt (reportlab, matplotlib), and move generate_audit_report.py to the repo root (drop the tools/scripts/ nesting). See issue #1 on the repo."
     }
   ]
 }
