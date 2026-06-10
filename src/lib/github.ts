@@ -121,6 +121,17 @@ function isBotLogin(login: string): boolean {
   return /\[bot\]$/i.test(login);
 }
 
+// Logins excluded from Agent Builder attribution. Organisers/maintainers don't
+// compete for the bonus, and — more importantly — their central-repo commit
+// history bleeds into agent repos that were copied/forked from the main repo
+// (e.g. Track-2---IAM-final inherited MSACC's main-repo commits), which would
+// otherwise credit them for agents they didn't build.
+const AGENT_ATTRIBUTION_EXCLUDE = new Set(["msacc"]);
+
+function isExcludedFromAgentAttribution(login: string): boolean {
+  return isBotLogin(login) || AGENT_ATTRIBUTION_EXCLUDE.has(login.toLowerCase());
+}
+
 const MANIFEST_FILES = new Set([
   "requirements.txt",
   "pyproject.toml",
@@ -395,7 +406,7 @@ export async function fetchAgentContributions(): Promise<AgentContributions> {
 
       for (const c of contributors) {
         const login: string | undefined = c?.login;
-        if (!login || isBotLogin(login)) continue;
+        if (!login || isExcludedFromAgentAttribution(login)) continue;
         if (!result[login]) result[login] = { repos: [], linesChanged: 0 };
         result[login].repos.push({
           name: repo.name,
