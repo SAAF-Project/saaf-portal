@@ -70,6 +70,17 @@ const CONTRIBUTION_WAYS: ContribWay[] = [
     iconColor: "text-saaf-orange",
   },
   {
+    icon: "📐",
+    title: "Document audit criteria",
+    needsGit: true,
+    desc: "Every agent needs an AUDIT-CRITERIA.md next to its README — control objectives mapped to frameworks, testable pass/fail acceptance criteria, and known coverage gaps so anyone can assess it (the A2 track). Copy the SAAF template.",
+    href: "https://github.com/SAAF-Project/SAAF-Project/blob/main/docs/conventions/audit-criteria-template.md",
+    cta: "Open the template →",
+    external: true,
+    color: "border-saaf-green/30 bg-saaf-green/5",
+    iconColor: "text-saaf-green",
+  },
+  {
     icon: "📦",
     title: "Migrate your agent to its own repo",
     needsGit: true,
