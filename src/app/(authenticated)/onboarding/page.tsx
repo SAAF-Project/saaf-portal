@@ -298,8 +298,9 @@ export default function OnboardingPage() {
           <div className="p-3 bg-saaf-orange/5 border border-saaf-orange/20 rounded-lg">
             <div className="font-semibold text-sm text-saaf-orange mb-1">Your own agent repo</div>
             <p className="text-xs text-muted leading-relaxed">
-              The full agent: source code, tests, sample inputs/outputs, its own README and deploy
-              config. One repo = one agent, easy to run and review.
+              The full agent: source code, tests, sample inputs/outputs, its own README,{" "}
+              <code className="px-1 py-0.5 bg-surface2 rounded text-[11px] text-text">AUDIT-CRITERIA.md</code>,
+              and deploy config. One repo = one agent, easy to run and review.
             </p>
           </div>
           <div className="p-3 bg-accent/5 border border-accent/20 rounded-lg">
@@ -326,6 +327,7 @@ export default function OnboardingPage() {
         <pre className="bg-surface2 rounded-lg p-3 text-xs text-text font-mono leading-relaxed overflow-x-auto mb-4">
 {`your-agent-repo/
   README.md            ← required (see template below)
+  AUDIT-CRITERIA.md    ← required — what to judge this agent against (see below)
   requirements.txt     ← or pyproject.toml / package.json
   your_agent.py        ← main script at the root
   samples/             ← example inputs and outputs
@@ -361,6 +363,24 @@ Short description of the steps the agent takes.
 
 [saaf-portal.vercel.app](https://saaf-portal.vercel.app)`}
         </pre>
+        <h4 className="font-bold text-sm mb-2">AUDIT-CRITERIA.md — required, next to your README</h4>
+        <p className="text-sm text-muted leading-relaxed mb-4">
+          The README says <em>what the agent does and how to run it</em>.{" "}
+          <code className="px-1.5 py-0.5 bg-surface2 rounded text-xs text-text">AUDIT-CRITERIA.md</code>{" "}
+          says <em>what it must be judged against as an auditee</em>: control objectives mapped to
+          frameworks, testable pass/fail acceptance criteria, a &quot;good output / never do&quot;
+          list, and known coverage gaps. Copy and fill in the{" "}
+          <a
+            href="https://github.com/SAAF-Project/SAAF-Project/blob/main/docs/conventions/audit-criteria-template.md"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent font-semibold hover:underline"
+          >
+            template on GitHub
+          </a>
+          . This is the output of the A2 — Audit Criteria &amp; Controls track; A1 stress-tests verify
+          against it.
+        </p>
         <p className="text-sm text-muted leading-relaxed">
           A repo with a real README earns the{" "}
           <Link href="/leaderboard" className="text-accent font-semibold hover:underline">
