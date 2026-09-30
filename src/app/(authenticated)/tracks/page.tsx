@@ -50,7 +50,7 @@ function ExpandablePlan({
     <div className={`border rounded-xl mb-2 transition-all ${isYours ? "border-saaf-green/40 bg-saaf-green/5" : "border-border bg-surface"}`}>
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full text-left p-3 flex items-start gap-3 cursor-pointer hover:bg-white/3 rounded-xl transition-colors"
+        className="w-full text-left p-3 flex items-start gap-3 cursor-pointer hover:bg-subtle rounded-xl transition-colors"
       >
         <span className="mt-0.5 text-muted text-xs shrink-0">{expanded ? "▼" : "▶"}</span>
         <div className="flex-1 min-w-0">
@@ -240,11 +240,11 @@ export default function TracksPage() {
 
             <div className="flex gap-1.5 flex-wrap mb-4">
               {Object.entries(track.team).map(([role, count]) => (
-                <span key={role} className="text-xs px-2.5 py-1 rounded-full bg-white/8 text-muted font-medium">
+                <span key={role} className="text-xs px-2.5 py-1 rounded-full bg-hover text-muted font-medium">
                   {count}× {role}
                 </span>
               ))}
-              <span className="text-xs px-2.5 py-1 rounded-full bg-white/8 text-muted font-medium">
+              <span className="text-xs px-2.5 py-1 rounded-full bg-hover text-muted font-medium">
                 {trackPlans.length} plan{trackPlans.length !== 1 ? "s" : ""}
               </span>
             </div>

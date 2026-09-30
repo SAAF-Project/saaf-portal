@@ -619,7 +619,7 @@ Short description of the steps the agent takes.
           href="https://github.com/SAAF-Project/SAAF-Project/blob/main/docs/getting-started.md"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-block px-5 py-2.5 border border-white/10 bg-white/5 text-text text-sm font-medium rounded-xl no-underline hover:bg-white/10"
+          className="inline-block px-5 py-2.5 border border-border bg-hover text-text text-sm font-medium rounded-xl no-underline hover:bg-border"
         >
           Full Guide on GitHub ↗
         </a>
@@ -627,7 +627,7 @@ Short description of the steps the agent takes.
           href="https://github.com/SAAF-Project/SAAF-Project/discussions"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-block px-5 py-2.5 border border-white/10 bg-white/5 text-text text-sm font-medium rounded-xl no-underline hover:bg-white/10"
+          className="inline-block px-5 py-2.5 border border-border bg-hover text-text text-sm font-medium rounded-xl no-underline hover:bg-border"
         >
           Ask in Discussions ↗
         </a>

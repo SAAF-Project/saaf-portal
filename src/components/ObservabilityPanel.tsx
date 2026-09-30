@@ -132,7 +132,7 @@ export default function ObservabilityPanel({
             <div key={q.key}>
               <button
                 onClick={() => setActiveQuestion(isActive ? null : q.key)}
-                className="w-full text-left px-4 py-2.5 flex items-center gap-3 hover:bg-white/3 transition-colors cursor-pointer"
+                className="w-full text-left px-4 py-2.5 flex items-center gap-3 hover:bg-subtle transition-colors cursor-pointer"
               >
                 <span className="text-[10px] text-muted w-4">{isActive ? "▼" : "▶"}</span>
                 <span className="text-xs font-semibold text-text flex-1">{q.label}</span>

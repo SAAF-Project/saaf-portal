@@ -51,7 +51,7 @@ export default function TrackCard({
           {tasks.map((task, i) => (
             <div
               key={i}
-              className="flex gap-2.5 py-1.5 text-[13px] border-b border-white/4 last:border-b-0"
+              className="flex gap-2.5 py-1.5 text-[13px] border-b border-border last:border-b-0"
             >
               <span className="text-saaf-yellow min-w-[50px] font-semibold">
                 {task.time}

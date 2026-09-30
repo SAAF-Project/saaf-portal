@@ -128,7 +128,7 @@ function ProviderCard({ provider }: { provider: Provider }) {
 
       <button
         onClick={() => setOpen(!open)}
-        className="w-full px-6 py-3 border-t border-border flex items-center gap-2 text-xs font-bold text-muted uppercase tracking-wider hover:bg-white/3 transition-colors cursor-pointer"
+        className="w-full px-6 py-3 border-t border-border flex items-center gap-2 text-xs font-bold text-muted uppercase tracking-wider hover:bg-subtle transition-colors cursor-pointer"
         aria-expanded={open}
       >
         <span className="text-muted">{open ? "▼" : "▶"}</span>
@@ -141,7 +141,7 @@ function ProviderCard({ provider }: { provider: Provider }) {
             {provider.items.map((item) => (
               <div
                 key={item.title}
-                className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-white/3 transition-colors"
+                className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-subtle transition-colors"
               >
                 <span className="text-saaf-green text-xs mt-1 shrink-0">✓</span>
                 <div className="flex-1 min-w-0">

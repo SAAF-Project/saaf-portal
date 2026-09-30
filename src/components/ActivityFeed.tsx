@@ -27,7 +27,7 @@ export default function ActivityFeed({
       {entries.map((entry) => (
         <div
           key={entry.num}
-          className="p-3 rounded-lg border-l-3 border-saaf-green bg-white/2 hover:bg-white/4 transition-colors"
+          className="p-3 rounded-lg border-l-3 border-saaf-green bg-subtle hover:bg-hover transition-colors"
         >
           <a
             href={entry.url}

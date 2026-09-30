@@ -118,7 +118,7 @@ export default function AboutPage() {
           </Link>
           <Link
             href="/tracks"
-            className="px-4 py-2 border border-border bg-white/5 hover:bg-white/10 text-text text-sm font-semibold rounded-lg no-underline"
+            className="px-4 py-2 border border-border bg-hover hover:bg-border text-text text-sm font-semibold rounded-lg no-underline"
           >
             Explore tracks →
           </Link>

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
+import ThemeToggle from "./ThemeToggle";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: "◆" },
@@ -41,7 +42,7 @@ export default function Navbar() {
             alt="SAAF"
             width={110}
             height={32}
-            className="h-8 w-auto"
+            className="h-8 w-auto logo-invert"
             style={{ width: "auto", height: "32px" }}
             loading="eager"
           />
@@ -60,7 +61,7 @@ export default function Navbar() {
                 className={`text-[13px] font-medium px-3 py-1.5 rounded-lg transition-all no-underline ${
                   active
                     ? "text-accent bg-accent/8 border-b-2 border-accent"
-                    : "text-muted hover:text-text hover:bg-white/5"
+                    : "text-muted hover:text-text hover:bg-hover"
                 }`}
               >
                 {item.label}
@@ -78,6 +79,7 @@ export default function Navbar() {
           >
             saafproject.com ↗
           </a>
+          <ThemeToggle />
           {session?.user && (
             <div className="flex items-center gap-2">
               {session.user.image && (

@@ -202,7 +202,7 @@ export default function LeaderboardPage() {
                 {selectedUser.prList.map((pr) => (
                   <div
                     key={pr.num}
-                    className="flex items-center gap-3 py-2 border-b border-white/4 last:border-b-0 text-sm"
+                    className="flex items-center gap-3 py-2 border-b border-border last:border-b-0 text-sm"
                   >
                     <span className="text-saaf-green font-extrabold min-w-[40px] text-right">
                       +10
@@ -223,7 +223,7 @@ export default function LeaderboardPage() {
                   </div>
                 ))}
                 {selectedUser.newPlans > 0 && (
-                  <div className="flex items-center gap-3 py-2 border-b border-white/4 text-sm">
+                  <div className="flex items-center gap-3 py-2 border-b border-border text-sm">
                     <span className="text-saaf-green font-extrabold min-w-[40px] text-right">
                       +{selectedUser.newPlans * 15}
                     </span>
@@ -234,7 +234,7 @@ export default function LeaderboardPage() {
                   </div>
                 )}
                 {selectedUser.updateCount > 0 && (
-                  <div className="flex items-center gap-3 py-2 border-b border-white/4 text-sm">
+                  <div className="flex items-center gap-3 py-2 border-b border-border text-sm">
                     <span className="text-saaf-green font-extrabold min-w-[40px] text-right">
                       +{selectedUser.updateCount * 5}
                     </span>
@@ -256,7 +256,7 @@ export default function LeaderboardPage() {
                   </div>
                 )}
                 {selectedUser.agentPoints > 0 && (
-                  <div className="flex items-start gap-3 py-2 border-t border-white/4 text-sm">
+                  <div className="flex items-start gap-3 py-2 border-t border-border text-sm">
                     <span className="text-saaf-orange font-extrabold min-w-[40px] text-right">
                       +{selectedUser.agentPoints}
                     </span>

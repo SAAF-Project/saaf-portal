@@ -4,6 +4,7 @@ import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
 import Image from "next/image";
+import ThemeToggle from "@/components/ThemeToggle";
 
 function LoginForm() {
   const searchParams = useSearchParams();
@@ -38,6 +39,7 @@ function LoginForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
+      <ThemeToggle className="fixed top-4 right-4" />
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
           <Image
@@ -45,7 +47,7 @@ function LoginForm() {
             alt="SAAF"
             width={200}
             height={60}
-            className="mx-auto mb-6"
+            className="mx-auto mb-6 logo-invert"
             style={{ width: "200px", height: "auto" }}
             priority
           />

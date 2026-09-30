@@ -161,7 +161,7 @@ function SignupsTab({ requests, pendingCount }: { requests: SignupRequest[]; pen
               </thead>
               <tbody>
                 {pending.map((req) => (
-                  <tr key={req.id} className="border-b border-white/4">
+                  <tr key={req.id} className="border-b border-border">
                     <td className="px-4 py-3 font-semibold">@{req.githubUsername}</td>
                     <td className="px-4 py-3 text-muted">{req.email || "—"}</td>
                     <td className="px-4 py-3"><StatusBadge status={req.status} /></td>
@@ -192,7 +192,7 @@ function SignupsTab({ requests, pendingCount }: { requests: SignupRequest[]; pen
               </thead>
               <tbody>
                 {processed.map((req) => (
-                  <tr key={req.id} className="border-b border-white/4 opacity-70">
+                  <tr key={req.id} className="border-b border-border opacity-70">
                     <td className="px-4 py-3 font-semibold">@{req.githubUsername}</td>
                     <td className="px-4 py-3 text-muted">{req.email || "—"}</td>
                     <td className="px-4 py-3"><StatusBadge status={req.status} /></td>

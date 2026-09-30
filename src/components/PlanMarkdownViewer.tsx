@@ -54,7 +54,7 @@ export default function PlanMarkdownViewer({
   }
 
   return (
-    <div className="p-4 prose prose-invert prose-sm max-w-none">
+    <div className="p-4 prose prose-sm max-w-none">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{

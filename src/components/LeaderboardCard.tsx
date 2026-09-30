@@ -37,7 +37,7 @@ export default function LeaderboardCard({
           rank === 0
             ? "text-saaf-yellow"
             : rank === 1
-              ? "text-gray-400"
+              ? "text-muted"
               : rank === 2
                 ? "text-saaf-orange"
                 : "text-muted/30 text-lg"
