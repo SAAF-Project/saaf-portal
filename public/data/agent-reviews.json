@@ -295,20 +295,36 @@
     },
     {
       "repo": "three-way-match-audit",
-      "verdict": "not-yet",
-      "reviewer": "Portal agent review (approved by MSACC)",
-      "reviewedAt": "2026-06-09",
+      "verdict": "reviewed",
+      "reviewer": "Portal agent review (pending MSACC approval)",
+      "reviewedAt": "2026-10-03",
       "category": "Audit Reporting",
       "tags": ["P2P", "3-way-match", "PDF-report"],
       "language": "Python",
-      "structure": "Single script generate_audit_report.py nested under tools/scripts/ + sample P2P CSVs",
+      "structure": "FastAPI webapp (webapp/) with matcher + parsers services, plus legacy PDF report script under tools/scripts/",
       "quality": {
         "hasTests": false,
         "hasSamples": true,
-        "notes": "A PDF audit-report generator with sample P2P CSV data, but no README, no dependency manifest, and the SAAF-Project folder structure copied verbatim (tools/scripts/) instead of a flat agent layout."
+        "notes": "FastAPI 3-way match webapp (PO / GRN / invoice → MATCH/WARNING/FAIL per line) with CSV/JSON sample data, requirements.txt, SECURITY.md and a merged AUDIT-CRITERIA.md."
       },
-      "reasoning": "Not yet a packaged agent: no README, no requirements.txt, and the nested tools/scripts/ layout was carried over from the main repo. The owner pushed on 2026-06-09 but the documented fixes (README + manifest + flatten) are not yet in.",
-      "pathToReviewed": "Add a README and a requirements.txt (reportlab, matplotlib), and move generate_audit_report.py to the repo root (drop the tools/scripts/ nesting). See issue #1 on the repo."
+      "reasoning": "The June blockers are resolved: root README, a dependency manifest (webapp/requirements.txt) and a runnable FastAPI interface with sample inputs. No tests, but passes on samples + polished interface (precedent: CUEC_Crosscheck, llm_owasp). Merged AUDIT-CRITERIA.md honestly documents the branch mismatch and non-AI nature."
+    },
+    {
+      "repo": "judging-found-controls",
+      "verdict": "reviewed",
+      "reviewer": "Portal agent review (pending MSACC approval)",
+      "reviewedAt": "2026-10-03",
+      "category": "Risk & Controls",
+      "tags": ["Policy", "Controls", "Hallucination check"],
+      "language": "Python",
+      "structure": "Single-file CLI agent (agent.py, argparse) + tests/ + samples/",
+      "quality": {
+        "hasTests": true,
+        "testCount": 2,
+        "hasSamples": true,
+        "notes": "Judges whether each control extracted from a policy PDF is grounded in the source text (verdict + page + verbatim paragraph). Mocked agent run, error-handling and output-validation tests; merged AUDIT-CRITERIA.md."
+      },
+      "reasoning": "Real working code with a runnable CLI, requirements.txt + requirements-dev.txt, sample inputs/outputs and tests. Clear README covering purpose, how to run and I/O. Meets the reviewed bar."
     }
   ]
 }

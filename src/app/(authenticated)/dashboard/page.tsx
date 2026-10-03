@@ -58,6 +58,7 @@ export default function DashboardPage() {
   const completeness = profile ? profileCompleteness(profile) : null;
 
   const quickLinks = [
+    { href: "/open-source", label: "Open-Source Readiness", desc: "Claim an agent repo with your dev + auditor team", icon: "⬡" },
     { href: "/tracks", label: "Tracks", desc: "Explore tracks & submit observability checks", icon: "▶" },
     { href: "/participants", label: "Participants", desc: "Find a colleague to collaborate with", icon: "👥" },
     { href: "/agent-library", label: "Agent Library", desc: "Browse SAAF community AI audit agents", icon: "◈" },
@@ -87,6 +88,30 @@ export default function DashboardPage() {
           <p className="text-muted text-sm">@{username}</p>
         </div>
       </div>
+
+      {/* Open-source readiness call-to-action */}
+      <Link
+        href="/open-source"
+        className="block mb-6 p-5 rounded-2xl border border-saaf-green/30 bg-gradient-to-r from-saaf-green/10 via-accent/8 to-saaf-purple/10 hover:border-saaf-green/60 transition-all no-underline group"
+      >
+        <div className="flex items-center gap-4 flex-wrap">
+          <span className="text-3xl text-saaf-green">⬡</span>
+          <div className="flex-1 min-w-[220px]">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-saaf-green mb-1">
+              New · Make our agents open-source ready
+            </div>
+            <div className="font-extrabold text-base group-hover:text-accent transition-colors">
+              Team up (1 dev + 1 auditor), claim an agent repo and harden it
+            </div>
+            <div className="text-xs text-muted mt-0.5">
+              Run the /harden-agent-repo skill, open the PR — and help sharpen the skill itself.
+            </div>
+          </div>
+          <span className="px-4 py-2 rounded-lg bg-saaf-green text-bg text-sm font-bold shrink-0">
+            Claim a repo →
+          </span>
+        </div>
+      </Link>
 
       {/* Activity stats banner */}
       <ActivityStatsBanner />

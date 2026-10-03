@@ -9,6 +9,7 @@ import ThemeToggle from "./ThemeToggle";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: "◆" },
+  { href: "/open-source", label: "Open-Source Readiness", icon: "⬡" },
   { href: "/profile", label: "Profile", icon: "●" },
   { href: "/leaderboard", label: "Leaderboard", icon: "★" },
   { href: "/participants", label: "Participants", icon: "👥" },
