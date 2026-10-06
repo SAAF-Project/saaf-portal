@@ -1,30 +1,25 @@
 # Agent review — Compliance-Report-Generator
 
-- **Verdict:** 🟡 borderline (one step from reviewed)
-- **Reviewed:** 2026-06-09 · Portal agent review (approved by MSACC)
+- **Verdict:** ✅ reviewed
+- **Reviewed:** 2026-10-06 · Portal agent review (pending MSACC approval)
 - **Repo:** https://github.com/SAAF-Project/Compliance-Report-Generator
 - **Category:** Compliance
-- **Tags:** EU AI Act, compliance, reporting, anthropic
-- **Language / structure:** Python — CLI agent with modular core + knowledge base + output formatter
+- **Language / structure:** Python — Python package + CLI, CI (tests, Ruff, weekly e2e clause check)
 
 ## Quality criteria
 
 | Criterion | Result |
 |---|---|
-| Working code + runnable interface | ✓ CLI entry point (~107 KB across 10 files) |
-| Dependency manifest | ✓ requirements.txt |
-| Unit tests | ✓ tests/test_saaf.py |
+| Working code + runnable interface | ✓ |
+| Dependency manifest | ✓ |
+| Unit tests | ✓ 14 |
 | Sample inputs/outputs | ✗ |
-| README | ✗ missing |
+| AUDIT-CRITERIA.md | ✓ merged |
 
 ## Assessment
 
-Substantial, runnable Python agent with a knowledge base of frameworks/regulations, an output formatter, a CLI entry point, and a real test suite. The one gap is a missing README — purpose and usage are undocumented.
+Grounding check rejects output outside mapped frameworks, clause references verified against official clause lists, per-run audit trail, finding-schema export, CI with tests + Ruff.
 
 ## Reasoning
 
-One of the strongest borderline repos: real code + dependency manifest + actual tests clears most of the bar. It falls short only because there is no README.
-
-## Path to reviewed
-
-Add a real README (purpose, how to run, inputs/outputs). That single step would take this to reviewed, given it already has tests and a manifest.
+The only blocker (README) is resolved; strong test suite and green CI. Hardened heavily at Hackathon #9 (JET).
