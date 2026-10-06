@@ -226,21 +226,20 @@
     },
     {
       "repo": "Compliance-Report-Generator",
-      "verdict": "borderline",
-      "reviewer": "Portal agent review (approved by MSACC)",
-      "reviewedAt": "2026-06-09",
+      "verdict": "reviewed",
+      "reviewer": "Portal agent review (pending MSACC approval)",
+      "reviewedAt": "2026-10-06",
       "category": "Compliance",
-      "tags": ["EU AI Act", "compliance", "reporting", "anthropic"],
+      "tags": ["DORA", "NIS2", "GDPR", "Grounding"],
       "language": "Python",
-      "structure": "Python CLI agent with modular core + knowledge base + output formatter",
+      "structure": "Python package + CLI, CI (tests, Ruff, weekly e2e clause check)",
       "quality": {
         "hasTests": true,
-        "testCount": null,
+        "testCount": 14,
         "hasSamples": false,
-        "notes": "Substantial, runnable Python agent (~107 KB across 10 files) with a knowledge base of frameworks/regulations, an output formatter, a CLI entry point, and a real test suite (tests/test_saaf.py). The one gap is a missing README — there is no documentation of what it does or how to run it."
+        "notes": "Grounding check rejects output outside mapped frameworks, clause references verified against official clause lists, per-run audit trail, finding-schema export, CI with tests + Ruff."
       },
-      "reasoning": "One of the strongest borderline repos: real code + dependency manifest + actual tests clears most of the bar. It falls short only because it has no README, so its purpose and usage are undiscoverable.",
-      "pathToReviewed": "Add a real README (purpose, how to run, inputs/outputs) — that single step would take this to reviewed, given it already has tests and a manifest."
+      "reasoning": "The only blocker (README) is resolved; strong test suite and green CI. Hardened heavily at Hackathon #9 (JET)."
     },
     {
       "repo": "threewaysecurity",
@@ -325,6 +324,73 @@
         "notes": "Judges whether each control extracted from a policy PDF is grounded in the source text (verdict + page + verbatim paragraph). Mocked agent run, error-handling and output-validation tests; merged AUDIT-CRITERIA.md."
       },
       "reasoning": "Real working code with a runnable CLI, requirements.txt + requirements-dev.txt, sample inputs/outputs and tests. Clear README covering purpose, how to run and I/O. Meets the reviewed bar."
+    },
+    {
+      "repo": "Executive-Summary-Writer",
+      "verdict": "reviewed",
+      "reviewer": "Portal agent review (pending MSACC approval)",
+      "reviewedAt": "2026-10-06",
+      "category": "Audit Reporting",
+      "tags": ["Executive summary", "LangGraph", "Reporting"],
+      "language": "Python",
+      "structure": "Python scripts/graph pipeline + FastAPI agent-service + frontend",
+      "quality": {
+        "hasTests": true,
+        "testCount": 64,
+        "hasSamples": true,
+        "notes": "64 core tests pass offline; samples included; AUDIT-CRITERIA.md merged. Open PR #2 (prompt-injection hardening) not merged: conflicts + rewrites evidence."
+      },
+      "reasoning": "Real runnable pipeline with manifests, tests and samples. Meets the bar."
+    },
+    {
+      "repo": "Compliance-Audit-Agent",
+      "verdict": "reviewed",
+      "reviewer": "Portal agent review (pending MSACC approval)",
+      "reviewedAt": "2026-10-06",
+      "category": "Compliance",
+      "tags": ["Compliance audit", "Evidence"],
+      "language": "Python",
+      "structure": "Python CLI with progress-folder outputs",
+      "quality": {
+        "hasTests": true,
+        "testCount": 82,
+        "hasSamples": true,
+        "notes": "82 tests (164 subtests) pass; extensive sample data; AUDIT-CRITERIA.md merged."
+      },
+      "reasoning": "Working code, manifest, tests and samples. Meets the bar."
+    },
+    {
+      "repo": "Audit-criteria",
+      "verdict": "reviewed",
+      "reviewer": "Portal agent review (pending MSACC approval)",
+      "reviewedAt": "2026-10-06",
+      "category": "Risk & Controls",
+      "tags": ["UC7", "UC8", "Mandate guard", "Agent hand-off"],
+      "language": "Python",
+      "structure": "Orchestrators under tools/scripts + criteria_checks + replay harness",
+      "quality": {
+        "hasTests": false,
+        "hasSamples": true,
+        "notes": "No unit tests, but criteria_checks (AC-10..AC-16 pass) and a replay that reproduces the README table (6/6 poisoned runs held, hash chain intact). 5 of 16 older checks fail — disclosed."
+      },
+      "reasoning": "Runnable (--simulate, stdlib only), reproducible evidence and synthetic fixtures; passes on samples + verifiable harness (CUEC_Crosscheck precedent)."
+    },
+    {
+      "repo": "OWASP-top-10-LLM-assessment",
+      "verdict": "reviewed",
+      "reviewer": "Portal agent review (pending MSACC approval)",
+      "reviewedAt": "2026-10-06",
+      "category": "AI Assurance",
+      "tags": ["OWASP LLM", "Code review", "Citations"],
+      "language": "Python",
+      "structure": "CLI reviewer + web portal; llm-owasp package",
+      "quality": {
+        "hasTests": true,
+        "testCount": 38,
+        "hasSamples": true,
+        "notes": "38 tests pass; line-numbered source + verify_citations() checks every file:line quote; AUDIT-CRITERIA.md merged. Nit: committed __pycache__, triplicated reviewer code."
+      },
+      "reasoning": "Working CLI with manifest and tests. Meets the bar."
     }
   ]
 }
