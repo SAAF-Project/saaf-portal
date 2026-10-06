@@ -273,6 +273,20 @@ export async function fetchAgentLibrary(): Promise<AgentRepo[]> {
   });
 }
 
+// Open-source readiness gate: an agent repo is "ready" once it is reviewed AND
+// has an AUDIT-CRITERIA.md (SAAF A2 standard) next to its README.
+export async function repoHasAuditCriteria(repoName: string): Promise<boolean> {
+  try {
+    const res = await githubFetch(
+      `${API}/repos/${ORG}/${repoName}/contents/AUDIT-CRITERIA.md`,
+      { revalidate: CACHE_TTL.REPOS_LIST }
+    );
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 function extractExcerpt(markdown: string, maxChars = 400): string {
   let text = markdown
     .replace(/<!--[\s\S]*?-->/g, "")

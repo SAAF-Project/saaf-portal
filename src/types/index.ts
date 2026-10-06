@@ -133,3 +133,25 @@ export interface SuggestedPlanWithReasons extends Plan {
   score: number;
   reasons: string[];
 }
+
+// Open-source readiness tab (/open-source)
+export type ClaimRole = "dev" | "auditor";
+
+export interface ClaimMember {
+  username: string;
+  name: string | null;
+  avatarUrl: string | null;
+  role: ClaimRole;
+}
+
+export interface ReadinessRepo {
+  name: string;
+  description: string | null;
+  htmlUrl: string;
+  language: string | null;
+  libraryStatus: "reviewed" | "work-in-progress" | "needs-readme" | "not-reviewed";
+  reviewed: boolean;
+  hasAuditCriteria: boolean;
+  ready: boolean;
+  claim: { prUrl: string | null; members: ClaimMember[] } | null;
+}

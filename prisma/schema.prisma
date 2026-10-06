@@ -29,6 +29,7 @@ model User {
   updatedAt            DateTime             @updatedAt
   observabilityChecks  ObservabilityCheck[]
   feedback             Feedback[]
+  repoClaims           RepoClaimMember[]
 }
 
 model Feedback {
@@ -69,4 +70,27 @@ model ObservabilityCheck {
   updatedAt           DateTime @updatedAt
 
   @@unique([planSlug, userId])
+}
+
+// Open-source readiness: a team (≥1 dev + ≥1 auditor) claims an agent repo and
+// runs the harden-agent-repo skill on it. One claim per repo; others join it.
+model RepoClaim {
+  id        String            @id @default(cuid())
+  repo      String            @unique
+  prUrl     String?
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  members   RepoClaimMember[]
+}
+
+model RepoClaimMember {
+  id        String    @id @default(cuid())
+  claimId   String
+  claim     RepoClaim @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  role      String // "dev" | "auditor"
+  createdAt DateTime  @default(now())
+
+  @@unique([claimId, userId])
 }
