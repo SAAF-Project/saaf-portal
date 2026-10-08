@@ -391,6 +391,40 @@
         "notes": "38 tests pass; line-numbered source + verify_citations() checks every file:line quote; AUDIT-CRITERIA.md merged. Nit: committed __pycache__, triplicated reviewer code."
       },
       "reasoning": "Working CLI with manifest and tests. Meets the bar."
+    },
+    {
+      "repo": "SAAF-circuit-breaker",
+      "verdict": "reviewed",
+      "reviewer": "Portal agent review (pending MSACC approval)",
+      "reviewedAt": "2026-10-08",
+      "category": "Governance & Guardrails",
+      "tags": ["Circuit breaker", "Policy enforcement", "TypeScript", "Python", "Offline verification", "Rollback"],
+      "language": "TypeScript/Python",
+      "structure": "Next.js 16 web app wrapping an offline Python CLI (forge-scan -> rehearsal -> sentinel -> verify), zero LLM calls in the CLI path",
+      "quality": {
+        "hasTests": true,
+        "testCount": 34,
+        "hasSamples": true,
+        "notes": "Python CLI suite: 34 tests pass offline, no API key or network. Full pipeline run reproduced correct output (6/6 red flags found, correct ROUTE_TO_HUMAN/HALT routing, matching Merkle roots). 5 control objectives mapped to EU AI Act and GDPR with testable criteria. TS suite (13 tests) needs a live DB/API key, not independently run. Repo has notable media bloat (duplicated demo videos) worth a cleanup pass."
+      },
+      "reasoning": "Clears the bar: real runnable CLI with a dependency manifest, passing tests, sample data and a strong AUDIT-CRITERIA.md with an honestly-disclosed gap (the live web-app path isn't independently verified)."
+    },
+    {
+      "repo": "hallucination-detection-agent",
+      "verdict": "reviewed",
+      "reviewer": "Portal agent review (pending MSACC approval)",
+      "reviewedAt": "2026-10-08",
+      "category": "Governance & Guardrails",
+      "tags": ["Hallucination detection", "RAG", "Claim verification", "BYOK"],
+      "language": "Python",
+      "structure": "Pipeline package: extractor (Haiku) -> verifier (Sonnet) -> aggregator (pure Python) -> annotator, markdown RAG corpus, CLI entrypoint",
+      "quality": {
+        "hasTests": true,
+        "testCount": 19,
+        "hasSamples": true,
+        "notes": "19 tests pass offline; a smoke test exercises every non-network path. Includes a test that specifically guards against ever committing a real API key. 5 control objectives mapped to IIA GIAS, EU AI Act, ISO 27001 and OWASP LLM. Note: AUDIT-CRITERIA.md still says 'no automated tests' as a gap -- that's now stale, the tests exist."
+      },
+      "reasoning": "Clears the bar: runnable CLI, manifest, passing tests, sample findings, and an honest AUDIT-CRITERIA.md. Flagged the stale 'no tests' line for the maintainer to fix."
     }
   ]
 }
