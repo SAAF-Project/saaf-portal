@@ -81,6 +81,16 @@ const CONTRIBUTION_WAYS: ContribWay[] = [
     iconColor: "text-saaf-green",
   },
   {
+    icon: "🗺️",
+    title: "Put your agent on the Living Map",
+    needsGit: true,
+    desc: "Add a small agent.yaml next to your README. The Living Map reads every agent's manifest hourly and renders them all on one map — island, maturity, dependencies and open slots. No list to keep up to date by hand.",
+    href: "#living-map",
+    cta: "How it works →",
+    color: "border-saaf-green/30 bg-saaf-green/5",
+    iconColor: "text-saaf-green",
+  },
+  {
     icon: "📦",
     title: "Migrate your agent to its own repo",
     needsGit: true,
@@ -339,6 +349,7 @@ export default function OnboardingPage() {
 {`your-agent-repo/
   README.md            ← required (see template below)
   AUDIT-CRITERIA.md    ← required — what to judge this agent against (see below)
+  agent.yaml           ← required — puts the agent on the Living Map (see below)
   requirements.txt     ← or pyproject.toml / package.json
   your_agent.py        ← main script at the root
   samples/             ← example inputs and outputs
@@ -391,6 +402,87 @@ Short description of the steps the agent takes.
           </a>
           . This is the output of the A2 — Audit Criteria &amp; Controls track; A1 stress-tests verify
           against it.
+        </p>
+        <h4 id="living-map" className="font-bold text-sm mb-2 scroll-mt-24">agent.yaml — puts your agent on the Living Map</h4>
+        <p className="text-sm text-muted leading-relaxed mb-2">
+          The README says <em>what the agent does</em>. AUDIT-CRITERIA.md says <em>what it is judged
+          against</em>.{" "}
+          <code className="px-1.5 py-0.5 bg-surface2 rounded text-xs text-text">agent.yaml</code>{" "}
+          says <em>where it sits in SAAF</em>: which island (Planning, Fieldwork, Reporting, AI
+          Governance &amp; QA, Monitoring, Shared Infrastructure), how mature it is (Draft workplan →
+          Building → QA Assessment → Ready), which other agents it depends on, and its mandate —
+          allowed tools, forbidden actions, trusted inputs, human approval steps.
+        </p>
+        <p className="text-sm text-muted leading-relaxed mb-2">
+          The{" "}
+          <a
+            href="https://tonybarratt100.github.io/saaf-living-map/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent font-semibold hover:underline"
+          >
+            SAAF Living Map
+          </a>{" "}
+          collects these files once an hour and renders one map of every agent. Change your{" "}
+          <code className="px-1.5 py-0.5 bg-surface2 rounded text-xs text-text">agent.yaml</code> and
+          the map changes; nobody maintains it by hand. Until your repo has one, the map shows a seed
+          manifest drafted from this portal — adding the real file makes you the owner of what the map
+          says about your agent.
+        </p>
+        <p className="text-sm text-muted leading-relaxed mb-2">
+          Minimal file, in your repo root, added by pull request like any other change (this is the real
+          one from{" "}
+          <a
+            href="https://github.com/SAAF-Project/RCM-Builder/pull/4"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent font-semibold hover:underline"
+          >
+            RCM-Builder #4
+          </a>
+          ):
+        </p>
+        <pre className="bg-surface2 rounded-lg p-3 text-xs text-text font-mono leading-relaxed overflow-x-auto mb-2">
+{`name: RCM Builder (UC7)
+repo: SAAF-Project/RCM-Builder
+island: Planning
+maturity: QA Assessment
+description: Three-stage Python pipeline that builds a Risk Control Matrix from UC1-UC5 risk inputs. Outputs JSON and Markdown for UC8.
+
+mandate:
+  purpose: Turn structured UC1-UC5 risk inputs into a GIAS-aligned risk-control matrix that UC8 can consume without manual rework.
+  allowed_tools: [read_risk_inputs, read_it_matrix, write_rcm_json, write_rcm_markdown]
+  forbidden_actions:
+    - action: change_own_config
+      rationale: Changes to this mandate go through a pull request.
+    - action: modify_source_data
+      rationale: Risk inputs are audit evidence and must stay unchanged.
+    - action: call_llm
+      rationale: The pipeline is deterministic by design; every control traces to a stated risk through code, not generation.
+  trusted_inputs: [risk_inputs_uc1_uc5, it_dependency_matrix]
+  human_approval_required_for: [publishing the RCM to UC8]
+  evidence_policy: cite_only_given_context`}
+        </pre>
+        <p className="text-sm text-muted leading-relaxed mb-4">
+          Full field reference, allowed values and a one-command local check:{" "}
+          <a
+            href="https://github.com/SAAF-Project/SAAF-Project/blob/main/docs/conventions/agent-yaml.md"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent font-semibold hover:underline"
+          >
+            docs/conventions/agent-yaml.md
+          </a>
+          . If your repo is not yet in the map&apos;s{" "}
+          <a
+            href="https://github.com/TonyBarratt100/saaf-living-map/blob/main/repos.txt"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent font-semibold hover:underline"
+          >
+            repos.txt
+          </a>
+          , add it in a one-line PR there.
         </p>
         <p className="text-sm text-muted leading-relaxed">
           A repo with a real README earns the{" "}
