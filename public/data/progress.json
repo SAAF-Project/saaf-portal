@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated": "2026-10-08",
+  "generated": "2026-10-26",
   "weights": {
     "complete": 1.0,
     "in_progress": 0.5,
@@ -725,7 +725,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-13 (178 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-13 (196 days ago)."
         },
         {
           "id": "proposed-track",
@@ -1628,7 +1628,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-14 (177 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-14 (195 days ago)."
         },
         {
           "id": "proposed-track",
@@ -1698,7 +1698,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-05-12 (149 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-05-12 (167 days ago)."
         }
       ]
     },
@@ -2049,7 +2049,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-16 (175 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-16 (193 days ago)."
         }
       ]
     },
@@ -2099,7 +2099,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-16 (175 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-16 (193 days ago)."
         }
       ]
     },
@@ -2358,7 +2358,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (174 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
         },
         {
           "id": "proposed-track",
@@ -2413,7 +2413,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (174 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
         },
         {
           "id": "proposed-track",
@@ -2468,7 +2468,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (174 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
         },
         {
           "id": "proposed-track",
@@ -2523,7 +2523,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (174 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
         }
       ]
     },
@@ -2573,7 +2573,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (174 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
         }
       ]
     },
@@ -2623,7 +2623,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (174 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
         },
         {
           "id": "proposed-track",
@@ -2683,7 +2683,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (174 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
         }
       ]
     },
@@ -2733,7 +2733,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (174 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
         },
         {
           "id": "proposed-track",
@@ -2788,7 +2788,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (174 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
         },
         {
           "id": "proposed-track",
@@ -2843,7 +2843,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (174 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
         },
         {
           "id": "proposed-track",
@@ -2898,7 +2898,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (174 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
         }
       ]
     },
@@ -2953,7 +2953,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (174 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
         }
       ]
     },
@@ -3104,7 +3104,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-21 (170 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-21 (188 days ago)."
         },
         {
           "id": "proposed-track",
@@ -3164,7 +3164,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (174 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
         }
       ]
     },
@@ -3219,7 +3219,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (174 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
         }
       ]
     },
@@ -3320,7 +3320,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (174 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
         },
         {
           "id": "proposed-track",
@@ -3425,7 +3425,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (174 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
         },
         {
           "id": "proposed-track",
@@ -3485,7 +3485,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (174 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
         },
         {
           "id": "proposed-track",
@@ -3596,7 +3596,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (174 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
         }
       ]
     },
@@ -3651,7 +3651,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (174 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
         },
         {
           "id": "proposed-track",
@@ -3706,7 +3706,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (174 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
         }
       ]
     },
@@ -3756,7 +3756,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (174 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
         }
       ]
     },
@@ -3806,7 +3806,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (174 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
         },
         {
           "id": "proposed-track",
@@ -3882,7 +3882,7 @@
         {
           "id": "pdca-stale",
           "severity": "info",
-          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (174 days ago)."
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
         }
       ]
     },
