@@ -60,6 +60,7 @@ export default function DashboardPage() {
   const quickLinks = [
     { href: "/open-source", label: "Open-Source Readiness", desc: "Claim an agent repo with your dev + auditor team", icon: "⬡" },
     { href: "/tracks", label: "Tracks", desc: "Explore tracks & submit observability checks", icon: "▶" },
+    { href: "/progress", label: "Progress", desc: "See how far the SAAF project has come, as a 3D temple", icon: "▲" },
     { href: "/participants", label: "Participants", desc: "Find a colleague to collaborate with", icon: "👥" },
     { href: "/agent-library", label: "Agent Library", desc: "Browse SAAF community AI audit agents", icon: "◈" },
     { href: "/e-learning", label: "E-Learning", desc: "Recommended external AI fluency courses", icon: "▣" },
