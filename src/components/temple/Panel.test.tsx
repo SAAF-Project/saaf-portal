@@ -77,4 +77,17 @@ describe("side panel", () => {
     // without relation data the section is not there at all
     expect(sections(render({ level: "plan", slug })).map((x) => x.title)).not.toContain("Inputs and outputs");
   });
+
+  it("keeps the alert counts as plain labels unless the host wants them clickable", () => {
+    const html = render({ level: "project" });
+    expect(html).not.toContain("chip-btn");
+  });
+
+  it("makes the alert counts buttons that filter, and marks the active ones", () => {
+    const id = data.alert_catalog.find((a) => data.plans.some((p) => p.alerts.some((x) => x.id === a.id)))!.id;
+    const html = renderToStaticMarkup(<Panel data={data} focus={{ level: "project" }} matches={() => true} filtersActive={false} onFocus={() => {}} title="The SAAF Temple" onInfo={() => {}} onHide={() => {}} activeAlerts={[id]} onToggleAlert={() => {}} />);
+    expect(html.match(/class="chip chip-btn/g)!.length).toBeGreaterThan(0);
+    expect(html.match(/aria-pressed="true"/g)).toHaveLength(1);
+    expect(html).toContain("chip chip-btn on");
+  });
 });

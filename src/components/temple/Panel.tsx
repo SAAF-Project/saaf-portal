@@ -81,21 +81,34 @@ function Phases({ r }: { r: Rollup }) {
   );
 }
 
-/** How many plans raise each alert, worst first. */
-function AlertSummary({ plans, catalog }: { plans: PlanRecord[]; catalog: AlertDefinition[] }) {
+/**
+ * How many plans raise each alert, worst first. With `onToggle` each count is a button that filters the picture on that
+ * alert (the same filter as in the filter bar); an alert that is filtered on stays listed, so it can be switched off here.
+ */
+function AlertSummary({ plans, catalog, active = [], onToggle }: { plans: PlanRecord[]; catalog: AlertDefinition[]; active?: string[]; onToggle?: (id: string) => void }) {
   const rows = catalog
     .map((a) => ({ a, n: plans.filter((p) => p.alerts.some((x) => x.id === a.id)).length }))
-    .filter((r) => r.n > 0)
+    .filter((r) => r.n > 0 || active.includes(r.a.id))
     .sort((x, y) => severityRank(y.a.severity) - severityRank(x.a.severity) || y.n - x.n);
   if (!rows.length) return <p className="hint">No alerts.</p>;
   return (
     <div className="chips">
-      {rows.map(({ a, n }) => (
-        <span key={a.id} className="chip" title={a.hint} style={{ borderColor: a.severity === "info" ? undefined : ALERT_COLOR[a.severity] }}>
-          <i style={{ background: ALERT_COLOR[a.severity] }} />
-          {a.label} <b>{n}</b>
-        </span>
-      ))}
+      {rows.map(({ a, n }) => {
+        const style = { borderColor: a.severity === "info" ? undefined : ALERT_COLOR[a.severity] };
+        const inner = (
+          <>
+            <i style={{ background: ALERT_COLOR[a.severity] }} />
+            {a.label} <b>{n}</b>
+          </>
+        );
+        if (!onToggle) return <span key={a.id} className="chip" title={a.hint} style={style}>{inner}</span>;
+        const on = active.includes(a.id);
+        return (
+          <button key={a.id} type="button" className={`chip chip-btn${on ? " on" : ""}`} aria-pressed={on} title={`${a.hint}. ${on ? "Click to show all plans again." : "Click to show only these plans."}`} style={style} onClick={() => onToggle(a.id)}>
+            {inner}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -219,6 +232,8 @@ interface PanelProps {
   onHide: () => void; // folds the panel away, to see the whole temple
   relations?: RelationEdge[]; // which plan feeds which; without it the "Inputs and outputs" section is left out
   relationsOpen?: boolean; // open that section (in the dependency view)
+  activeAlerts?: string[]; // alert ids the picture is filtered on
+  onToggleAlert?: (id: string) => void; // makes the alert counts clickable: filter on that alert
 }
 
 /** A collapsible block. Only what matters at the current level is open; the rest is one click away. */
@@ -265,7 +280,7 @@ function Stat({ value, label, onInfo }: { value: string; label: ReactNode; onInf
 const PART_KICKER: Record<string, string> = { foundation: "Foundation", pillar: "Pillar", roof: "Roof" };
 const attention = (plans: PlanRecord[]) => plans.some((p) => p.alerts.some((a) => a.severity !== "info"));
 
-export function Panel({ data, focus, matches, filtersActive, onFocus, title, onInfo, onHide, relations, relationsOpen = false }: PanelProps) {
+export function Panel({ data, focus, matches, filtersActive, onFocus, title, onInfo, onHide, relations, relationsOpen = false, activeAlerts, onToggleAlert }: PanelProps) {
   const plans = new Map(data.plans.map((p) => [p.slug, p]));
   const guidance = data.annex.guidance;
   const plansOf = (part: PartRecord) => part.plans.map((s) => plans.get(s)).filter((p): p is PlanRecord => !!p);
@@ -297,7 +312,7 @@ export function Panel({ data, focus, matches, filtersActive, onFocus, title, onI
           ))}
         </Section>
         <Section title="Alerts" open={attention(inView)}>
-          <AlertSummary plans={inView} catalog={data.alert_catalog} />
+          <AlertSummary plans={inView} catalog={data.alert_catalog} active={activeAlerts} onToggle={onToggleAlert} />
         </Section>
         <Section title="Types">
           <KindSummary plans={inView} />
@@ -334,7 +349,7 @@ export function Panel({ data, focus, matches, filtersActive, onFocus, title, onI
           ))}
         </Section>
         <Section title="Alerts" open={attention(members)}>
-          <AlertSummary plans={members} catalog={data.alert_catalog} />
+          <AlertSummary plans={members} catalog={data.alert_catalog} active={activeAlerts} onToggle={onToggleAlert} />
         </Section>
         <Section title="Types">
           <KindSummary plans={members} />

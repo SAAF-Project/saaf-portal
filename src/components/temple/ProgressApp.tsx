@@ -8,7 +8,7 @@ import { withAnnexPart } from "./derive";
 import { FilterBar } from "./FilterBar";
 import { InfoDialog } from "./InfoDialog";
 import { cleanRelations, relationsFor } from "./relations";
-import { isActive, makeMatcher, ownedBy, parseFilters, serializeFilters, type Filters, type Submitter } from "./filters";
+import { isActive, makeMatcher, ownedBy, parseFilters, serializeFilters, toggle, type Filters, type Submitter } from "./filters";
 import { STAGES } from "./stages";
 import { DEFAULT_VIEW, VIEWS, resolveView } from "./views";
 import type { Focus, ProgressData } from "./types";
@@ -302,7 +302,7 @@ export function ProgressApp({ data: raw, submitters, identity = null, assetBase 
         )}
 
         {panelOpen ? (
-          <Panel data={data} focus={focus} matches={matches} filtersActive={filtersActive} onFocus={open} title={view.title} onInfo={() => openInfo()} onHide={() => setPanelOpen(false)} relations={relations} relationsOpen={view.id === "dependencies"} />
+          <Panel data={data} focus={focus} matches={matches} filtersActive={filtersActive} onFocus={open} title={view.title} onInfo={() => openInfo()} onHide={() => setPanelOpen(false)} relations={relations} relationsOpen={view.id === "dependencies"} activeAlerts={filters.alerts} onToggleAlert={(id) => { changeFilters({ ...filters, alerts: toggle(filters.alerts, id) }, focus); setFiltersOpen(true); }} />
         ) : (
           <button className="panel-tab" onClick={() => setPanelOpen(true)} title="Show the side panel">‹ Details</button>
         )}
