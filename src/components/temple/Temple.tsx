@@ -6,6 +6,7 @@ import type CameraControlsImpl from "camera-controls";
 import { cameraFor, focusKey, type View } from "./camera";
 import { LabelLayer, LabelProjector, buildLabels } from "./labels";
 import { Outline, SketchContext } from "./Outline";
+import { rayFor } from "./raycast";
 import { Paving, SkyArc, useAccents, type Accents } from "./Scenery";
 import { PALETTE, type Palette, type Theme } from "./colors";
 import { ALERT_COLOR, hasAlert, tagSeverity } from "./alerts";
@@ -167,7 +168,7 @@ function PlanCell({ plan, cell, palette, selected, dim, hovered, onPick, onHover
 }
 
 /** Roof slices, one per stage segment, each covering the share of the roof's surface that its plans cover. */
-function RoofBands({ body, segments, material, edge, dim, noRay }: { body: RoofBody; segments: StageSegment[]; material: (color: string, ghost: boolean) => ReactElement; edge: string; dim: boolean; noRay: (() => null) | undefined }) {
+function RoofBands({ body, segments, material, edge, dim, noRay }: { body: RoofBody; segments: StageSegment[]; material: (color: string, ghost: boolean) => ReactElement; edge: string; dim: boolean; noRay: ReturnType<typeof rayFor> }) {
   const bands = useMemo(() => {
     const starts = segmentStarts(segments);
     return segments.map(({ stage, count, ghost }, i) => {
@@ -208,7 +209,21 @@ interface PartBodyProps {
 function PartBody({ body, plans, matches, palette, hovered, dim, onPick, onHover, partId }: PartBodyProps) {
   const segments = useMemo(() => stageSegments(plans, matches), [plans, matches]);
   const n = plans.length;
-  const noRay = dim ? () => null : undefined;
+  const live = useRef({ hovered, onHover });
+  useEffect(() => {
+    live.current = { hovered, onHover };
+  });
+  useEffect(
+    () => () => {
+      // no pointer-out arrives when this body disappears under the pointer: clear the tooltip and the cursor here
+      if (live.current.hovered) {
+        live.current.onHover(null);
+        document.body.style.cursor = "";
+      }
+    },
+    [],
+  );
+  const noRay = rayFor(dim);
   // plans that do not match the filters stay in place, as faded ghosts
   const material = (color: string, ghost: boolean) => (
     <meshStandardMaterial key={`${dim}-${ghost}`} color={color} emissive={color} emissiveIntensity={hovered ? 0.18 : 0.08} roughness={0.9} transparent={dim || ghost} opacity={dim ? 0.1 : ghost ? 0.13 : 1} depthWrite={!(dim || ghost)} />

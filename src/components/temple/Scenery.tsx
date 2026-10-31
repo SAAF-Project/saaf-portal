@@ -81,17 +81,29 @@ export function useAccents(theme: Theme, enabled: boolean, assetBase = "/"): Acc
 
 const R = 210; // distance of the sky from the temple
 const H = 130; // height of the sky picture in the world
-const ARC = (120 * Math.PI) / 180;
+const TILES = 4; // the picture is repeated this many times around the temple; even, so the mirrored copies close the circle
 
-/** Sky: a wide arc behind the temple, so the horizon stays where it is when the camera moves. */
+/**
+ * Sky: a full circle around the temple, so there is something to see in every direction. The picture is repeated
+ * TILES times, every second copy mirrored, so the copies meet without a seam. The unmirrored copy sits behind the
+ * temple, where the picture used to be, and the horizon stays where it is when the camera moves.
+ */
 export function SkyArc({ texture, theme, centreX }: { texture: THREE.Texture; theme: Theme; centreX: number }) {
-  // theta 0 points along +z; the arc is centred on -z, the side the temple faces away from
-  const geometry = useMemo(() => new THREE.CylinderGeometry(R, R, H, 48, 1, true, Math.PI - ARC / 2, ARC), []);
+  const tile = (2 * Math.PI) / TILES;
+  // theta 0 points along +z; the middle of the first copy faces -z, the side the temple faces away from
+  const geometry = useMemo(() => new THREE.CylinderGeometry(R, R, H, 96, 1, true, Math.PI - tile / 2, 2 * Math.PI), [tile]);
+  const map = useMemo(() => {
+    const t = texture.clone();
+    t.wrapS = THREE.MirroredRepeatWrapping;
+    t.repeat.set(TILES, 1);
+    t.needsUpdate = true;
+    return t;
+  }, [texture]);
   // the picture's horizon line goes to world height 0
   const y = SKY[theme].horizon * H - H / 2;
   return (
     <mesh geometry={geometry} position={[centreX, y, 0]} raycast={() => null}>
-      <meshBasicMaterial map={texture} side={THREE.BackSide} toneMapped={false} fog={false} />
+      <meshBasicMaterial map={map} side={THREE.BackSide} toneMapped={false} fog={false} />
     </mesh>
   );
 }

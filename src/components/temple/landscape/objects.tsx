@@ -1,6 +1,7 @@
 import { useMemo, type ReactNode } from "react";
 import * as THREE from "three";
 import { Outline } from "../Outline";
+import { rayFor } from "../raycast";
 import { ALERT_COLOR, tagSeverity } from "../alerts";
 import { nameTexture } from "../nameTexture";
 import { stageOf } from "../stages";
@@ -30,7 +31,7 @@ interface PartProps {
 /** One solid piece: a mesh with a flat soft material and, optionally, a pen outline. */
 function Piece({ position, rotation, color, dim, outline, children }: PartProps) {
   return (
-    <mesh position={position} rotation={rotation} raycast={dim ? () => null : undefined}>
+    <mesh position={position} rotation={rotation} raycast={rayFor(dim)}>
       {children}
       <meshStandardMaterial key={String(dim)} color={color} emissive={color} emissiveIntensity={0.07} roughness={0.9} transparent={dim} opacity={dim ? 0.16 : 1} depthWrite={!dim} />
       {outline && !dim && <Outline color={outline} threshold={30} />}
