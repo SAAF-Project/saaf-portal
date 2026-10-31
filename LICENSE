@@ -1,0 +1,15 @@
+Copyright (c) 2026 Mathijs Schouten, on behalf of Stichting SAAF (in formation).
+All rights reserved.
+
+The source code of the SAAF Portal is published so that it can be read,
+reviewed and contributed to. No licence to use, copy, modify, distribute or
+host this software, in whole or in part, is granted by publishing it, except
+for the rights GitHub's Terms of Service give other GitHub users to view and
+fork this repository on GitHub (section D.5, "License Grant to Other Users":
+https://docs.github.com/en/site-policy/github-terms/github-terms-of-service#5-license-grant-to-other-users).
+
+Licence terms for the SAAF Portal will be published in this file by Stichting
+SAAF. Until then, contact the maintainers for any use beyond the above.
+
+Agents, conventions and other SAAF building blocks live in their own
+repositories and carry their own licences.
