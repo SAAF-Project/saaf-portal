@@ -408,10 +408,13 @@ Short description of the steps the agent takes.
           The README says <em>what the agent does</em>. AUDIT-CRITERIA.md says <em>what it is judged
           against</em>.{" "}
           <code className="px-1.5 py-0.5 bg-surface2 rounded text-xs text-text">agent.yaml</code>{" "}
-          says <em>where it sits in SAAF</em>: which island (Planning, Fieldwork, Reporting, AI
-          Governance &amp; QA, Monitoring, Shared Infrastructure), how mature it is (Draft workplan →
-          Building → QA Assessment → Ready), which other agents it depends on, and its mandate —
-          allowed tools, forbidden actions, trusted inputs, human approval steps.
+          says <em>where it sits in SAAF</em>: which island (one of the portal&apos;s part ids: planning
+          = GIAS Audit Planning Pipeline, collection = Evidence Collection &amp; Extraction, reporting =
+          Reporting &amp; Visualization, monitoring = Compliance &amp; Regulatory Assessment, governance
+          = AI Governance &amp; Quality Assurance, foundation = Shared Infrastructure, quarry = not yet
+          assigned to a track), how mature it is (the portal&apos;s stage keys: building → ready →
+          tested → improving), which other agents it depends on, and its mandate — allowed tools,
+          forbidden actions, trusted inputs, human approval steps.
         </p>
         <p className="text-sm text-muted leading-relaxed mb-2">
           The{" "}
@@ -445,8 +448,8 @@ Short description of the steps the agent takes.
         <pre className="bg-surface2 rounded-lg p-3 text-xs text-text font-mono leading-relaxed overflow-x-auto mb-2">
 {`name: RCM Builder (UC7)
 repo: SAAF-Project/RCM-Builder
-island: Planning
-maturity: QA Assessment
+island: planning
+maturity: ready
 description: Three-stage Python pipeline that builds a Risk Control Matrix from UC1-UC5 risk inputs. Outputs JSON and Markdown for UC8.
 
 mandate:
