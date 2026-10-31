@@ -1,0 +1,4089 @@
+{
+  "schema_version": 2,
+  "generated": "2026-10-26",
+  "weights": {
+    "complete": 1.0,
+    "in_progress": 0.5,
+    "not_started": 0.0
+  },
+  "stages": [
+    {
+      "id": 0,
+      "key": "draft-plan",
+      "label": "Draft plan",
+      "hint": "The plan is not complete yet, or it has no PDCA table"
+    },
+    {
+      "id": 1,
+      "key": "final-plan",
+      "label": "Final plan",
+      "hint": "The plan is complete; nothing is built yet"
+    },
+    {
+      "id": 2,
+      "key": "building",
+      "label": "Building",
+      "hint": "Work has started (PDCA: Do in progress)"
+    },
+    {
+      "id": 3,
+      "key": "ready",
+      "label": "Ready",
+      "hint": "Do is complete; not tested yet"
+    },
+    {
+      "id": 4,
+      "key": "tested",
+      "label": "Tested",
+      "hint": "Check has started or is done"
+    },
+    {
+      "id": 5,
+      "key": "improving",
+      "label": "Improving",
+      "hint": "Act has started or is done"
+    }
+  ],
+  "kinds": [
+    "agent",
+    "workflow",
+    "skill",
+    "document",
+    "unspecified"
+  ],
+  "alert_catalog": [
+    {
+      "id": "duplicate-repos",
+      "severity": "error",
+      "label": "Duplicate repos",
+      "hint": "The same agent lives in more than one repo: pick the canonical one and archive the rest (see the Repo Annex)"
+    },
+    {
+      "id": "claims-building-no-repo",
+      "severity": "error",
+      "label": "Building without a repo",
+      "hint": "An agent whose PDCA says work has started, but no repo or code is linked: it stays in its plan stage"
+    },
+    {
+      "id": "pdca-missing",
+      "severity": "error",
+      "label": "PDCA missing",
+      "hint": "The plan has no PDCA table, so it stays in Draft plan until it has one"
+    },
+    {
+      "id": "pdca-out-of-sync",
+      "severity": "error",
+      "label": "PDCA out of sync",
+      "hint": "A later PDCA phase is further along than an earlier one"
+    },
+    {
+      "id": "repo-not-started",
+      "severity": "warning",
+      "label": "Repo, but Do not started",
+      "hint": "A repo is linked, but the PDCA table says Do has not started"
+    },
+    {
+      "id": "repo-shared",
+      "severity": "warning",
+      "label": "Repo shared by plans",
+      "hint": "Two or more plans point at the same repo: one repo per agent, so check which plan it really belongs to"
+    },
+    {
+      "id": "status-draft",
+      "severity": "info",
+      "label": "Status still Draft",
+      "hint": "The plan is complete (PDCA), but its Status row still says Draft. The template says: Finalised once your PR is merged"
+    },
+    {
+      "id": "pdca-stale",
+      "severity": "info",
+      "label": "PDCA not updated for 90+ days",
+      "hint": "Do is in progress, but the plan has not been touched for a long time: check the PDCA table"
+    },
+    {
+      "id": "proposed-track",
+      "severity": "info",
+      "label": "Placement to confirm",
+      "hint": "The plan is not in the Hackathon #3 workstreams list, so its place in the temple is a proposal. It says nothing about the plan's progress or quality"
+    }
+  ],
+  "sector_vocabulary": [
+    "General",
+    "Banking",
+    "Insurance",
+    "Payments/Fintech",
+    "Public sector",
+    "Healthcare",
+    "Other"
+  ],
+  "project": {
+    "name": "SAAF",
+    "plan_count": 66,
+    "plans_unknown": 1,
+    "progress": 0.373,
+    "phase_progress": {
+      "plan": 0.992,
+      "do": 0.469,
+      "check": 0.031,
+      "act": 0.0
+    },
+    "phases": {
+      "complete": 81,
+      "in_progress": 32,
+      "not_started": 147
+    },
+    "repo_count": 14,
+    "repo_status": {
+      "missing": 43,
+      "dedicated": 11,
+      "duplicate": 3,
+      "main-repo": 6,
+      "not-needed": 3
+    }
+  },
+  "parts": [
+    {
+      "id": "foundation",
+      "kind": "foundation",
+      "track": 0,
+      "stage": null,
+      "position": 0,
+      "name": "Shared Infrastructure",
+      "mission": "Build the foundation that all other tracks depend on. First 2 hours: build. Rest of day: helpdesk.",
+      "team": {
+        "engineers": 4,
+        "analysts": 2
+      },
+      "plans": [
+        "always-on-audit-agent",
+        "audit-agent-gamified-ui",
+        "audit-loop-orchestration-sdk",
+        "audit-memory-knowledge-system",
+        "audit-subagent-coordination-framework",
+        "n8n-audit-workflow-migration",
+        "on-premise-ai-compute-decision-framework",
+        "open-source-audit-agent-framework",
+        "overnight-audit-batch-processing-agent",
+        "saaf-jira-confluence-mcp",
+        "saaf-rag-knowledge-base",
+        "saaf-skills-registry-and-matching",
+        "saaf-strapi-synthetic-data"
+      ],
+      "plan_count": 13,
+      "plans_unknown": 0,
+      "progress": 0.365,
+      "phase_progress": {
+        "plan": 1.0,
+        "do": 0.462,
+        "check": 0.0,
+        "act": 0.0
+      },
+      "phases": {
+        "complete": 13,
+        "in_progress": 12,
+        "not_started": 27
+      },
+      "repo_count": 0,
+      "repo_status": {
+        "missing": 12,
+        "main-repo": 1
+      }
+    },
+    {
+      "id": "planning",
+      "kind": "pillar",
+      "track": 1,
+      "stage": "Planning",
+      "position": 1,
+      "name": "GIAS Audit Planning Pipeline",
+      "mission": "Run the full UC1-UC9 audit planning pipeline against synthetic data and produce a complete RCM + Work Program.",
+      "team": {
+        "auditors": 3,
+        "vaktechniek": 2,
+        "analysts": 2,
+        "engineers": 1
+      },
+      "plans": [
+        "auditflow-ai",
+        "floris-stokkers-work-program-agent",
+        "frank-van-dissel-uc1-policy-process-intake",
+        "frank-van-dissel-uc2-previous-audit-intelligence",
+        "frank-van-dissel-uc3-incident-issue-intelligence",
+        "frank-van-dissel-uc4-fraud-risk-assessment",
+        "frank-van-dissel-uc5-regulatory-criteria",
+        "frank-van-dissel-uc6-it-dependency-identifier",
+        "frank-van-dissel-uc7-rcm-builder",
+        "frank-van-dissel-uc8-audit-work-program",
+        "frank-van-dissel-uc9-quality-resource-guard",
+        "inge-garretsen-audit-work-program-agent",
+        "linda-nyvelius-team-hightable",
+        "the-control-freaks-uc7-rcm-builder",
+        "the-rcm-rangers-audit-work-program-agent"
+      ],
+      "plan_count": 15,
+      "plans_unknown": 0,
+      "progress": 0.317,
+      "phase_progress": {
+        "plan": 1.0,
+        "do": 0.267,
+        "check": 0.0,
+        "act": 0.0
+      },
+      "phases": {
+        "complete": 17,
+        "in_progress": 4,
+        "not_started": 39
+      },
+      "repo_count": 2,
+      "repo_status": {
+        "missing": 13,
+        "duplicate": 1,
+        "dedicated": 1
+      }
+    },
+    {
+      "id": "collection",
+      "kind": "pillar",
+      "track": 2,
+      "stage": "Collection & Extraction",
+      "position": 2,
+      "name": "Evidence Collection & Extraction",
+      "mission": "Build and test evidence extraction pipelines for 4 different evidence types.",
+      "team": {
+        "auditors": 2,
+        "vaktechniek": 1,
+        "analysts": 2,
+        "engineers": 1
+      },
+      "plans": [
+        "mollie-group-x-evidence-audit",
+        "diyve-garg-pbc-assistant-isabelle",
+        "example-synthetic-access-review",
+        "koekenpan-ia-fieldwork-preparation",
+        "cli-audit-system-wrapper",
+        "document-evidence-extraction-agent",
+        "grc-copilot-mindshift-agent"
+      ],
+      "plan_count": 7,
+      "plans_unknown": 0,
+      "progress": 0.429,
+      "phase_progress": {
+        "plan": 1.0,
+        "do": 0.643,
+        "check": 0.071,
+        "act": 0.0
+      },
+      "phases": {
+        "complete": 10,
+        "in_progress": 4,
+        "not_started": 14
+      },
+      "repo_count": 2,
+      "repo_status": {
+        "missing": 4,
+        "dedicated": 2,
+        "main-repo": 1
+      }
+    },
+    {
+      "id": "reporting",
+      "kind": "pillar",
+      "track": 4,
+      "stage": "Reporting & Visualisation",
+      "position": 3,
+      "name": "Reporting & Visualization",
+      "mission": "Convert raw findings from Tracks 1-3 into polished audit reports and visual dashboards.",
+      "team": {
+        "auditors": 2,
+        "analysts": 2,
+        "engineers": 2
+      },
+      "plans": [
+        "anonymous-audit-rep-analysis",
+        "themontechristo-threewaysecurity",
+        "audit-evidence-visualization",
+        "audit-report-generator-from-work-program",
+        "power-bi-audit-dashboard-mcp",
+        "Plan_ExecSummary"
+      ],
+      "plan_count": 6,
+      "plans_unknown": 0,
+      "progress": 0.333,
+      "phase_progress": {
+        "plan": 0.917,
+        "do": 0.417,
+        "check": 0.0,
+        "act": 0.0
+      },
+      "phases": {
+        "complete": 6,
+        "in_progress": 4,
+        "not_started": 14
+      },
+      "repo_count": 2,
+      "repo_status": {
+        "dedicated": 1,
+        "duplicate": 1,
+        "missing": 4
+      }
+    },
+    {
+      "id": "monitoring",
+      "kind": "pillar",
+      "track": 3,
+      "stage": "Monitoring (Compliance & Regulatory)",
+      "position": 4,
+      "name": "Compliance & Regulatory Assessment",
+      "mission": "Run framework-specific compliance assessments against synthetic data. Produce gap reports with regulatory citations.",
+      "team": {
+        "auditors": 2,
+        "vaktechniek": 3,
+        "analysts": 2,
+        "engineers": 1
+      },
+      "plans": [
+        "team-67-intelligent-audit-agents",
+        "immistyle-cuec-crosscheck-agent",
+        "johannesiv-policy-to-controls-extractor",
+        "robeminem94-gdpr-ai-audit-agent",
+        "robeminem94-vendor-guard",
+        "rohan-sobha-compliance-report-generator",
+        "yellowraptor-whats-the-news",
+        "ai-agent-visibility-scanner",
+        "eu-ai-act-compliance-monitor",
+        "icfcop-control-testing-agent",
+        "saaf-intelligence-monitor"
+      ],
+      "plan_count": 11,
+      "plans_unknown": 0,
+      "progress": 0.398,
+      "phase_progress": {
+        "plan": 1.0,
+        "do": 0.591,
+        "check": 0.0,
+        "act": 0.0
+      },
+      "phases": {
+        "complete": 16,
+        "in_progress": 3,
+        "not_started": 25
+      },
+      "repo_count": 5,
+      "repo_status": {
+        "missing": 6,
+        "dedicated": 5
+      }
+    },
+    {
+      "id": "governance",
+      "kind": "roof",
+      "track": 5,
+      "stage": null,
+      "position": 5,
+      "name": "AI Governance & Quality Assurance",
+      "mission": "Be the second pair of eyes for every other track. Test agents for security, validate findings for accuracy.",
+      "team": {
+        "auditors": 1,
+        "vaktechniek": 2,
+        "analysts": 1,
+        "engineers": 2
+      },
+      "plans": [
+        "group-5-hackers-ai-audit-agents",
+        "ellert-van-der-vecht-llm-owasp",
+        "ellert-van-der-vecht-multi-model-validation",
+        "ai-audit-explainability-framework",
+        "audit-automation-overview",
+        "audit-skills-transformation-curriculum",
+        "audit-workflow-automation-levels",
+        "frank-heldens-llm-finding-fact-check-agent",
+        "frank-lubbers-ai-finding-escalation-azure-devops",
+        "llm-hallucination-detection-agent",
+        "owasp-ai-testing-agent",
+        "table-9-execution-plan",
+        "rene-volwerk-compliance-harnas-configurator",
+        "rohan-sobha-judging-found-controls"
+      ],
+      "plan_count": 14,
+      "plans_unknown": 1,
+      "progress": 0.413,
+      "phase_progress": {
+        "plan": 1.0,
+        "do": 0.538,
+        "check": 0.115,
+        "act": 0.0
+      },
+      "phases": {
+        "complete": 19,
+        "in_progress": 5,
+        "not_started": 28
+      },
+      "repo_count": 3,
+      "repo_status": {
+        "missing": 4,
+        "duplicate": 1,
+        "not-needed": 3,
+        "main-repo": 4,
+        "dedicated": 2
+      }
+    },
+    {
+      "id": "quarry",
+      "kind": "quarry",
+      "track": null,
+      "stage": null,
+      "position": 6,
+      "name": "Not yet assigned to a track",
+      "mission": "Plans submitted outside the Hackathon #3 track structure.",
+      "team": {},
+      "plans": [],
+      "plan_count": 0,
+      "plans_unknown": 0,
+      "progress": null,
+      "phase_progress": {
+        "plan": null,
+        "do": null,
+        "check": null,
+        "act": null
+      },
+      "phases": {
+        "complete": 0,
+        "in_progress": 0,
+        "not_started": 0
+      },
+      "repo_count": 0,
+      "repo_status": {}
+    }
+  ],
+  "annex": {
+    "name": "Repo Annex",
+    "items": [
+      {
+        "plan": "ellert-van-der-vecht-llm-owasp",
+        "title": "AI Security — OWASP LLM Top 10",
+        "part": "governance",
+        "status": "duplicate",
+        "primary": {
+          "name": "OWASP-top-10-LLM-assessment",
+          "url": "https://github.com/SAAF-Project/OWASP-top-10-LLM-assessment",
+          "source": "mapping"
+        },
+        "duplicates": [
+          {
+            "name": "llm_owasp",
+            "url": "https://github.com/SAAF-Project/llm_owasp",
+            "source": "mapping"
+          }
+        ],
+        "main_repo_code": [
+          {
+            "path": "tools/scripts/llm-owasp",
+            "url": "https://github.com/SAAF-Project/SAAF-Project/tree/main/tools/scripts/llm-owasp",
+            "source": "mapping"
+          }
+        ],
+        "note": "OWASP-top-10-LLM-assessment now carries the AUDIT-CRITERIA.md and contains the llm-owasp pipeline; llm_owasp and the copy in the main repo are earlier homes of the same pipeline. OWASP pipeline built in the main repo (PRs #98, #101)."
+      },
+      {
+        "plan": "example-synthetic-access-review",
+        "title": "IAM — user access review (100% population)",
+        "part": "collection",
+        "status": "main-repo",
+        "primary": null,
+        "duplicates": [],
+        "main_repo_code": [
+          {
+            "path": "tools/scripts/access_review_app.py",
+            "url": "https://github.com/SAAF-Project/SAAF-Project/tree/main/tools/scripts/access_review_app.py",
+            "source": "mapping"
+          }
+        ],
+        "note": "IAM access review Streamlit app (PR #111); matched by topic, please confirm."
+      },
+      {
+        "plan": "inge-garretsen-audit-work-program-agent",
+        "title": "Audit planning — work program (UC 8)",
+        "part": "planning",
+        "status": "duplicate",
+        "primary": {
+          "name": "Audit-Work-Program-Agent-UC-8-",
+          "url": "https://github.com/SAAF-Project/Audit-Work-Program-Agent-UC-8-",
+          "source": "mapping"
+        },
+        "duplicates": [],
+        "main_repo_code": [
+          {
+            "path": "tools/scripts/work_program_generator.py",
+            "url": "https://github.com/SAAF-Project/SAAF-Project/tree/main/tools/scripts/work_program_generator.py",
+            "source": "mapping"
+          }
+        ],
+        "note": "Dedicated repo with AUDIT-CRITERIA.md; an earlier copy of the script still lives in the main repo. Original script from PR #107."
+      },
+      {
+        "plan": "themontechristo-threewaysecurity",
+        "title": "Financial — P2P/O2C 3-way match",
+        "part": "reporting",
+        "status": "duplicate",
+        "primary": {
+          "name": "three-way-match-audit",
+          "url": "https://github.com/SAAF-Project/three-way-match-audit",
+          "source": "mapping"
+        },
+        "duplicates": [
+          {
+            "name": "threewaysecurity",
+            "url": "https://github.com/SAAF-Project/threewaysecurity",
+            "source": "mapping"
+          }
+        ],
+        "main_repo_code": [],
+        "note": "three-way-match-audit is the latest repo and carries the AUDIT-CRITERIA.md; threewaysecurity is the older repo linked in the plan."
+      },
+      {
+        "plan": "frank-lubbers-ai-finding-escalation-azure-devops",
+        "title": "Plan: AI Finding Escalation Agent — OWASP & Hallucination Findings to Azure DevOps",
+        "part": "governance",
+        "status": "main-repo",
+        "primary": null,
+        "duplicates": [],
+        "main_repo_code": [
+          {
+            "path": "tools/scripts/frank-lubbers-ai-finding-escalation-azure-devops.py",
+            "url": "https://github.com/SAAF-Project/SAAF-Project/tree/main/tools/scripts/frank-lubbers-ai-finding-escalation-azure-devops.py",
+            "source": "mapping"
+          }
+        ],
+        "note": "Built in the main repo (PR #103)."
+      },
+      {
+        "plan": "llm-hallucination-detection-agent",
+        "title": "Evidence Quality — hallucination detection for audit findings",
+        "part": "governance",
+        "status": "main-repo",
+        "primary": null,
+        "duplicates": [],
+        "main_repo_code": [
+          {
+            "path": "tools/scripts/hallucination_check.py",
+            "url": "https://github.com/SAAF-Project/SAAF-Project/tree/main/tools/scripts/hallucination_check.py",
+            "source": "mapping"
+          }
+        ],
+        "note": "Hallucination check built in the main repo (PR #89)."
+      },
+      {
+        "plan": "owasp-ai-testing-agent",
+        "title": "AI Security — OWASP AI Testing Guide v1.0 operational agent (250 pages)",
+        "part": "governance",
+        "status": "main-repo",
+        "primary": null,
+        "duplicates": [],
+        "main_repo_code": [
+          {
+            "path": "tools/scripts/owasp-agent-reviewer",
+            "url": "https://github.com/SAAF-Project/SAAF-Project/tree/main/tools/scripts/owasp-agent-reviewer",
+            "source": "mapping"
+          },
+          {
+            "path": "tools/scripts/llm-owasp",
+            "url": "https://github.com/SAAF-Project/SAAF-Project/tree/main/tools/scripts/llm-owasp",
+            "source": "mapping"
+          }
+        ],
+        "note": "OWASP reviewer and pipeline in the main repo (PR #113); matched by topic, please confirm."
+      },
+      {
+        "plan": "saaf-strapi-synthetic-data",
+        "title": "Shared synthetic data sandbox",
+        "part": "foundation",
+        "status": "main-repo",
+        "primary": null,
+        "duplicates": [],
+        "main_repo_code": [
+          {
+            "path": "tools/strapi",
+            "url": "https://github.com/SAAF-Project/SAAF-Project/tree/main/tools/strapi",
+            "source": "mapping"
+          },
+          {
+            "path": "tools/scripts/generate_synthetic_data.py",
+            "url": "https://github.com/SAAF-Project/SAAF-Project/tree/main/tools/scripts/generate_synthetic_data.py",
+            "source": "mapping"
+          },
+          {
+            "path": "tools/scripts/seed_strapi.py",
+            "url": "https://github.com/SAAF-Project/SAAF-Project/tree/main/tools/scripts/seed_strapi.py",
+            "source": "mapping"
+          },
+          {
+            "path": "tools/scripts/verify_strapi_seed.py",
+            "url": "https://github.com/SAAF-Project/SAAF-Project/tree/main/tools/scripts/verify_strapi_seed.py",
+            "source": "mapping"
+          }
+        ],
+        "note": "Synthetic-data sandbox built in the main repo (PR #102); shared tooling, may legitimately stay here."
+      },
+      {
+        "plan": "table-9-execution-plan",
+        "title": "Table 9 — Track 5 Execution Plan (Hackathon 3)",
+        "part": "governance",
+        "status": "main-repo",
+        "primary": null,
+        "duplicates": [],
+        "main_repo_code": [
+          {
+            "path": "tools/scripts/track-5",
+            "url": "https://github.com/SAAF-Project/SAAF-Project/tree/main/tools/scripts/track-5",
+            "source": "mapping"
+          }
+        ],
+        "note": "Track 5 hallucination detector (PR #95)."
+      }
+    ],
+    "guidance": {
+      "config": {
+        "mapping_file": "plans/metadata/plan-repos.json",
+        "plan_row": "the 'Repository' row in section 1 of the plan",
+        "refresh": "The visual updates after the next dashboard run (GitHub Action on pushes to main that touch plans/)."
+      },
+      "duplicate": {
+        "title": "Possible duplicate repositories",
+        "steps": [
+          "Confirm the canonical repo: the latest one that carries an AUDIT-CRITERIA.md (shown as primary).",
+          "To change it, set 'primary' for the plan in plans/metadata/plan-repos.json (or the plan's 'Repository' row) and open a PR (fork, branch your-name/feature-description).",
+          "Move any unique code or docs from the other repo into the canonical repo through a PR there, so history and credit are kept.",
+          "Archive the other repo on GitHub (Settings, Archive) and add a README pointer to the canonical repo, instead of deleting it.",
+          "Remove it from 'duplicates' in plans/metadata/plan-repos.json once archived."
+        ]
+      },
+      "main-repo": {
+        "title": "Built inside the main repository",
+        "steps": [
+          "Create a dedicated repo for the agent in the SAAF-Project org (one repo per agent); see docs/getting-started.md#building-an-agent.",
+          "Copy the code with its README and add an AUDIT-CRITERIA.md next to the README; the /harden-agent-repo skill walks you through it.",
+          "Open a PR in SAAF-Project that removes the code from the main repo and links the new repo. You keep your contribution history and earn the Agent Builder bonus.",
+          "Set the new repo as 'primary' in plans/metadata/plan-repos.json (or the plan's 'Repository' row) and remove the 'main_repo_code' entry.",
+          "Shared tooling (for example the Strapi sandbox) may legitimately stay in tools/."
+        ]
+      },
+      "missing": {
+        "title": "No repository linked",
+        "steps": [
+          "If the agent exists, set the plan's 'Repository' row or add an assignment in plans/metadata/plan-repos.json.",
+          "If it was built inside the main repo, add a 'main_repo_code' entry with its path.",
+          "If it is not built yet, create a dedicated repo when work starts and link it.",
+          "Strategy or reference plans that are not expected to have a repo go under 'no_repo_needed'."
+        ]
+      }
+    }
+  },
+  "plans": [
+    {
+      "slug": "auditflow-ai",
+      "title": "Overall audit lifecycle",
+      "session": "alignment",
+      "part": "planning",
+      "track": 1,
+      "track_source": "proposed",
+      "track_reason": "Overall audit lifecycle orchestration",
+      "type": "Agent",
+      "status": "Presented",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 3,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/alignment/auditflow-ai.md",
+      "problem_summary": "70% of audit time is spent on manual, repetitive work — leaving teams burned out and unable to focus on strategic risk analysis. Audit coverage is incomplete and fraud signals are missed because audit...",
+      "updated": "2026-04-13",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "claims-building-no-repo",
+          "severity": "error",
+          "message": "The PDCA table says work has started, but no repo or code is linked, so the plan stays in Final plan."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-13 (196 days ago)."
+        },
+        {
+          "id": "proposed-track",
+          "severity": "info",
+          "message": "Not a problem with the plan: it is not in the Hackathon #3 workstreams list, so it was placed in Track 1 (GIAS Audit Planning Pipeline) as a proposal (Overall audit lifecycle orchestration). The owner can confirm or change this placement."
+        }
+      ]
+    },
+    {
+      "slug": "group-5-hackers-ai-audit-agents",
+      "title": "AI Governance — auditing AI systems",
+      "session": "alignment",
+      "part": "governance",
+      "track": 5,
+      "track_source": "proposed",
+      "track_reason": "Auditing AI agents in financial services",
+      "type": "Agent",
+      "status": "Presented",
+      "pdca": {
+        "plan": "complete",
+        "do": "not_started",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.25,
+      "quality_score": 3,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "Banking"
+      ],
+      "sector_source": "mapping",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/alignment/group-5-hackers-ai-audit-agents.md",
+      "problem_summary": "AI agents are being deployed across financial services at speed — for credit scoring, fraud detection, customer service, and trading. Yet internal audit teams lack systematic tools to audit these AI s...",
+      "updated": "2026-04-13",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "proposed-track",
+          "severity": "info",
+          "message": "Not a problem with the plan: it is not in the Hackathon #3 workstreams list, so it was placed in Track 5 (AI Governance & Quality Assurance) as a proposal (Auditing AI agents in financial services). The owner can confirm or change this placement."
+        }
+      ]
+    },
+    {
+      "slug": "mollie-group-x-evidence-audit",
+      "title": "Evidence collection & analysis",
+      "session": "alignment",
+      "part": "collection",
+      "track": 2,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Presented",
+      "pdca": {
+        "plan": "complete",
+        "do": "not_started",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.25,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "Payments/Fintech"
+      ],
+      "sector_source": "organisation",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/alignment/mollie-group-x-evidence-audit.md",
+      "problem_summary": "Internal auditors spend significant time on repetitive, low-judgment tasks: collecting evidence from various systems, cross-referencing it against control objectives, assessing whether the evidence is...",
+      "updated": "2026-04-13",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": []
+    },
+    {
+      "slug": "team-67-intelligent-audit-agents",
+      "title": "Multi-domain (risk, compliance, ops)",
+      "session": "alignment",
+      "part": "monitoring",
+      "track": 3,
+      "track_source": "proposed",
+      "track_reason": "Multi-domain risk and compliance agents",
+      "type": "Agent",
+      "status": "Presented",
+      "pdca": {
+        "plan": "complete",
+        "do": "not_started",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.25,
+      "quality_score": 3,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/alignment/team-67-intelligent-audit-agents.md",
+      "problem_summary": "The 2026 risk landscape presents three converging challenges for internal audit: cybersecurity and AI risks dominate audit priorities, regulatory complexity and supply chain vulnerabilities are accele...",
+      "updated": "2026-04-13",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "proposed-track",
+          "severity": "info",
+          "message": "Not a problem with the plan: it is not in the Hackathon #3 workstreams list, so it was placed in Track 3 (Compliance & Regulatory Assessment) as a proposal (Multi-domain risk and compliance agents). The owner can confirm or change this placement."
+        }
+      ]
+    },
+    {
+      "slug": "anonymous-audit-rep-analysis",
+      "title": "Audit reporting — finding analysis",
+      "session": "hackathon-2",
+      "part": "reporting",
+      "track": 4,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "not_started",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.25,
+      "quality_score": 3,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": {
+        "name": "AuditRepAnalysis",
+        "url": "https://github.com/SAAF-Project/AuditRepAnalysis",
+        "source": "text-link"
+      },
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "dedicated",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/anonymous-audit-rep-analysis.md",
+      "problem_summary": "Auditors preparing for a new engagement often need to review previous audit reports covering the same domain or entity to understand what findings were raised before, whether they were resolved, and w...",
+      "updated": "2026-04-13",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "repo-not-started",
+          "severity": "warning",
+          "message": "A repo is linked (AuditRepAnalysis), but the PDCA table says Do has not started."
+        },
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        }
+      ]
+    },
+    {
+      "slug": "diyve-garg-pbc-assistant-isabelle",
+      "title": "Evidence request (PBC assistant)",
+      "session": "hackathon-2",
+      "part": "collection",
+      "track": 2,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Workflow",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "complete",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.5,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "Public sector"
+      ],
+      "sector_source": "organisation",
+      "repo": {
+        "name": "PBC-Assistant-Isabelle---IA-AI-Hackathon",
+        "url": "https://github.com/SAAF-Project/PBC-Assistant-Isabelle---IA-AI-Hackathon",
+        "source": "text-link"
+      },
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "dedicated",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/diyve-garg-pbc-assistant-isabelle.md",
+      "problem_summary": "Managing Prepared-by-Client (PBC) requests is one of the most administrative-heavy parts of an audit engagement. Auditors must track which documents have been requested, which have been received, whic...",
+      "updated": "2026-04-17",
+      "kind": "workflow",
+      "stage": 3,
+      "stage_key": "ready",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        }
+      ]
+    },
+    {
+      "slug": "ellert-van-der-vecht-llm-owasp",
+      "title": "AI Security — OWASP LLM Top 10",
+      "session": "hackathon-2",
+      "part": "governance",
+      "track": 5,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Workflow",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "complete",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.5,
+      "quality_score": 5,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": {
+        "name": "OWASP-top-10-LLM-assessment",
+        "url": "https://github.com/SAAF-Project/OWASP-top-10-LLM-assessment",
+        "source": "mapping"
+      },
+      "repo_alternatives": [
+        {
+          "name": "llm_owasp",
+          "url": "https://github.com/SAAF-Project/llm_owasp",
+          "source": "mapping"
+        }
+      ],
+      "main_repo_code": [
+        {
+          "path": "tools/scripts/llm-owasp",
+          "url": "https://github.com/SAAF-Project/SAAF-Project/tree/main/tools/scripts/llm-owasp",
+          "source": "mapping"
+        }
+      ],
+      "repo_note": "OWASP-top-10-LLM-assessment now carries the AUDIT-CRITERIA.md and contains the llm-owasp pipeline; llm_owasp and the copy in the main repo are earlier homes of the same pipeline. OWASP pipeline built in the main repo (PRs #98, #101).",
+      "repo_status": "duplicate",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/ellert-van-der-vecht-llm-owasp.md",
+      "problem_summary": "Organizations deploying LLM-based agents lack a repeatable, evidence-based way to assess their security posture against the OWASP Top 10 for LLM Applications. Manual audits are slow, inconsistent, and...",
+      "updated": "2026-04-17",
+      "kind": "workflow",
+      "stage": 3,
+      "stage_key": "ready",
+      "alerts": [
+        {
+          "id": "duplicate-repos",
+          "severity": "error",
+          "message": "Held in more than one place: OWASP-top-10-LLM-assessment (primary), llm_owasp, a copy in the main repo."
+        },
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        }
+      ]
+    },
+    {
+      "slug": "ellert-van-der-vecht-multi-model-validation",
+      "title": "AI output validation (multi-model)",
+      "session": "hackathon-2",
+      "part": "governance",
+      "track": 5,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Skill",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "complete",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.5,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/ellert-van-der-vecht-multi-model-validation.md",
+      "problem_summary": "AI agents and skills built by audit teams rely on a single model's output — which may contain errors, blind spots, or overconfident conclusions. In an audit context, where findings have real consequen...",
+      "updated": "2026-04-13",
+      "kind": "skill",
+      "stage": 3,
+      "stage_key": "ready",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        }
+      ]
+    },
+    {
+      "slug": "example-synthetic-access-review",
+      "title": "IAM — user access review (100% population)",
+      "session": "hackathon-2",
+      "part": "collection",
+      "track": 2,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Finalised",
+      "pdca": {
+        "plan": "complete",
+        "do": "complete",
+        "check": "in_progress",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.625,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [
+        {
+          "path": "tools/scripts/access_review_app.py",
+          "url": "https://github.com/SAAF-Project/SAAF-Project/tree/main/tools/scripts/access_review_app.py",
+          "source": "mapping"
+        }
+      ],
+      "repo_note": "IAM access review Streamlit app (PR #111); matched by topic, please confirm.",
+      "repo_status": "main-repo",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/example-synthetic-access-review.md",
+      "problem_summary": "User access reviews are conducted quarterly. The current process requires an IT auditor to manually export an Active Directory export, cross-reference it against the HR system, and flag accounts belon...",
+      "updated": "2026-04-02",
+      "kind": "agent",
+      "stage": 4,
+      "stage_key": "tested",
+      "alerts": []
+    },
+    {
+      "slug": "floris-stokkers-work-program-agent",
+      "title": "Audit planning — work program generation",
+      "session": "hackathon-2",
+      "part": "planning",
+      "track": 1,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "complete",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.5,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "Payments/Fintech"
+      ],
+      "sector_source": "mapping",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/floris-stokkers-work-program-agent.md",
+      "problem_summary": "Audit work programs are written manually today: the auditor reads the Risk & Control Matrix (RCM), translates each control into test procedures, chooses a methodology, estimates hours, and informally ...",
+      "updated": "2026-04-17",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "claims-building-no-repo",
+          "severity": "error",
+          "message": "The PDCA table says work has started, but no repo or code is linked, so the plan stays in Final plan."
+        },
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        }
+      ]
+    },
+    {
+      "slug": "frank-van-dissel-uc1-policy-process-intake",
+      "title": "Information Security Policy — intake & gap",
+      "session": "hackathon-2",
+      "part": "planning",
+      "track": 1,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "not_started",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.25,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "Payments/Fintech"
+      ],
+      "sector_source": "organisation",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/frank-van-dissel-uc1-policy-process-intake.md",
+      "problem_summary": "The first step of any audit is understanding the \"official\" way a process is intended to function. Today, auditors read policy documents, SOPs, and process manuals manually — extracting process steps,...",
+      "updated": "2026-04-13",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        }
+      ]
+    },
+    {
+      "slug": "frank-van-dissel-uc2-previous-audit-intelligence",
+      "title": "Audit planning — historical audit analysis",
+      "session": "hackathon-2",
+      "part": "planning",
+      "track": 1,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "not_started",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.25,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "Payments/Fintech"
+      ],
+      "sector_source": "organisation",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/frank-van-dissel-uc2-previous-audit-intelligence.md",
+      "problem_summary": "Internal audit departments accumulate valuable knowledge from previous audits, but this information is often scattered across reports, databases, and team members' memories. Before starting a new enga...",
+      "updated": "2026-04-13",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        }
+      ]
+    },
+    {
+      "slug": "frank-van-dissel-uc3-incident-issue-intelligence",
+      "title": "IT Ops — incident & change intelligence (Jira/GitHub)",
+      "session": "hackathon-2",
+      "part": "planning",
+      "track": 1,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "not_started",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.25,
+      "quality_score": 5,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "Payments/Fintech"
+      ],
+      "sector_source": "organisation",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/frank-van-dissel-uc3-incident-issue-intelligence.md",
+      "problem_summary": "Organizations capture operational incidents and control failures in systems like Jira or ServiceNow, but this data rarely makes its way into audit risk assessments in a structured way. Auditors either...",
+      "updated": "2026-04-13",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        }
+      ]
+    },
+    {
+      "slug": "frank-van-dissel-uc4-fraud-risk-assessment",
+      "title": "Fraud Risk Assessment",
+      "session": "hackathon-2",
+      "part": "planning",
+      "track": 1,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "not_started",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.25,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "Payments/Fintech"
+      ],
+      "sector_source": "organisation",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/frank-van-dissel-uc4-fraud-risk-assessment.md",
+      "problem_summary": "Fraud risk assessment is a mandatory component of every internal audit's risk assessment under GIAS 13.2, yet it is one of the most inconsistently performed steps. Auditors rely on generic fraud typol...",
+      "updated": "2026-04-17",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        }
+      ]
+    },
+    {
+      "slug": "frank-van-dissel-uc5-regulatory-criteria",
+      "title": "Compliance — regulatory criteria retrieval (DORA, GDPR, ISO)",
+      "session": "hackathon-2",
+      "part": "planning",
+      "track": 1,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "not_started",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.25,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "Payments/Fintech"
+      ],
+      "sector_source": "organisation",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/frank-van-dissel-uc5-regulatory-criteria.md",
+      "problem_summary": "Audits must be measured against valid, authoritative \"yardsticks.\" Identifying the right external regulations, industry frameworks, and internal policies applicable to an audit scope is time-consuming...",
+      "updated": "2026-04-13",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        }
+      ]
+    },
+    {
+      "slug": "frank-van-dissel-uc6-it-dependency-identifier",
+      "title": "IT Ops — IT dependency mapping (cloud, APIs)",
+      "session": "hackathon-2",
+      "part": "planning",
+      "track": 1,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "not_started",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.25,
+      "quality_score": 3,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "Payments/Fintech"
+      ],
+      "sector_source": "organisation",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/frank-van-dissel-uc6-it-dependency-identifier.md",
+      "problem_summary": "Modern business processes are inextricably linked to IT systems. An automated control is only as reliable as the systems it runs on — yet many internal audit teams assess automated controls without ex...",
+      "updated": "2026-04-17",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        }
+      ]
+    },
+    {
+      "slug": "frank-van-dissel-uc7-rcm-builder",
+      "title": "RCM (Risk & Control Matrix) building",
+      "session": "hackathon-2",
+      "part": "planning",
+      "track": 1,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "not_started",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.25,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "Payments/Fintech"
+      ],
+      "sector_source": "organisation",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/frank-van-dissel-uc7-rcm-builder.md",
+      "problem_summary": "The Risk and Control Matrix (RCM) is the central artifact of any internal audit — connecting identified risks to control activities. Building it today is manual: auditors take outputs from multiple so...",
+      "updated": "2026-04-16",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        }
+      ]
+    },
+    {
+      "slug": "frank-van-dissel-uc8-audit-work-program",
+      "title": "Audit planning — work program generation",
+      "session": "hackathon-2",
+      "part": "planning",
+      "track": 1,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "not_started",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.25,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "Payments/Fintech"
+      ],
+      "sector_source": "organisation",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/frank-van-dissel-uc8-audit-work-program.md",
+      "problem_summary": "The audit work program is the tactical blueprint that tells auditors exactly what to do, how to do it, who does it, and how long it will take. Today, drafting a work program for a 30-control RCM takes...",
+      "updated": "2026-04-13",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        }
+      ]
+    },
+    {
+      "slug": "frank-van-dissel-uc9-quality-resource-guard",
+      "title": "Audit quality — resource management",
+      "session": "hackathon-2",
+      "part": "planning",
+      "track": 1,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "not_started",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.25,
+      "quality_score": 3,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "Payments/Fintech"
+      ],
+      "sector_source": "organisation",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/frank-van-dissel-uc9-quality-resource-guard.md",
+      "problem_summary": "The final step before fieldwork begins is a quality review of the entire planning package. Under GIAS 13.3, the CAE must approve objectives and scope; under 13.5, resources must be assessed as appropr...",
+      "updated": "2026-04-13",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        }
+      ]
+    },
+    {
+      "slug": "immistyle-cuec-crosscheck-agent",
+      "title": "Third-party risk — CUEC crosscheck & gap flagging",
+      "session": "hackathon-2",
+      "part": "monitoring",
+      "track": 3,
+      "track_source": "proposed",
+      "track_reason": "Third-party risk: CUEC crosscheck and gap flagging",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/immistyle-cuec-crosscheck-agent.md",
+      "problem_summary": "When an organization receives a third-party assurance report from a vendor (e.g. ISAE 3402 or SOC 2), the report typically includes a chapter on **Complementary User Entity Controls (CUECs)** — contro...",
+      "updated": "2026-04-14",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "claims-building-no-repo",
+          "severity": "error",
+          "message": "The PDCA table says work has started, but no repo or code is linked, so the plan stays in Final plan."
+        },
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-14 (195 days ago)."
+        },
+        {
+          "id": "proposed-track",
+          "severity": "info",
+          "message": "Not a problem with the plan: it is not in the Hackathon #3 workstreams list, so it was placed in Track 3 (Compliance & Regulatory Assessment) as a proposal (Third-party risk: CUEC crosscheck and gap flagging). The owner can confirm or change this placement."
+        }
+      ]
+    },
+    {
+      "slug": "inge-garretsen-audit-work-program-agent",
+      "title": "Audit planning — work program (UC 8)",
+      "session": "hackathon-2",
+      "part": "planning",
+      "track": 1,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "Payments/Fintech"
+      ],
+      "sector_source": "mapping",
+      "repo": {
+        "name": "Audit-Work-Program-Agent-UC-8-",
+        "url": "https://github.com/SAAF-Project/Audit-Work-Program-Agent-UC-8-",
+        "source": "mapping"
+      },
+      "repo_alternatives": [],
+      "main_repo_code": [
+        {
+          "path": "tools/scripts/work_program_generator.py",
+          "url": "https://github.com/SAAF-Project/SAAF-Project/tree/main/tools/scripts/work_program_generator.py",
+          "source": "mapping"
+        }
+      ],
+      "repo_note": "Dedicated repo with AUDIT-CRITERIA.md; an earlier copy of the script still lives in the main repo. Original script from PR #107.",
+      "repo_status": "duplicate",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/inge-garretsen-audit-work-program-agent.md",
+      "problem_summary": "Auditors schrijven work programs handmatig: ze nemen een Risk & Control Matrix (RCM), bedenken per control een toetsingsaanpak en schatten uren in. Dit is tijdrovend, inconsistent tussen teamleden, en...",
+      "updated": "2026-05-12",
+      "kind": "agent",
+      "stage": 2,
+      "stage_key": "building",
+      "alerts": [
+        {
+          "id": "duplicate-repos",
+          "severity": "error",
+          "message": "Held in more than one place: Audit-Work-Program-Agent-UC-8- (primary), a copy in the main repo."
+        },
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-05-12 (167 days ago)."
+        }
+      ]
+    },
+    {
+      "slug": "johannesiv-policy-to-controls-extractor",
+      "title": "GDPR + EU AI Act — policy-to-controls extraction",
+      "session": "hackathon-2",
+      "part": "monitoring",
+      "track": 3,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "complete",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.5,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": {
+        "name": "Policy-to-Controls-Extractor",
+        "url": "https://github.com/SAAF-Project/Policy-to-Controls-Extractor",
+        "source": "text-link"
+      },
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "dedicated",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/johannesiv-policy-to-controls-extractor.md",
+      "problem_summary": "Policy documents contain dozens of normative requirements buried in dense prose. Identifying, extracting, and translating these into testable audit controls is a manual, time-consuming task that is do...",
+      "updated": "2026-04-13",
+      "kind": "agent",
+      "stage": 3,
+      "stage_key": "ready",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        }
+      ]
+    },
+    {
+      "slug": "koekenpan-ia-fieldwork-preparation",
+      "title": "Fieldwork preparation — evidence gathering",
+      "session": "hackathon-2",
+      "part": "collection",
+      "track": 2,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "TBD",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "complete",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.5,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": {
+        "name": "IA-Fieldwork-Preparation",
+        "url": "https://github.com/SAAF-Project/IA-Fieldwork-Preparation",
+        "source": "text-link"
+      },
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "dedicated",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/koekenpan-ia-fieldwork-preparation.md",
+      "problem_summary": "Preparing for internal audit fieldwork is one of the most time-intensive steps in an engagement. Auditors must translate a risk assessment or audit scope into concrete test procedures, interview quest...",
+      "updated": "2026-04-13",
+      "kind": "unspecified",
+      "stage": 3,
+      "stage_key": "ready",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        }
+      ]
+    },
+    {
+      "slug": "linda-nyvelius-team-hightable",
+      "title": "TeamMate+ knowledge reuse",
+      "session": "hackathon-2",
+      "part": "planning",
+      "track": 1,
+      "track_source": "proposed",
+      "track_reason": "Knowledge reuse from earlier audits (like UC2)",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "complete",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.5,
+      "quality_score": 3,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": {
+        "name": "Team-HighTable",
+        "url": "https://github.com/SAAF-Project/Team-HighTable",
+        "source": "text-link"
+      },
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "dedicated",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/linda-nyvelius-team-hightable.md",
+      "problem_summary": "Internal auditors using TeamMate+ spend time manually searching past audit issues to check whether a current finding has been raised before, how it was resolved, and what recommendation was given. Thi...",
+      "updated": "2026-04-13",
+      "kind": "agent",
+      "stage": 3,
+      "stage_key": "ready",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "proposed-track",
+          "severity": "info",
+          "message": "Not a problem with the plan: it is not in the Hackathon #3 workstreams list, so it was placed in Track 1 (GIAS Audit Planning Pipeline) as a proposal (Knowledge reuse from earlier audits (like UC2)). The owner can confirm or change this placement."
+        }
+      ]
+    },
+    {
+      "slug": "robeminem94-gdpr-ai-audit-agent",
+      "title": "GDPR + EU AI Act audit",
+      "session": "hackathon-2",
+      "part": "monitoring",
+      "track": 3,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "complete",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.5,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": {
+        "name": "GDPR-AI-Audit-Agent",
+        "url": "https://github.com/SAAF-Project/GDPR-AI-Audit-Agent",
+        "source": "text-link"
+      },
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "dedicated",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/robeminem94-gdpr-ai-audit-agent.md",
+      "problem_summary": "Auditors working with datasets that contain personal data face a double challenge: they need access to the data to perform the audit, but they must simultaneously protect data subjects' rights under G...",
+      "updated": "2026-04-13",
+      "kind": "agent",
+      "stage": 3,
+      "stage_key": "ready",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        }
+      ]
+    },
+    {
+      "slug": "robeminem94-vendor-guard",
+      "title": "Third-party & vendor risk",
+      "session": "hackathon-2",
+      "part": "monitoring",
+      "track": 3,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "complete",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.5,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": {
+        "name": "Vendor_Guard",
+        "url": "https://github.com/SAAF-Project/Vendor_Guard",
+        "source": "text-link"
+      },
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "dedicated",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/robeminem94-vendor-guard.md",
+      "problem_summary": "Auditing third-party vendors against multiple regulatory frameworks is a time-intensive, specialist task. Auditors must manually cross-reference vendor questionnaires and supporting documents (SOC 2 r...",
+      "updated": "2026-04-13",
+      "kind": "agent",
+      "stage": 3,
+      "stage_key": "ready",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        }
+      ]
+    },
+    {
+      "slug": "rohan-sobha-compliance-report-generator",
+      "title": "Compliance reporting — multi-framework",
+      "session": "hackathon-2",
+      "part": "monitoring",
+      "track": 3,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Finalised",
+      "pdca": {
+        "plan": "complete",
+        "do": "complete",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.5,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "Banking",
+        "Insurance",
+        "Payments/Fintech",
+        "Public sector"
+      ],
+      "sector_source": "mapping",
+      "repo": {
+        "name": "Compliance-Report-Generator",
+        "url": "https://github.com/SAAF-Project/Compliance-Report-Generator",
+        "source": "plan-metadata"
+      },
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "dedicated",
+      "github_url": "https://github.com/SAAF-Project/Compliance-Report-Generator",
+      "problem_summary": "Auditors working across different financial entities (banks, insurers, payment institutions, government bodies) spend significant time identifying which regulatory frameworks apply to a given entity. ...",
+      "updated": "2026-09-14",
+      "kind": "agent",
+      "stage": 3,
+      "stage_key": "ready",
+      "alerts": []
+    },
+    {
+      "slug": "the-control-freaks-uc7-rcm-builder",
+      "title": "RCM Builder (UC 7)",
+      "session": "hackathon-2",
+      "part": "planning",
+      "track": 1,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 5,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/the-control-freaks-uc7-rcm-builder.md",
+      "problem_summary": "Creating and maintaining a Risk & Control Matrix (RCM) is one of the most time-consuming and error-prone activities in audit planning. In practice, auditors manually copy risks from prior-year Excel R...",
+      "updated": "2026-04-16",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "claims-building-no-repo",
+          "severity": "error",
+          "message": "The PDCA table says work has started, but no repo or code is linked, so the plan stays in Final plan."
+        },
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-16 (193 days ago)."
+        }
+      ]
+    },
+    {
+      "slug": "the-rcm-rangers-audit-work-program-agent",
+      "title": "RCM + work program (combined)",
+      "session": "hackathon-2",
+      "part": "planning",
+      "track": 1,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Workflow",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 3,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/the-rcm-rangers-audit-work-program-agent.md",
+      "problem_summary": "Internal auditors spend significant time manually translating a completed\nRisk & Control Matrix (RCM) into an executable Audit Work Program. This process\nis repetitive and error-prone: test steps are ...",
+      "updated": "2026-04-16",
+      "kind": "workflow",
+      "stage": 2,
+      "stage_key": "building",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-16 (193 days ago)."
+        }
+      ]
+    },
+    {
+      "slug": "themontechristo-threewaysecurity",
+      "title": "Financial — P2P/O2C 3-way match",
+      "session": "hackathon-2",
+      "part": "reporting",
+      "track": 4,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "complete",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.5,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "Payments/Fintech"
+      ],
+      "sector_source": "mapping",
+      "repo": {
+        "name": "three-way-match-audit",
+        "url": "https://github.com/SAAF-Project/three-way-match-audit",
+        "source": "mapping"
+      },
+      "repo_alternatives": [
+        {
+          "name": "threewaysecurity",
+          "url": "https://github.com/SAAF-Project/threewaysecurity",
+          "source": "mapping"
+        }
+      ],
+      "main_repo_code": [],
+      "repo_note": "three-way-match-audit is the latest repo and carries the AUDIT-CRITERIA.md; threewaysecurity is the older repo linked in the plan.",
+      "repo_status": "duplicate",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/themontechristo-threewaysecurity.md",
+      "problem_summary": "Procurement audits require three-way matching: verifying that a purchase order (PO), goods receipt, and vendor invoice are consistent before a payment is approved. This matching is repetitive, data-in...",
+      "updated": "2026-04-17",
+      "kind": "agent",
+      "stage": 3,
+      "stage_key": "ready",
+      "alerts": [
+        {
+          "id": "duplicate-repos",
+          "severity": "error",
+          "message": "Held in more than one place: three-way-match-audit (primary), threewaysecurity."
+        },
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        }
+      ]
+    },
+    {
+      "slug": "yellowraptor-whats-the-news",
+      "title": "Regulatory monitoring — RSS aggregation",
+      "session": "hackathon-2",
+      "part": "monitoring",
+      "track": 3,
+      "track_source": "proposed",
+      "track_reason": "Regulatory change monitoring (DNB/AFM feeds)",
+      "type": "Skill",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "complete",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.5,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "Banking"
+      ],
+      "sector_source": "mapping",
+      "repo": {
+        "name": "WhatsTheNews",
+        "url": "https://github.com/SAAF-Project/WhatsTheNews",
+        "source": "text-link"
+      },
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "dedicated",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-2/yellowraptor-whats-the-news.md",
+      "problem_summary": "Auditors in the financial sector need to stay current with regulatory developments from supervisors such as DNB (De Nederlandsche Bank), AFM (Autoriteit Financiële Markten), and the FD (Financieel Dag...",
+      "updated": "2026-04-17",
+      "kind": "skill",
+      "stage": 3,
+      "stage_key": "ready",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "proposed-track",
+          "severity": "info",
+          "message": "Not a problem with the plan: it is not in the Hackathon #3 workstreams list, so it was placed in Track 3 (Compliance & Regulatory Assessment) as a proposal (Regulatory change monitoring (DNB/AFM feeds)). The owner can confirm or change this placement."
+        }
+      ]
+    },
+    {
+      "slug": "ai-agent-visibility-scanner",
+      "title": "AI Governance — shadow AI discovery & inventory (Akto 2025: 21% visibility)",
+      "session": "hackathon-3",
+      "part": "monitoring",
+      "track": 3,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "not_started",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.25,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/ai-agent-visibility-scanner.md",
+      "problem_summary": "Only 21% of enterprises know what AI agents are running in their organization (Akto 2025 State of Agentic AI Security). The other 79% have employees who have deployed:",
+      "updated": "2026-04-17",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        }
+      ]
+    },
+    {
+      "slug": "ai-audit-explainability-framework",
+      "title": "AI Governance — audit finding explainability & challenge response",
+      "session": "hackathon-3",
+      "part": "governance",
+      "track": 5,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Framework + Workflow",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "not_started",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.25,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/ai-audit-explainability-framework.md",
+      "problem_summary": "Internal auditors using AI to generate findings face a challenge that has no analogue in traditional audit: **the AI cannot explain, in audit-defensible terms, why it reached a conclusion.** When an a...",
+      "updated": "2026-04-17",
+      "kind": "workflow",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        }
+      ]
+    },
+    {
+      "slug": "always-on-audit-agent",
+      "title": "Agent Infrastructure — 24/7 field assistant (Clawdbot)",
+      "session": "hackathon-3",
+      "part": "foundation",
+      "track": 0,
+      "track_source": "proposed",
+      "track_reason": "Agent infrastructure: 24/7 field assistant",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/always-on-audit-agent.md",
+      "problem_summary": "Audit agents today are \"on-demand\" — the auditor manually starts a Claude session, provides context, and gets a one-time output. When the auditor is in the field (client site, interview, physical walk...",
+      "updated": "2026-04-17",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "claims-building-no-repo",
+          "severity": "error",
+          "message": "The PDCA table says work has started, but no repo or code is linked, so the plan stays in Final plan."
+        },
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
+        },
+        {
+          "id": "proposed-track",
+          "severity": "info",
+          "message": "Not a problem with the plan: it is not in the Hackathon #3 workstreams list, so it was placed in Track 0 (Shared Infrastructure) as a proposal (Agent infrastructure: 24/7 field assistant). The owner can confirm or change this placement."
+        }
+      ]
+    },
+    {
+      "slug": "audit-agent-gamified-ui",
+      "title": "Agent Infrastructure — fleet manager dashboard",
+      "session": "hackathon-3",
+      "part": "foundation",
+      "track": 0,
+      "track_source": "proposed",
+      "track_reason": "Agent infrastructure: fleet manager dashboard",
+      "type": "Workflow",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/audit-agent-gamified-ui.md",
+      "problem_summary": "Running multiple parallel audit agents today requires watching terminal logs, manually checking output files, and mentally tracking which agent is doing what. There is no visual interface that shows t...",
+      "updated": "2026-04-17",
+      "kind": "workflow",
+      "stage": 2,
+      "stage_key": "building",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
+        },
+        {
+          "id": "proposed-track",
+          "severity": "info",
+          "message": "Not a problem with the plan: it is not in the Hackathon #3 workstreams list, so it was placed in Track 0 (Shared Infrastructure) as a proposal (Agent infrastructure: fleet manager dashboard). The owner can confirm or change this placement."
+        }
+      ]
+    },
+    {
+      "slug": "audit-automation-overview",
+      "title": "Meta — AI audit lifecycle overview",
+      "session": "hackathon-3",
+      "part": "governance",
+      "track": 5,
+      "track_source": "proposed",
+      "track_reason": "Strategy overview of the AI audit lifecycle",
+      "type": "Workflow",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "not-needed",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/audit-automation-overview.md",
+      "problem_summary": "There is no practical, practitioner-facing overview of how AI agents can be deployed across the audit lifecycle — one that connects directly to the daily reality of internal auditors.",
+      "updated": "2026-04-17",
+      "kind": "workflow",
+      "stage": 2,
+      "stage_key": "building",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
+        },
+        {
+          "id": "proposed-track",
+          "severity": "info",
+          "message": "Not a problem with the plan: it is not in the Hackathon #3 workstreams list, so it was placed in Track 5 (AI Governance & Quality Assurance) as a proposal (Strategy overview of the AI audit lifecycle). The owner can confirm or change this placement."
+        }
+      ]
+    },
+    {
+      "slug": "audit-evidence-visualization",
+      "title": "Reporting — HTML audit visual generation",
+      "session": "hackathon-3",
+      "part": "reporting",
+      "track": 4,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Skill",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/audit-evidence-visualization.md",
+      "problem_summary": "Audit reports are text-heavy. Control maps, risk heat maps, and policy-control matrices that would make findings immediately clear to management are instead described in dense prose or basic Excel tab...",
+      "updated": "2026-04-17",
+      "kind": "skill",
+      "stage": 2,
+      "stage_key": "building",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
+        }
+      ]
+    },
+    {
+      "slug": "audit-loop-orchestration-sdk",
+      "title": "Agent Infrastructure — Python loop orchestration SDK",
+      "session": "hackathon-3",
+      "part": "foundation",
+      "track": 0,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Workflow",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/audit-loop-orchestration-sdk.md",
+      "problem_summary": "Building multi-agent audit workflows today requires every team to solve the same infrastructure problems: managing agent state across context windows, routing messages between agents, tracking progres...",
+      "updated": "2026-04-17",
+      "kind": "workflow",
+      "stage": 2,
+      "stage_key": "building",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
+        }
+      ]
+    },
+    {
+      "slug": "audit-memory-knowledge-system",
+      "title": "Knowledge Management — Obsidian vault + ChromaDB",
+      "session": "hackathon-3",
+      "part": "foundation",
+      "track": 0,
+      "track_source": "proposed",
+      "track_reason": "Shared knowledge store (Obsidian + ChromaDB)",
+      "type": "Workflow",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/audit-memory-knowledge-system.md",
+      "problem_summary": "Audit knowledge lives in individual auditors' heads and disconnected document stores. When an auditor encounters a control weakness, there is no easy way to check: \"Have we seen this before? What did ...",
+      "updated": "2026-04-17",
+      "kind": "workflow",
+      "stage": 2,
+      "stage_key": "building",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
+        },
+        {
+          "id": "proposed-track",
+          "severity": "info",
+          "message": "Not a problem with the plan: it is not in the Hackathon #3 workstreams list, so it was placed in Track 0 (Shared Infrastructure) as a proposal (Shared knowledge store (Obsidian + ChromaDB)). The owner can confirm or change this placement."
+        }
+      ]
+    },
+    {
+      "slug": "audit-report-generator-from-work-program",
+      "title": "Audit Reporting — auto-draft audit report from completed work program",
+      "session": "hackathon-3",
+      "part": "reporting",
+      "track": 4,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/audit-report-generator-from-work-program.md",
+      "problem_summary": "A completed audit work program contains all the raw material for an audit report: test procedures executed, evidence referenced, observations made, and conclusions drawn per test step. Translating thi...",
+      "updated": "2026-04-17",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "claims-building-no-repo",
+          "severity": "error",
+          "message": "The PDCA table says work has started, but no repo or code is linked, so the plan stays in Final plan."
+        },
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
+        }
+      ]
+    },
+    {
+      "slug": "audit-skills-transformation-curriculum",
+      "title": "Talent — AI audit reskilling (4 stages)",
+      "session": "hackathon-3",
+      "part": "governance",
+      "track": 5,
+      "track_source": "proposed",
+      "track_reason": "Talent and reskilling curriculum",
+      "type": "Reference",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "not-needed",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/audit-skills-transformation-curriculum.md",
+      "problem_summary": "AI is restructuring audit roles. Anthropic's white-collar exposure study estimates that 70-80% of audit tasks have at least partial AI automation potential within 3-5 years. Most audit teams have no s...",
+      "updated": "2026-04-17",
+      "kind": "document",
+      "stage": 2,
+      "stage_key": "building",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
+        },
+        {
+          "id": "proposed-track",
+          "severity": "info",
+          "message": "Not a problem with the plan: it is not in the Hackathon #3 workstreams list, so it was placed in Track 5 (AI Governance & Quality Assurance) as a proposal (Talent and reskilling curriculum). The owner can confirm or change this placement."
+        }
+      ]
+    },
+    {
+      "slug": "audit-subagent-coordination-framework",
+      "title": "Agent Infrastructure — multi-agent debate & consensus",
+      "session": "hackathon-3",
+      "part": "foundation",
+      "track": 0,
+      "track_source": "proposed",
+      "track_reason": "Agent infrastructure: multi-agent coordination",
+      "type": "Workflow",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/audit-subagent-coordination-framework.md",
+      "problem_summary": "Single-agent audit analysis is subject to model bias: a single Claude instance will consistently produce similar findings, miss the same blind spots, and apply the same interpretation of ambiguous cri...",
+      "updated": "2026-04-17",
+      "kind": "workflow",
+      "stage": 2,
+      "stage_key": "building",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
+        },
+        {
+          "id": "proposed-track",
+          "severity": "info",
+          "message": "Not a problem with the plan: it is not in the Hackathon #3 workstreams list, so it was placed in Track 0 (Shared Infrastructure) as a proposal (Agent infrastructure: multi-agent coordination). The owner can confirm or change this placement."
+        }
+      ]
+    },
+    {
+      "slug": "audit-workflow-automation-levels",
+      "title": "AI Strategy — automation maturity (Level 1→3)",
+      "session": "hackathon-3",
+      "part": "governance",
+      "track": 5,
+      "track_source": "proposed",
+      "track_reason": "Automation maturity strategy",
+      "type": "Workflow",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "not-needed",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/audit-workflow-automation-levels.md",
+      "problem_summary": "Audit teams implementing AI lack a framework for choosing the right level of automation for a given task. They either automate too much (agents taking actions without oversight) or too little (just us...",
+      "updated": "2026-04-17",
+      "kind": "workflow",
+      "stage": 2,
+      "stage_key": "building",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
+        },
+        {
+          "id": "proposed-track",
+          "severity": "info",
+          "message": "Not a problem with the plan: it is not in the Hackathon #3 workstreams list, so it was placed in Track 5 (AI Governance & Quality Assurance) as a proposal (Automation maturity strategy). The owner can confirm or change this placement."
+        }
+      ]
+    },
+    {
+      "slug": "cli-audit-system-wrapper",
+      "title": "Evidence Collection — CLI wrapper for legacy systems",
+      "session": "hackathon-3",
+      "part": "collection",
+      "track": 2,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Skill",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/cli-audit-system-wrapper.md",
+      "problem_summary": "Many audit-relevant systems (ERP exports, SIEM log tools, GRC platforms, Active Directory utilities) have strong command-line interfaces but weak or absent REST APIs. Building an MCP server for these ...",
+      "updated": "2026-04-17",
+      "kind": "skill",
+      "stage": 2,
+      "stage_key": "building",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
+        }
+      ]
+    },
+    {
+      "slug": "document-evidence-extraction-agent",
+      "title": "Evidence Collection — OCR + document extraction",
+      "session": "hackathon-3",
+      "part": "collection",
+      "track": 2,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/document-evidence-extraction-agent.md",
+      "problem_summary": "Auditors spend hours manually extracting relevant clauses, dates, and control statements from policy PDFs, system configuration screenshots, and compliance documents. These documents are often scanned...",
+      "updated": "2026-04-17",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "claims-building-no-repo",
+          "severity": "error",
+          "message": "The PDCA table says work has started, but no repo or code is linked, so the plan stays in Final plan."
+        },
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
+        }
+      ]
+    },
+    {
+      "slug": "eu-ai-act-compliance-monitor",
+      "title": "Compliance — EU AI Act continuous monitoring (GPAI Aug 2026 deadline, ALTAI)",
+      "session": "hackathon-3",
+      "part": "monitoring",
+      "track": 3,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "not_started",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.25,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/eu-ai-act-compliance-monitor.md",
+      "problem_summary": "The EU AI Act's GPAI (General Purpose AI) obligations come into force on **August 2, 2026** — less than four months away. This date affects any organization deploying foundation models (ChatGPT Enterp...",
+      "updated": "2026-04-21",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        }
+      ]
+    },
+    {
+      "slug": "frank-heldens-llm-finding-fact-check-agent",
+      "title": "Plan: LLM Finding Fact-Check Agent",
+      "session": "hackathon-3",
+      "part": "governance",
+      "track": 5,
+      "track_source": "proposed",
+      "track_reason": "Quality assurance of AI findings",
+      "type": "Skill",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "not_started",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.25,
+      "quality_score": 0,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/frank-heldens-llm-finding-fact-check-agent.md",
+      "problem_summary": "AI-generated audit findings can contain hallucinations: plausible-sounding statements that are factually incorrect, unsupported by source documents, or internally inconsistent. When these findings are...",
+      "updated": "2026-04-21",
+      "kind": "skill",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "proposed-track",
+          "severity": "info",
+          "message": "Not a problem with the plan: it is not in the Hackathon #3 workstreams list, so it was placed in Track 5 (AI Governance & Quality Assurance) as a proposal (Quality assurance of AI findings). The owner can confirm or change this placement."
+        }
+      ]
+    },
+    {
+      "slug": "frank-lubbers-ai-finding-escalation-azure-devops",
+      "title": "Plan: AI Finding Escalation Agent — OWASP & Hallucination Findings to Azure DevOps",
+      "session": "hackathon-3",
+      "part": "governance",
+      "track": 5,
+      "track_source": "proposed",
+      "track_reason": "Escalates OWASP and hallucination findings",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 0,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [
+        {
+          "path": "tools/scripts/frank-lubbers-ai-finding-escalation-azure-devops.py",
+          "url": "https://github.com/SAAF-Project/SAAF-Project/tree/main/tools/scripts/frank-lubbers-ai-finding-escalation-azure-devops.py",
+          "source": "mapping"
+        }
+      ],
+      "repo_note": "Built in the main repo (PR #103).",
+      "repo_status": "main-repo",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/frank-lubbers-ai-finding-escalation-azure-devops.md",
+      "problem_summary": "When the OWASP LLM Top 10 checker and the hallucination detection skill produce findings, those findings currently stay within the audit toolchain. There is no automated path to escalate them into the...",
+      "updated": "2026-04-21",
+      "kind": "agent",
+      "stage": 2,
+      "stage_key": "building",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-21 (188 days ago)."
+        },
+        {
+          "id": "proposed-track",
+          "severity": "info",
+          "message": "Not a problem with the plan: it is not in the Hackathon #3 workstreams list, so it was placed in Track 5 (AI Governance & Quality Assurance) as a proposal (Escalates OWASP and hallucination findings). The owner can confirm or change this placement."
+        }
+      ]
+    },
+    {
+      "slug": "grc-copilot-mindshift-agent",
+      "title": "GRC — M365 Copilot adoption",
+      "session": "hackathon-3",
+      "part": "collection",
+      "track": 2,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/grc-copilot-mindshift-agent.md",
+      "problem_summary": "Schuberg Philis's GRC (Governance, Risk and Compliance) team identified a fundamental adoption gap in their 2026 AI strategy: **\"Technology is in 2026, our behavior is in 2010.\"** M365 Copilot is avai...",
+      "updated": "2026-04-17",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "claims-building-no-repo",
+          "severity": "error",
+          "message": "The PDCA table says work has started, but no repo or code is linked, so the plan stays in Final plan."
+        },
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
+        }
+      ]
+    },
+    {
+      "slug": "icfcop-control-testing-agent",
+      "title": "Multi-framework control testing (12 frameworks)",
+      "session": "hackathon-3",
+      "part": "monitoring",
+      "track": 3,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 5,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/icfcop-control-testing-agent.md",
+      "problem_summary": "Schuberg Philis operates under an **Integrated Control Framework for Compliance and Operations Purposes (ICFCOP)** that maps 12 compliance frameworks (ISO 27001, SOC 2, NIS2, DORA, GDPR, BIO, ISO 9001...",
+      "updated": "2026-04-17",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "claims-building-no-repo",
+          "severity": "error",
+          "message": "The PDCA table says work has started, but no repo or code is linked, so the plan stays in Final plan."
+        },
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
+        }
+      ]
+    },
+    {
+      "slug": "llm-hallucination-detection-agent",
+      "title": "Evidence Quality — hallucination detection for audit findings",
+      "session": "hackathon-3",
+      "part": "governance",
+      "track": 5,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Skill",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "complete",
+        "check": "complete",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.75,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [
+        {
+          "path": "tools/scripts/hallucination_check.py",
+          "url": "https://github.com/SAAF-Project/SAAF-Project/tree/main/tools/scripts/hallucination_check.py",
+          "source": "mapping"
+        }
+      ],
+      "repo_note": "Hallucination check built in the main repo (PR #89).",
+      "repo_status": "main-repo",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/llm-hallucination-detection-agent.md",
+      "problem_summary": "AI-generated audit findings can contain **hallucinations**: plausible-sounding statements that are factually incorrect, unsupported by source documents, or internally inconsistent. When these findings...",
+      "updated": "2026-04-21",
+      "kind": "skill",
+      "stage": 4,
+      "stage_key": "tested",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        }
+      ]
+    },
+    {
+      "slug": "n8n-audit-workflow-migration",
+      "title": "Agent Infrastructure — n8n to Claude migration",
+      "session": "hackathon-3",
+      "part": "foundation",
+      "track": 0,
+      "track_source": "proposed",
+      "track_reason": "Agent infrastructure: workflow migration",
+      "type": "Workflow",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/n8n-audit-workflow-migration.md",
+      "problem_summary": "Several audit teams built automation workflows in n8n — a visual workflow automation tool — for tasks like evidence collection reminders, control testing triggers, and regulatory monitoring. n8n is ap...",
+      "updated": "2026-04-17",
+      "kind": "workflow",
+      "stage": 2,
+      "stage_key": "building",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
+        },
+        {
+          "id": "proposed-track",
+          "severity": "info",
+          "message": "Not a problem with the plan: it is not in the Hackathon #3 workstreams list, so it was placed in Track 0 (Shared Infrastructure) as a proposal (Agent infrastructure: workflow migration). The owner can confirm or change this placement."
+        }
+      ]
+    },
+    {
+      "slug": "on-premise-ai-compute-decision-framework",
+      "title": "AI Infrastructure — on-premise GPU vs. cloud API decision (NVIDIA DGX/RTX, TCO, GDPR Art. 28)",
+      "session": "hackathon-3",
+      "part": "foundation",
+      "track": 0,
+      "track_source": "proposed",
+      "track_reason": "AI infrastructure decision: on-premise vs cloud",
+      "type": "Framework + Reference",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "not_started",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.25,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/on-premise-ai-compute-decision-framework.md",
+      "problem_summary": "Most SAAF agents call Claude or GPT-4o via API — fast to prototype, but raises three structural concerns as audit AI usage matures:",
+      "updated": "2026-04-17",
+      "kind": "document",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "proposed-track",
+          "severity": "info",
+          "message": "Not a problem with the plan: it is not in the Hackathon #3 workstreams list, so it was placed in Track 0 (Shared Infrastructure) as a proposal (AI infrastructure decision: on-premise vs cloud). The owner can confirm or change this placement."
+        }
+      ]
+    },
+    {
+      "slug": "open-source-audit-agent-framework",
+      "title": "Agent Infrastructure — local LLM stack (GLM 4.7 + router)",
+      "session": "hackathon-3",
+      "part": "foundation",
+      "track": 0,
+      "track_source": "proposed",
+      "track_reason": "Agent infrastructure: local LLM stack",
+      "type": "Skill",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/open-source-audit-agent-framework.md",
+      "problem_summary": "Claude API costs are a barrier for smaller audit teams and organizations in the public sector. A single audit run (RCM building, vendor assessments, policy review) can cost €5-20 in Claude Sonnet toke...",
+      "updated": "2026-04-17",
+      "kind": "skill",
+      "stage": 2,
+      "stage_key": "building",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
+        },
+        {
+          "id": "proposed-track",
+          "severity": "info",
+          "message": "Not a problem with the plan: it is not in the Hackathon #3 workstreams list, so it was placed in Track 0 (Shared Infrastructure) as a proposal (Agent infrastructure: local LLM stack). The owner can confirm or change this placement."
+        }
+      ]
+    },
+    {
+      "slug": "overnight-audit-batch-processing-agent",
+      "title": "Agent Infrastructure — overnight batch (Ralph loop)",
+      "session": "hackathon-3",
+      "part": "foundation",
+      "track": 0,
+      "track_source": "proposed",
+      "track_reason": "Agent infrastructure: overnight batch processing",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/overnight-audit-batch-processing-agent.md",
+      "problem_summary": "Long-running audit tasks — building a Risk & Control Matrix from scratch, assessing 100+ vendor contracts, generating work programs for 20 audit domains — exceed the context window of a single Claude ...",
+      "updated": "2026-04-17",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "claims-building-no-repo",
+          "severity": "error",
+          "message": "The PDCA table says work has started, but no repo or code is linked, so the plan stays in Final plan."
+        },
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
+        },
+        {
+          "id": "proposed-track",
+          "severity": "info",
+          "message": "Not a problem with the plan: it is not in the Hackathon #3 workstreams list, so it was placed in Track 0 (Shared Infrastructure) as a proposal (Agent infrastructure: overnight batch processing). The owner can confirm or change this placement."
+        }
+      ]
+    },
+    {
+      "slug": "owasp-ai-testing-agent",
+      "title": "AI Security — OWASP AI Testing Guide v1.0 operational agent (250 pages)",
+      "session": "hackathon-3",
+      "part": "governance",
+      "track": 5,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "not_started",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.25,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [
+        {
+          "path": "tools/scripts/owasp-agent-reviewer",
+          "url": "https://github.com/SAAF-Project/SAAF-Project/tree/main/tools/scripts/owasp-agent-reviewer",
+          "source": "mapping"
+        },
+        {
+          "path": "tools/scripts/llm-owasp",
+          "url": "https://github.com/SAAF-Project/SAAF-Project/tree/main/tools/scripts/llm-owasp",
+          "source": "mapping"
+        }
+      ],
+      "repo_note": "OWASP reviewer and pipeline in the main repo (PR #113); matched by topic, please confirm.",
+      "repo_status": "main-repo",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/owasp-ai-testing-agent.md",
+      "problem_summary": "The OWASP AI Testing Guide v1.0 (250 pages, released 2025) defines a comprehensive methodology for testing AI systems — covering prompt injection, data poisoning, model inversion, supply chain attacks...",
+      "updated": "2026-04-21",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        }
+      ]
+    },
+    {
+      "slug": "power-bi-audit-dashboard-mcp",
+      "title": "Reporting — Power BI MCP integration",
+      "session": "hackathon-3",
+      "part": "reporting",
+      "track": 4,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Skill",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/power-bi-audit-dashboard-mcp.md",
+      "problem_summary": "Audit findings and control statuses live in disconnected documents and spreadsheets. Management and audit committees want live dashboards — but building Power BI reports manually from audit findings i...",
+      "updated": "2026-04-17",
+      "kind": "skill",
+      "stage": 2,
+      "stage_key": "building",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
+        }
+      ]
+    },
+    {
+      "slug": "saaf-intelligence-monitor",
+      "title": "Intelligence monitoring — 30 AI/audit sources",
+      "session": "hackathon-3",
+      "part": "monitoring",
+      "track": 3,
+      "track_source": "proposed",
+      "track_reason": "Monitoring of AI and audit sources",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/saaf-intelligence-monitor.md",
+      "problem_summary": "The SAAF community has curated 30+ high-quality AI/audit news sources (newsletters, portals, research journals, regulatory feeds — see `docs/reference/ai-sources-registry.md`), but monitoring them man...",
+      "updated": "2026-04-17",
+      "kind": "agent",
+      "stage": 1,
+      "stage_key": "final-plan",
+      "alerts": [
+        {
+          "id": "claims-building-no-repo",
+          "severity": "error",
+          "message": "The PDCA table says work has started, but no repo or code is linked, so the plan stays in Final plan."
+        },
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
+        },
+        {
+          "id": "proposed-track",
+          "severity": "info",
+          "message": "Not a problem with the plan: it is not in the Hackathon #3 workstreams list, so it was placed in Track 3 (Compliance & Regulatory Assessment) as a proposal (Monitoring of AI and audit sources). The owner can confirm or change this placement."
+        }
+      ]
+    },
+    {
+      "slug": "saaf-jira-confluence-mcp",
+      "title": "IT infrastructure — MCP for Jira + Confluence",
+      "session": "hackathon-3",
+      "part": "foundation",
+      "track": 0,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Skill",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 5,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/saaf-jira-confluence-mcp.md",
+      "problem_summary": "Internal audit fieldwork involves heavy evidence collection from IT systems, particularly:",
+      "updated": "2026-04-17",
+      "kind": "skill",
+      "stage": 2,
+      "stage_key": "building",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
+        }
+      ]
+    },
+    {
+      "slug": "saaf-rag-knowledge-base",
+      "title": "Shared RAG infrastructure",
+      "session": "hackathon-3",
+      "part": "foundation",
+      "track": 0,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Skill",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/saaf-rag-knowledge-base.md",
+      "problem_summary": "Every SAAF participant building an audit agent faces the same bootstrapping problem: they need a knowledge base of audit standards, frameworks, policies, and procedures that their agent can retrieve c...",
+      "updated": "2026-04-17",
+      "kind": "skill",
+      "stage": 2,
+      "stage_key": "building",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
+        }
+      ]
+    },
+    {
+      "slug": "saaf-skills-registry-and-matching",
+      "title": "SAAF meta — skills matching",
+      "session": "hackathon-3",
+      "part": "foundation",
+      "track": 0,
+      "track_source": "proposed",
+      "track_reason": "Shared skills registry",
+      "type": "Workflow",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 4,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/saaf-skills-registry-and-matching.md",
+      "problem_summary": "SAAF has 45+ participating organisations and 80+ individual participants across four roles (Auditor, Vaktechniek/Audit Specialist, Analyst, Engineer). Each hackathon involves assigning participants to...",
+      "updated": "2026-04-17",
+      "kind": "workflow",
+      "stage": 2,
+      "stage_key": "building",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
+        },
+        {
+          "id": "proposed-track",
+          "severity": "info",
+          "message": "Not a problem with the plan: it is not in the Hackathon #3 workstreams list, so it was placed in Track 0 (Shared Infrastructure) as a proposal (Shared skills registry). The owner can confirm or change this placement."
+        }
+      ]
+    },
+    {
+      "slug": "saaf-strapi-synthetic-data",
+      "title": "Shared synthetic data sandbox",
+      "session": "hackathon-3",
+      "part": "foundation",
+      "track": 0,
+      "track_source": "workstreams",
+      "track_reason": "",
+      "type": "Skill",
+      "status": "Draft",
+      "pdca": {
+        "plan": "complete",
+        "do": "in_progress",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.375,
+      "quality_score": 5,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [
+        {
+          "path": "tools/strapi",
+          "url": "https://github.com/SAAF-Project/SAAF-Project/tree/main/tools/strapi",
+          "source": "mapping"
+        },
+        {
+          "path": "tools/scripts/generate_synthetic_data.py",
+          "url": "https://github.com/SAAF-Project/SAAF-Project/tree/main/tools/scripts/generate_synthetic_data.py",
+          "source": "mapping"
+        },
+        {
+          "path": "tools/scripts/seed_strapi.py",
+          "url": "https://github.com/SAAF-Project/SAAF-Project/tree/main/tools/scripts/seed_strapi.py",
+          "source": "mapping"
+        },
+        {
+          "path": "tools/scripts/verify_strapi_seed.py",
+          "url": "https://github.com/SAAF-Project/SAAF-Project/tree/main/tools/scripts/verify_strapi_seed.py",
+          "source": "mapping"
+        }
+      ],
+      "repo_note": "Synthetic-data sandbox built in the main repo (PR #102); shared tooling, may legitimately stay here.",
+      "repo_status": "main-repo",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/saaf-strapi-synthetic-data.md",
+      "problem_summary": "Every SAAF participant who builds an audit agent needs realistic test data to demonstrate their agent. The problem is:",
+      "updated": "2026-04-17",
+      "kind": "skill",
+      "stage": 2,
+      "stage_key": "building",
+      "alerts": [
+        {
+          "id": "status-draft",
+          "severity": "info",
+          "message": "The plan is complete, but its Status row still says Draft."
+        },
+        {
+          "id": "pdca-stale",
+          "severity": "info",
+          "message": "Do is in progress, but the plan was last updated on 2026-04-17 (192 days ago)."
+        }
+      ]
+    },
+    {
+      "slug": "table-9-execution-plan",
+      "title": "Table 9 — Track 5 Execution Plan (Hackathon 3)",
+      "session": "hackathon-3",
+      "part": "governance",
+      "track": 5,
+      "track_source": "proposed",
+      "track_reason": "Track 5 execution plan of Hackathon #3 (Table 9)",
+      "type": "",
+      "status": "Working plan — to be committed to SAAF repo via fork + PR",
+      "pdca": {
+        "plan": "not_started",
+        "do": "not_started",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": false,
+      "progress": 0.0,
+      "quality_score": 0,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [
+        {
+          "path": "tools/scripts/track-5",
+          "url": "https://github.com/SAAF-Project/SAAF-Project/tree/main/tools/scripts/track-5",
+          "source": "mapping"
+        }
+      ],
+      "repo_note": "Track 5 hallucination detector (PR #95).",
+      "repo_status": "main-repo",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-3/table-9-execution-plan.md",
+      "problem_summary": "",
+      "updated": "2026-04-21",
+      "kind": "unspecified",
+      "stage": 0,
+      "stage_key": "draft-plan",
+      "alerts": [
+        {
+          "id": "pdca-missing",
+          "severity": "error",
+          "message": "The plan has no PDCA table, so it stays in Draft plan until it has one."
+        },
+        {
+          "id": "proposed-track",
+          "severity": "info",
+          "message": "Not a problem with the plan: it is not in the Hackathon #3 workstreams list, so it was placed in Track 5 (AI Governance & Quality Assurance) as a proposal (Track 5 execution plan of Hackathon #3 (Table 9)). The owner can confirm or change this placement."
+        }
+      ]
+    },
+    {
+      "slug": "Plan_ExecSummary",
+      "title": "SAAF Hackathon Submission – Draft Plan",
+      "session": "hackathon-4",
+      "part": "reporting",
+      "track": 4,
+      "track_source": "proposed",
+      "track_reason": "Board reporting agent",
+      "type": "Agent",
+      "status": "Draft",
+      "pdca": {
+        "plan": "in_progress",
+        "do": "not_started",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.125,
+      "quality_score": 0,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": null,
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "missing",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-4/Plan_ExecSummary.md",
+      "problem_summary": "Organizations often maintain large amounts of Governance, Risk & Compliance (GRC) information across multiple departments, processes, and reporting layers. This includes internal controls, effectivene...",
+      "updated": "2026-06-03",
+      "kind": "agent",
+      "stage": 0,
+      "stage_key": "draft-plan",
+      "alerts": [
+        {
+          "id": "proposed-track",
+          "severity": "info",
+          "message": "Not a problem with the plan: it is not in the Hackathon #3 workstreams list, so it was placed in Track 4 (Reporting & Visualization) as a proposal (Board reporting agent). The owner can confirm or change this placement."
+        }
+      ]
+    },
+    {
+      "slug": "rene-volwerk-compliance-harnas-configurator",
+      "title": "Compliance-Harnas Configurator — SAAF Hackathon #4 Submission",
+      "session": "hackathon-4",
+      "part": "governance",
+      "track": 5,
+      "track_source": "proposed",
+      "track_reason": "Compliance harness for AI usage",
+      "type": "Workflow (infrastructure for all Agents)",
+      "status": "**Built (MVP live) — seeking adoption & community review**",
+      "pdca": {
+        "plan": "complete",
+        "do": "complete",
+        "check": "in_progress",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.625,
+      "quality_score": 0,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "General"
+      ],
+      "sector_source": "default",
+      "repo": {
+        "name": "compliance-harnas-configurator",
+        "url": "https://github.com/volwerk/compliance-harnas-configurator",
+        "source": "mapping"
+      },
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "dedicated",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-4/rene-volwerk-compliance-harnas-configurator.md",
+      "problem_summary": "**Whoever works with an AI system — builder or auditor — faces the same mapping problem.**",
+      "updated": "2026-04-21",
+      "kind": "workflow",
+      "stage": 4,
+      "stage_key": "tested",
+      "alerts": [
+        {
+          "id": "proposed-track",
+          "severity": "info",
+          "message": "Not a problem with the plan: it is not in the Hackathon #3 workstreams list, so it was placed in Track 5 (AI Governance & Quality Assurance) as a proposal (Compliance harness for AI usage). The owner can confirm or change this placement."
+        }
+      ]
+    },
+    {
+      "slug": "rohan-sobha-judging-found-controls",
+      "title": "rohan-sobha-judging-found-controls",
+      "session": "hackathon-4",
+      "part": "governance",
+      "track": 5,
+      "track_source": "proposed",
+      "track_reason": "Verifies extracted controls against the source policy",
+      "type": "Agent",
+      "status": "Finalised",
+      "pdca": {
+        "plan": "complete",
+        "do": "complete",
+        "check": "not_started",
+        "act": "not_started"
+      },
+      "pdca_known": true,
+      "progress": 0.5,
+      "quality_score": 0,
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
+      "sectors": [
+        "Public sector"
+      ],
+      "sector_source": "organisation",
+      "repo": {
+        "name": "judging-found-controls",
+        "url": "https://github.com/SAAF-Project/judging-found-controls",
+        "source": "text-link"
+      },
+      "repo_alternatives": [],
+      "main_repo_code": [],
+      "repo_note": "",
+      "repo_status": "dedicated",
+      "github_url": "https://github.com/SAAF-Project/SAAF-Project/blob/main/plans/hackathon-4/rohan-sobha-judging-found-controls.md",
+      "problem_summary": "Policy-to-controls extractors (such as the upstream johannesiv-policy-to-controls-extractor) use LLMs to derive structured control objects from raw policy PDFs or DOCX documents. This creates a well-k...",
+      "updated": "2026-07-15",
+      "kind": "agent",
+      "stage": 3,
+      "stage_key": "ready",
+      "alerts": [
+        {
+          "id": "proposed-track",
+          "severity": "info",
+          "message": "Not a problem with the plan: it is not in the Hackathon #3 workstreams list, so it was placed in Track 5 (AI Governance & Quality Assurance) as a proposal (Verifies extracted controls against the source policy). The owner can confirm or change this placement."
+        }
+      ]
+    }
+  ]
+}

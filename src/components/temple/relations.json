@@ -1,0 +1,1012 @@
+{
+  "schema_version": 1,
+  "updated": "2026-10-09",
+  "description": "Which plan's output is another plan's input. TEMPORARY home until the plan owners decide where this belongs (for example SAAF-Project/plans/metadata/). Every entry starts as \"suggested\": an AI interpretation of the plan texts in SAAF-Project@42d2628, with the lines it was read from. An owner sets \"confirmed\" (and confirmed_by) after checking it.",
+  "relations": [
+    {
+      "from": "frank-van-dissel-uc1-policy-process-intake",
+      "to": "frank-van-dissel-uc2-previous-audit-intelligence",
+      "what": "Context Brief",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc1-policy-process-intake.md",
+          "line": 240,
+          "quote": "UC2 — Previous Audit Intelligence — consumes Context Brief from UC1"
+        },
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc2-previous-audit-intelligence.md",
+          "line": 246,
+          "quote": "UC1 — Policy-to-Process Intake — provides Context Brief input"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc1-policy-process-intake",
+      "to": "frank-van-dissel-uc3-incident-issue-intelligence",
+      "what": "Context Brief",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc1-policy-process-intake.md",
+          "line": 241,
+          "quote": "UC3 — Incident Intelligence — consumes Context Brief from UC1"
+        },
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc3-incident-issue-intelligence.md",
+          "line": 240,
+          "quote": "UC1 — Policy-to-Process Intake — provides Context Brief input"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc1-policy-process-intake",
+      "to": "frank-van-dissel-uc4-fraud-risk-assessment",
+      "what": "Context Brief, native control register",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc1-policy-process-intake.md",
+          "line": 242,
+          "quote": "UC4 — Fraud Risk Assessment — consumes Context Brief from UC1"
+        },
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc4-fraud-risk-assessment.md",
+          "line": 299,
+          "quote": "UC1 — Policy-to-Process Intake — provides Context Brief and native control register"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc1-policy-process-intake",
+      "to": "frank-van-dissel-uc5-regulatory-criteria",
+      "what": "Context Brief",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc1-policy-process-intake.md",
+          "line": 243,
+          "quote": "UC5 — Regulatory Criteria — consumes Context Brief from UC1"
+        },
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc5-regulatory-criteria.md",
+          "line": 252,
+          "quote": "UC1 — Policy-to-Process Intake — provides Context Brief input"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc1-policy-process-intake",
+      "to": "frank-van-dissel-uc6-it-dependency-identifier",
+      "what": "Context Brief, native control register",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc1-policy-process-intake.md",
+          "line": 244,
+          "quote": "UC6 — IT Dependency Identifier — consumes Context Brief from UC1"
+        },
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc6-it-dependency-identifier.md",
+          "line": 257,
+          "quote": "UC1 — Policy-to-Process Intake — provides native control register as input"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc1-policy-process-intake",
+      "to": "frank-van-dissel-uc7-rcm-builder",
+      "what": "Context Brief",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc7-rcm-builder.md",
+          "line": 247,
+          "quote": "UC1, UC2, UC3, UC4, UC5, UC6 — all provide input to this agent"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc2-previous-audit-intelligence",
+      "to": "frank-van-dissel-uc7-rcm-builder",
+      "what": "Historical Risk Intelligence Report",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc2-previous-audit-intelligence.md",
+          "line": 247,
+          "quote": "UC7 — RCM Builder — consumes this agent's output"
+        },
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc7-rcm-builder.md",
+          "line": 247,
+          "quote": "UC1, UC2, UC3, UC4, UC5, UC6 — all provide input to this agent"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc3-incident-issue-intelligence",
+      "to": "frank-van-dissel-uc4-fraud-risk-assessment",
+      "what": "incident data (fraud signals)",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc3-incident-issue-intelligence.md",
+          "line": 241,
+          "quote": "UC4 — Fraud Risk Assessment — consumes incident data as fraud signal"
+        },
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc4-fraud-risk-assessment.md",
+          "line": 300,
+          "quote": "UC3 — Incident Intelligence — provides incident data as fraud signal input"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc3-incident-issue-intelligence",
+      "to": "frank-van-dissel-uc7-rcm-builder",
+      "what": "Incident Intelligence Report",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc3-incident-issue-intelligence.md",
+          "line": 242,
+          "quote": "UC7 — RCM Builder — aggregates this output with UC2, 4, 5"
+        },
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc7-rcm-builder.md",
+          "line": 247,
+          "quote": "UC1, UC2, UC3, UC4, UC5, UC6 — all provide input to this agent"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc4-fraud-risk-assessment",
+      "to": "frank-van-dissel-uc7-rcm-builder",
+      "what": "fraud scenarios",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc4-fraud-risk-assessment.md",
+          "line": 301,
+          "quote": "UC7 — RCM Builder — consumes fraud scenarios as risk input"
+        },
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc7-rcm-builder.md",
+          "line": 247,
+          "quote": "UC1, UC2, UC3, UC4, UC5, UC6 — all provide input to this agent"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc5-regulatory-criteria",
+      "to": "frank-van-dissel-uc7-rcm-builder",
+      "what": "Evaluation Criteria Matrix",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc5-regulatory-criteria.md",
+          "line": 253,
+          "quote": "UC7 — RCM Builder — consumes Criteria Matrix as input"
+        },
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc7-rcm-builder.md",
+          "line": 247,
+          "quote": "UC1, UC2, UC3, UC4, UC5, UC6 — all provide input to this agent"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc6-it-dependency-identifier",
+      "to": "frank-van-dissel-uc7-rcm-builder",
+      "what": "IT Dependency Matrix",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc6-it-dependency-identifier.md",
+          "line": 259,
+          "quote": "UC7 — RCM Builder — consumes IT Dependency Matrix as input"
+        },
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc6-it-dependency-identifier.md",
+          "line": 21,
+          "quote": "This is Use Case 6 of 9 in a complete AI-assisted audit planning pipeline developed by Mollie. It consumes outputs from UC1 through UC5 and feeds its IT Dependency Matrix into the RCM Builder (UC7)."
+        },
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc7-rcm-builder.md",
+          "line": 247,
+          "quote": "UC1, UC2, UC3, UC4, UC5, UC6 — all provide input to this agent"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc6-it-dependency-identifier",
+      "to": "frank-van-dissel-uc5-regulatory-criteria",
+      "what": "SaaS scope extensions (SOC1/SOC2)",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc6-it-dependency-identifier.md",
+          "line": 258,
+          "quote": "UC5 — Regulatory Criteria — SaaS scope extensions feed back into criteria (SOC1/SOC2)"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc7-rcm-builder",
+      "to": "frank-van-dissel-uc8-audit-work-program",
+      "what": "RCM",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc7-rcm-builder.md",
+          "line": 248,
+          "quote": "UC8 — Work Program Agent — consumes the RCM output"
+        },
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc8-audit-work-program.md",
+          "line": 261,
+          "quote": "UC7 — RCM Builder — provides RCM input"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc1-policy-process-intake",
+      "to": "frank-van-dissel-uc9-quality-resource-guard",
+      "what": "pipeline output",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc9-quality-resource-guard.md",
+          "line": 286,
+          "quote": "UC1 through UC8 — all provide input to this agent"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc2-previous-audit-intelligence",
+      "to": "frank-van-dissel-uc9-quality-resource-guard",
+      "what": "Historical Risk Intelligence Report",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc2-previous-audit-intelligence.md",
+          "line": 248,
+          "quote": "UC9 — Quality & Resource Guard — validates this output"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc3-incident-issue-intelligence",
+      "to": "frank-van-dissel-uc9-quality-resource-guard",
+      "what": "Incident Intelligence Report",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc3-incident-issue-intelligence.md",
+          "line": 243,
+          "quote": "UC9 — Quality & Resource Guard — validates pipeline output"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc4-fraud-risk-assessment",
+      "to": "frank-van-dissel-uc9-quality-resource-guard",
+      "what": "fraud risk assessment",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc4-fraud-risk-assessment.md",
+          "line": 302,
+          "quote": "UC9 — Quality & Resource Guard — validates fraud risk coverage"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc5-regulatory-criteria",
+      "to": "frank-van-dissel-uc9-quality-resource-guard",
+      "what": "criteria coverage",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc5-regulatory-criteria.md",
+          "line": 254,
+          "quote": "UC9 — Quality & Resource Guard — validates criteria coverage"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc6-it-dependency-identifier",
+      "to": "frank-van-dissel-uc9-quality-resource-guard",
+      "what": "scope (IT Dependency Matrix)",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc6-it-dependency-identifier.md",
+          "line": 260,
+          "quote": "UC9 — Quality & Resource Guard — validates scope completeness"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc7-rcm-builder",
+      "to": "frank-van-dissel-uc9-quality-resource-guard",
+      "what": "completed RCM",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc7-rcm-builder.md",
+          "line": 249,
+          "quote": "UC9 — Quality & Resource Guard — validates the completed RCM"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc8-audit-work-program",
+      "to": "frank-van-dissel-uc9-quality-resource-guard",
+      "what": "work program",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc8-audit-work-program.md",
+          "line": 262,
+          "quote": "UC9 — Quality & Resource Guard — validates and approves this output"
+        },
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc9-quality-resource-guard.md",
+          "line": 286,
+          "quote": "UC1 through UC8 — all provide input to this agent"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc7-rcm-builder",
+      "to": "floris-stokkers-work-program-agent",
+      "what": "RCM",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc7-rcm-builder.md",
+          "line": 271,
+          "quote": "3. How do we align the RCM output schema with the input format expected by Floris Stokkers' Work Program Agent?"
+        }
+      ]
+    },
+    {
+      "from": "floris-stokkers-work-program-agent",
+      "to": "frank-van-dissel-uc9-quality-resource-guard",
+      "what": "work program",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc9-quality-resource-guard.md",
+          "line": 287,
+          "quote": "Floris Stokkers — Work Program Agent — UC9 validates the work program that UC8 and Floris produce; coordinate on output format"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc1-policy-process-intake",
+      "to": "the-control-freaks-uc7-rcm-builder",
+      "what": "risk input data",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/the-control-freaks-uc7-rcm-builder.md",
+          "line": 481,
+          "quote": "Frank van Dissel — UC1, UC2, UC3, UC4, UC5 — provide risk input data to Stage 1"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc2-previous-audit-intelligence",
+      "to": "the-control-freaks-uc7-rcm-builder",
+      "what": "risk input data",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/the-control-freaks-uc7-rcm-builder.md",
+          "line": 481,
+          "quote": "Frank van Dissel — UC1, UC2, UC3, UC4, UC5 — provide risk input data to Stage 1"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc3-incident-issue-intelligence",
+      "to": "the-control-freaks-uc7-rcm-builder",
+      "what": "risk input data",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/the-control-freaks-uc7-rcm-builder.md",
+          "line": 481,
+          "quote": "Frank van Dissel — UC1, UC2, UC3, UC4, UC5 — provide risk input data to Stage 1"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc4-fraud-risk-assessment",
+      "to": "the-control-freaks-uc7-rcm-builder",
+      "what": "risk input data",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/the-control-freaks-uc7-rcm-builder.md",
+          "line": 481,
+          "quote": "Frank van Dissel — UC1, UC2, UC3, UC4, UC5 — provide risk input data to Stage 1"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc5-regulatory-criteria",
+      "to": "the-control-freaks-uc7-rcm-builder",
+      "what": "risk input data",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/the-control-freaks-uc7-rcm-builder.md",
+          "line": 481,
+          "quote": "Frank van Dissel — UC1, UC2, UC3, UC4, UC5 — provide risk input data to Stage 1"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc6-it-dependency-identifier",
+      "to": "the-control-freaks-uc7-rcm-builder",
+      "what": "IT Dependency Matrix (validation loop)",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/the-control-freaks-uc7-rcm-builder.md",
+          "line": 482,
+          "quote": "Frank van Dissel — UC6 IT Dependency Identifier — validation loop partner: UC6 output feeds Stage 3 of this agent"
+        }
+      ]
+    },
+    {
+      "from": "the-control-freaks-uc7-rcm-builder",
+      "to": "frank-van-dissel-uc8-audit-work-program",
+      "what": "Validated RCM",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/the-control-freaks-uc7-rcm-builder.md",
+          "line": 483,
+          "quote": "Frank van Dissel — UC8 Work Program — consumes the Validated RCM"
+        }
+      ]
+    },
+    {
+      "from": "the-control-freaks-uc7-rcm-builder",
+      "to": "frank-van-dissel-uc9-quality-resource-guard",
+      "what": "RCM",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/the-control-freaks-uc7-rcm-builder.md",
+          "line": 484,
+          "quote": "Frank van Dissel — UC9 Quality & Resource Guard — validates completeness and quality of RCM output"
+        }
+      ]
+    },
+    {
+      "from": "the-control-freaks-uc7-rcm-builder",
+      "to": "floris-stokkers-work-program-agent",
+      "what": "RCM",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/the-control-freaks-uc7-rcm-builder.md",
+          "line": 485,
+          "quote": "Floris Stokkers — Work Program Agent — downstream consumer; coordinate on output schema"
+        }
+      ]
+    },
+    {
+      "from": "the-control-freaks-uc7-rcm-builder",
+      "to": "inge-garretsen-audit-work-program-agent",
+      "what": "RCM",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/the-control-freaks-uc7-rcm-builder.md",
+          "line": 486,
+          "quote": "Inge Garretsen — Audit Work Program Agent — related downstream use case"
+        }
+      ]
+    },
+    {
+      "from": "the-control-freaks-uc7-rcm-builder",
+      "to": "audit-evidence-visualization",
+      "what": "RCM data for heat maps",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/audit-evidence-visualization.md",
+          "line": 240,
+          "quote": "the-control-freaks-uc7-rcm-builder.md — primary data source for heat maps"
+        }
+      ]
+    },
+    {
+      "from": "the-control-freaks-uc7-rcm-builder",
+      "to": "audit-memory-knowledge-system",
+      "what": "RCM outputs",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/audit-memory-knowledge-system.md",
+          "line": 251,
+          "quote": "the-control-freaks-uc7-rcm-builder.md — RCM outputs become audit memory inputs"
+        }
+      ]
+    },
+    {
+      "from": "cli-audit-system-wrapper",
+      "to": "frank-van-dissel-uc6-it-dependency-identifier",
+      "what": "dependency version evidence",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc6-it-dependency-identifier.md",
+          "line": 261,
+          "quote": "plans/hackathon-3/cli-audit-system-wrapper.md — CLI wrapper to query package managers for dependency version evidence"
+        }
+      ]
+    },
+    {
+      "from": "saaf-jira-confluence-mcp",
+      "to": "frank-van-dissel-uc3-incident-issue-intelligence",
+      "what": "Jira incident data",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/saaf-jira-confluence-mcp.md",
+          "line": 310,
+          "quote": "plans/hackathon-2/frank-van-dissel-uc3-incident-issue-intelligence.md — primary consumer of the Jira MCP"
+        }
+      ]
+    },
+    {
+      "from": "saaf-jira-confluence-mcp",
+      "to": "document-evidence-extraction-agent",
+      "what": "policy documents (Confluence)",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/document-evidence-extraction-agent.md",
+          "line": 292,
+          "quote": "saaf-jira-confluence-mcp.md — source of policy documents via Confluence"
+        }
+      ]
+    },
+    {
+      "from": "saaf-jira-confluence-mcp",
+      "to": "saaf-rag-knowledge-base",
+      "what": "Confluence pages (policies, SOPs)",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/saaf-rag-knowledge-base.md",
+          "line": 289,
+          "quote": "plans/hackathon-3/saaf-jira-confluence-mcp.md — Confluence pages (policies, SOPs) are candidate corpus sources"
+        }
+      ]
+    },
+    {
+      "from": "saaf-jira-confluence-mcp",
+      "to": "koekenpan-ia-fieldwork-preparation",
+      "what": "Confluence policy retrieval",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/saaf-jira-confluence-mcp.md",
+          "line": 312,
+          "quote": "plans/hackathon-2/koekenpan-ia-fieldwork-preparation.md — fieldwork preparation benefits from Confluence policy retrieval"
+        }
+      ]
+    },
+    {
+      "from": "saaf-strapi-synthetic-data",
+      "to": "saaf-jira-confluence-mcp",
+      "what": "test data (simulated Jira API)",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/saaf-jira-confluence-mcp.md",
+          "line": 311,
+          "quote": "plans/hackathon-3/saaf-strapi-synthetic-data.md — provides the test data for MCP development"
+        },
+        {
+          "file": "plans/hackathon-3/saaf-strapi-synthetic-data.md",
+          "line": 291,
+          "quote": "plans/hackathon-3/saaf-jira-confluence-mcp.md — Strapi can simulate the Jira API for agents that don't have real Jira access"
+        }
+      ]
+    },
+    {
+      "from": "saaf-strapi-synthetic-data",
+      "to": "saaf-rag-knowledge-base",
+      "what": "synthetic policy documents",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/saaf-strapi-synthetic-data.md",
+          "line": 292,
+          "quote": "plans/hackathon-3/saaf-rag-knowledge-base.md — synthetic policy documents can be included in the RAG corpus"
+        },
+        {
+          "file": "plans/hackathon-3/saaf-rag-knowledge-base.md",
+          "line": 288,
+          "quote": "plans/hackathon-3/saaf-strapi-synthetic-data.md — synthetic Mollie documents can be included in the corpus"
+        }
+      ]
+    },
+    {
+      "from": "saaf-strapi-synthetic-data",
+      "to": "icfcop-control-testing-agent",
+      "what": "test data",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/icfcop-control-testing-agent.md",
+          "line": 276,
+          "quote": "plans/hackathon-3/saaf-strapi-synthetic-data.md — Strapi sandbox provides test data for this agent"
+        }
+      ]
+    },
+    {
+      "from": "saaf-strapi-synthetic-data",
+      "to": "ai-agent-visibility-scanner",
+      "what": "synthetic AI deployment inventory",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/ai-agent-visibility-scanner.md",
+          "line": 239,
+          "quote": "saaf-strapi-synthetic-data.md — test the scanner against a synthetic AI deployment inventory"
+        }
+      ]
+    },
+    {
+      "from": "cli-audit-system-wrapper",
+      "to": "ai-agent-visibility-scanner",
+      "what": "allowlisted system scan commands",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/ai-agent-visibility-scanner.md",
+          "line": 237,
+          "quote": "cli-audit-system-wrapper.md — all system scan commands must go through the allowlist"
+        }
+      ]
+    },
+    {
+      "from": "ai-agent-visibility-scanner",
+      "to": "eu-ai-act-compliance-monitor",
+      "what": "discovered AI agents",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/ai-agent-visibility-scanner.md",
+          "line": 242,
+          "quote": "eu-ai-act-compliance-monitor.md — discovered agents become input to the compliance monitor"
+        },
+        {
+          "file": "plans/hackathon-3/ai-agent-visibility-scanner.md",
+          "line": 238,
+          "quote": "eu-ai-act-compliance-monitor.md — classifies each discovered agent under EU AI Act"
+        }
+      ]
+    },
+    {
+      "from": "ai-agent-visibility-scanner",
+      "to": "audit-automation-overview",
+      "what": "shadow AI finding",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/ai-agent-visibility-scanner.md",
+          "line": 243,
+          "quote": "audit-automation-overview.md — the \"shadow AI\" finding is a level-0 governance gap before automation levels even apply"
+        }
+      ]
+    },
+    {
+      "from": "ai-agent-visibility-scanner",
+      "to": "ellert-van-der-vecht-llm-owasp",
+      "what": "AI agent inventory",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/ellert-van-der-vecht-llm-owasp.md",
+          "line": 292,
+          "quote": "Pre-condition for any LLM audit: run the ai-agent-visibility-scanner.md to discover all agents first"
+        }
+      ]
+    },
+    {
+      "from": "saaf-rag-knowledge-base",
+      "to": "eu-ai-act-compliance-monitor",
+      "what": "EU AI Act text (corpus)",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/eu-ai-act-compliance-monitor.md",
+          "line": 321,
+          "quote": "saaf-rag-knowledge-base.md — EU AI Act full text must be in the corpus"
+        }
+      ]
+    },
+    {
+      "from": "saaf-intelligence-monitor",
+      "to": "eu-ai-act-compliance-monitor",
+      "what": "regulatory updates",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/eu-ai-act-compliance-monitor.md",
+          "line": 322,
+          "quote": "saaf-intelligence-monitor.md — feeds regulatory updates from artificialintelligenceact.eu"
+        },
+        {
+          "file": "plans/hackathon-3/saaf-intelligence-monitor.md",
+          "line": 278,
+          "quote": "eu-ai-act-compliance-monitor.md — regulatory updates from this monitor feed directly into that plan's monitoring function"
+        }
+      ]
+    },
+    {
+      "from": "frank-van-dissel-uc5-regulatory-criteria",
+      "to": "eu-ai-act-compliance-monitor",
+      "what": "article text on demand",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/eu-ai-act-compliance-monitor.md",
+          "line": 323,
+          "quote": "frank-van-dissel-uc5-regulatory-criteria.md — retrieves specific article text on demand"
+        }
+      ]
+    },
+    {
+      "from": "johannesiv-policy-to-controls-extractor",
+      "to": "eu-ai-act-compliance-monitor",
+      "what": "extracted controls (ALTAI)",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/eu-ai-act-compliance-monitor.md",
+          "line": 326,
+          "quote": "johannesiv-policy-to-controls-extractor.md — extracts controls from policies including EU AI Act; can feed the ALTAI assessment"
+        }
+      ]
+    },
+    {
+      "from": "rene-volwerk-compliance-harnas-configurator",
+      "to": "eu-ai-act-compliance-monitor",
+      "what": "AI Act triggers per use case",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-4/rene-volwerk-compliance-harnas-configurator.md",
+          "line": 105,
+          "quote": "eu-ai-act-compliance-monitor — monitors GPAI obligations (Aug 2026 deadline) across organisations using ChatGPT/Copilot/Claude. Direct handoff: the 8 AI Act triggers produced by this configurator feed into that monitor as per-use-case ob..."
+        },
+        {
+          "file": "plans/hackathon-4/rene-volwerk-compliance-harnas-configurator.md",
+          "line": 317,
+          "quote": "Downstream consumer — eu-ai-act-compliance-monitor could consume the 8 AI Act triggers this configurator produces as per-use-case obligation-input. Would make a nice end-to-end demo at Hackathon #4."
+        }
+      ]
+    },
+    {
+      "from": "on-premise-ai-compute-decision-framework",
+      "to": "rene-volwerk-compliance-harnas-configurator",
+      "what": "on-prem vs API decision tree",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-4/rene-volwerk-compliance-harnas-configurator.md",
+          "line": 107,
+          "quote": "on-premise-ai-compute-decision-framework — on-prem vs API decision for audit workloads. This is the decision tree that feeds the configurator's L01-Hardware wizard step."
+        }
+      ]
+    },
+    {
+      "from": "open-source-audit-agent-framework",
+      "to": "on-premise-ai-compute-decision-framework",
+      "what": "software stack (Ollama + router)",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/on-premise-ai-compute-decision-framework.md",
+          "line": 282,
+          "quote": "open-source-audit-agent-framework.md — software stack (Ollama + router) that runs on the hardware described here; this plan is the hardware complement to that plan"
+        }
+      ]
+    },
+    {
+      "from": "saaf-rag-knowledge-base",
+      "to": "owasp-ai-testing-agent",
+      "what": "OWASP AI Testing Guide (corpus)",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/owasp-ai-testing-agent.md",
+          "line": 267,
+          "quote": "saaf-rag-knowledge-base.md — OWASP AI Testing Guide must be ingested as a corpus"
+        }
+      ]
+    },
+    {
+      "from": "llm-hallucination-detection-agent",
+      "to": "owasp-ai-testing-agent",
+      "what": "hallucination tests (AT-09)",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/owasp-ai-testing-agent.md",
+          "line": 268,
+          "quote": "llm-hallucination-detection-agent.md — companion for AT-09 (misinformation/hallucination) tests"
+        }
+      ]
+    },
+    {
+      "from": "ellert-van-der-vecht-llm-owasp",
+      "to": "saaf-rag-knowledge-base",
+      "what": "OWASP LLM control definitions",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/ellert-van-der-vecht-llm-owasp.md",
+          "line": 230,
+          "quote": "plans/hackathon-3/saaf-rag-knowledge-base.md — the OWASP LLM control definitions (docs/LLM01–LLM10.md) are candidate RAG corpus documents"
+        }
+      ]
+    },
+    {
+      "from": "owasp-ai-testing-agent",
+      "to": "frank-lubbers-ai-finding-escalation-azure-devops",
+      "what": "OWASP security findings",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/frank-lubbers-ai-finding-escalation-azure-devops.md",
+          "line": 236,
+          "quote": "owasp-ai-testing-agent.md — upstream source of OWASP security findings (F-XXXX format)"
+        }
+      ]
+    },
+    {
+      "from": "llm-hallucination-detection-agent",
+      "to": "frank-lubbers-ai-finding-escalation-azure-devops",
+      "what": "hallucination-flagged findings",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/frank-lubbers-ai-finding-escalation-azure-devops.md",
+          "line": 237,
+          "quote": "llm-hallucination-detection-agent.md — upstream source of hallucination-flagged findings"
+        }
+      ]
+    },
+    {
+      "from": "document-evidence-extraction-agent",
+      "to": "ai-audit-explainability-framework",
+      "what": "XAI outputs",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/document-evidence-extraction-agent.md",
+          "line": 295,
+          "quote": "ai-audit-explainability-framework.md — XAI outputs extracted by this agent feed into the explainability annex"
+        }
+      ]
+    },
+    {
+      "from": "document-evidence-extraction-agent",
+      "to": "saaf-rag-knowledge-base",
+      "what": "extracted controls",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/document-evidence-extraction-agent.md",
+          "line": 293,
+          "quote": "saaf-rag-knowledge-base.md — extracted controls can be indexed in the RAG KB"
+        }
+      ]
+    },
+    {
+      "from": "johannesiv-policy-to-controls-extractor",
+      "to": "rohan-sobha-judging-found-controls",
+      "what": "control objects",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-4/rohan-sobha-judging-found-controls.md",
+          "line": 20,
+          "quote": "Policy-to-controls extractors (such as the upstream johannesiv-policy-to-controls-extractor) use LLMs to derive structured control objects from raw policy PDFs or DOCX documents. This creates a well-known reliability problem: the extract..."
+        }
+      ]
+    },
+    {
+      "from": "rohan-sobha-compliance-report-generator",
+      "to": "power-bi-audit-dashboard-mcp",
+      "what": "findings",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/power-bi-audit-dashboard-mcp.md",
+          "line": 250,
+          "quote": "rohan-sobha-compliance-report-generator.md — findings source"
+        }
+      ]
+    },
+    {
+      "from": "yellowraptor-whats-the-news",
+      "to": "frank-van-dissel-uc5-regulatory-criteria",
+      "what": "regulatory updates",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-2/frank-van-dissel-uc5-regulatory-criteria.md",
+          "line": 256,
+          "quote": "WhatsTheNews — regulatory monitoring skill; could feed regulatory updates into this agent's knowledge base"
+        }
+      ]
+    },
+    {
+      "from": "audit-loop-orchestration-sdk",
+      "to": "audit-agent-gamified-ui",
+      "what": "agent state files",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/audit-agent-gamified-ui.md",
+          "line": 286,
+          "quote": "audit-loop-orchestration-sdk.md — produces the state files this dashboard reads"
+        }
+      ]
+    },
+    {
+      "from": "audit-subagent-coordination-framework",
+      "to": "audit-agent-gamified-ui",
+      "what": "fleet state",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/audit-agent-gamified-ui.md",
+          "line": 289,
+          "quote": "audit-subagent-coordination-framework.md — multi-agent debates produce fleet state readable by this dashboard"
+        }
+      ]
+    },
+    {
+      "from": "audit-loop-orchestration-sdk",
+      "to": "overnight-audit-batch-processing-agent",
+      "what": "orchestration SDK",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/audit-loop-orchestration-sdk.md",
+          "line": 346,
+          "quote": "overnight-audit-batch-processing-agent.md — primary consumer of the SDK"
+        }
+      ]
+    },
+    {
+      "from": "audit-memory-knowledge-system",
+      "to": "always-on-audit-agent",
+      "what": "precedent lookups",
+      "status": "suggested",
+      "sources": [
+        {
+          "file": "plans/hackathon-3/always-on-audit-agent.md",
+          "line": 266,
+          "quote": "audit-memory-knowledge-system.md — knowledge base for precedent lookups"
+        }
+      ]
+    }
+  ]
+}
