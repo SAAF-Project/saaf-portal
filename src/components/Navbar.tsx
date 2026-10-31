@@ -14,7 +14,7 @@ const NAV_ITEMS = [
   { href: "/leaderboard", label: "Leaderboard", icon: "★" },
   { href: "/participants", label: "Participants", icon: "👥" },
   { href: "/tracks", label: "Tracks", icon: "▶" },
-  { href: "/progress", label: "Progress", icon: "▲" },
+  { href: "/visualised", label: "SAAF Visualised", icon: "▲" },
   { href: "/my-repos", label: "My Repos", icon: "◇" },
   { href: "/onboarding", label: "How to Contribute", icon: "→" },
   { href: "/about", label: "About SAAF", icon: "ℹ" },

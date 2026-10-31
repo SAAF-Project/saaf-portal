@@ -698,8 +698,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 3,
-      "organisation": "Anonymous",
-      "submitter": "AuditFlow AI team (anonymous)",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -753,8 +753,8 @@
       "pdca_known": true,
       "progress": 0.25,
       "quality_score": 3,
-      "organisation": "Anonymous",
-      "submitter": "Group 5 Hackers (anonymous)",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "Banking"
@@ -798,8 +798,8 @@
       "pdca_known": true,
       "progress": 0.25,
       "quality_score": 4,
-      "organisation": "Mollie",
-      "submitter": "Mollie Group X (anonymous)",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "Payments/Fintech"
@@ -837,8 +837,8 @@
       "pdca_known": true,
       "progress": 0.25,
       "quality_score": 3,
-      "organisation": "Anonymous",
-      "submitter": "Team 67 (anonymous — five specialists in IT Audit, IT Risk, Compliance, and Data Management)",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -882,8 +882,8 @@
       "pdca_known": true,
       "progress": 0.25,
       "quality_score": 3,
-      "organisation": "Anonymous",
-      "submitter": "Anonymous",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -936,8 +936,8 @@
       "pdca_known": true,
       "progress": 0.5,
       "quality_score": 4,
-      "organisation": "Deloitte Netherlands / Auditdienst Rijk / KPN / Wolters Kluwer",
-      "submitter": "Diyve Garg, Juriën Huisman, Karim Zemouri, Mourad Fakirou",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "Public sector"
@@ -985,8 +985,8 @@
       "pdca_known": true,
       "progress": 0.5,
       "quality_score": 5,
-      "organisation": "Schuberg Philis",
-      "submitter": "Ellert van der Vecht",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -1051,8 +1051,8 @@
       "pdca_known": true,
       "progress": 0.5,
       "quality_score": 4,
-      "organisation": "Schuberg Philis",
-      "submitter": "Ellert van der Vecht",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -1096,8 +1096,8 @@
       "pdca_known": true,
       "progress": 0.625,
       "quality_score": 4,
-      "organisation": "Synthetic Corp B.V.",
-      "submitter": "Example Participant (synthetic — for illustration only)",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -1141,8 +1141,8 @@
       "pdca_known": true,
       "progress": 0.5,
       "quality_score": 4,
-      "organisation": "RCM-Rangers",
-      "submitter": "Floris Stokkers",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "Payments/Fintech"
@@ -1191,8 +1191,8 @@
       "pdca_known": true,
       "progress": 0.25,
       "quality_score": 4,
-      "organisation": "Mollie",
-      "submitter": "Frank van Dissel & Lauren Browne",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "Payments/Fintech"
@@ -1236,8 +1236,8 @@
       "pdca_known": true,
       "progress": 0.25,
       "quality_score": 4,
-      "organisation": "Mollie",
-      "submitter": "Frank van Dissel & Lauren Browne",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "Payments/Fintech"
@@ -1281,8 +1281,8 @@
       "pdca_known": true,
       "progress": 0.25,
       "quality_score": 5,
-      "organisation": "Mollie",
-      "submitter": "Frank van Dissel & Lauren Browne",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "Payments/Fintech"
@@ -1326,8 +1326,8 @@
       "pdca_known": true,
       "progress": 0.25,
       "quality_score": 4,
-      "organisation": "Mollie",
-      "submitter": "Frank van Dissel & Lauren Browne",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "Payments/Fintech"
@@ -1371,8 +1371,8 @@
       "pdca_known": true,
       "progress": 0.25,
       "quality_score": 4,
-      "organisation": "Mollie",
-      "submitter": "Frank van Dissel & Lauren Browne",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "Payments/Fintech"
@@ -1416,8 +1416,8 @@
       "pdca_known": true,
       "progress": 0.25,
       "quality_score": 3,
-      "organisation": "Mollie",
-      "submitter": "Frank van Dissel & Lauren Browne",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "Payments/Fintech"
@@ -1461,8 +1461,8 @@
       "pdca_known": true,
       "progress": 0.25,
       "quality_score": 4,
-      "organisation": "Mollie",
-      "submitter": "Frank van Dissel & Lauren Browne",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "Payments/Fintech"
@@ -1506,8 +1506,8 @@
       "pdca_known": true,
       "progress": 0.25,
       "quality_score": 4,
-      "organisation": "Mollie",
-      "submitter": "Frank van Dissel & Lauren Browne",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "Payments/Fintech"
@@ -1551,8 +1551,8 @@
       "pdca_known": true,
       "progress": 0.25,
       "quality_score": 3,
-      "organisation": "Mollie",
-      "submitter": "Frank van Dissel & Lauren Browne",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "Payments/Fintech"
@@ -1596,8 +1596,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 4,
-      "organisation": "Anonymous",
-      "submitter": "immistyle",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -1656,8 +1656,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 4,
-      "organisation": "Anonymous",
-      "submitter": "Inge Garretsen",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "Payments/Fintech"
@@ -1721,8 +1721,8 @@
       "pdca_known": true,
       "progress": 0.5,
       "quality_score": 4,
-      "organisation": "Kouters Van Der Meer",
-      "submitter": "JohannesIV",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -1770,8 +1770,8 @@
       "pdca_known": true,
       "progress": 0.5,
       "quality_score": 4,
-      "organisation": "Anonymous",
-      "submitter": "KOEKENPAN",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -1819,8 +1819,8 @@
       "pdca_known": true,
       "progress": 0.5,
       "quality_score": 3,
-      "organisation": "BR1GHT / Booking.com / JTI",
-      "submitter": "Linda Nyvelius, Francois Marais, Julian",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -1873,8 +1873,8 @@
       "pdca_known": true,
       "progress": 0.5,
       "quality_score": 4,
-      "organisation": "Anonymous",
-      "submitter": "robeminem94",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -1922,8 +1922,8 @@
       "pdca_known": true,
       "progress": 0.5,
       "quality_score": 4,
-      "organisation": "Anonymous",
-      "submitter": "robeminem94",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -1971,8 +1971,8 @@
       "pdca_known": true,
       "progress": 0.5,
       "quality_score": 4,
-      "organisation": "Auditdienst Rijk (Ministerie van Financiën)",
-      "submitter": "Rohan Sobha",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "Banking",
@@ -2017,8 +2017,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 5,
-      "organisation": "The Control Freaks (cross-org)",
-      "submitter": "Ilona Hofland, Imane Akhyar, Peter Jongen, Guus Focken, Bart Loow, Joey Wild, Mourad Fakirou",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -2072,8 +2072,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 3,
-      "organisation": "Anonymous",
-      "submitter": "The RCM Rangers",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -2122,8 +2122,8 @@
       "pdca_known": true,
       "progress": 0.5,
       "quality_score": 4,
-      "organisation": "Anonymous",
-      "submitter": "TheMonteCristo",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "Payments/Fintech"
@@ -2182,8 +2182,8 @@
       "pdca_known": true,
       "progress": 0.5,
       "quality_score": 4,
-      "organisation": "Anonymous",
-      "submitter": "Yellowraptor",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "Banking"
@@ -2236,8 +2236,8 @@
       "pdca_known": true,
       "progress": 0.25,
       "quality_score": 4,
-      "organisation": "SAAF",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -2281,8 +2281,8 @@
       "pdca_known": true,
       "progress": 0.25,
       "quality_score": 4,
-      "organisation": "SAAF",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -2326,8 +2326,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 4,
-      "organisation": "SAAF Project",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -2386,8 +2386,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 4,
-      "organisation": "SAAF Project",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -2441,8 +2441,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 4,
-      "organisation": "SAAF Project",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -2496,8 +2496,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 4,
-      "organisation": "SAAF Project",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -2546,8 +2546,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 4,
-      "organisation": "SAAF Project",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -2596,8 +2596,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 4,
-      "organisation": "SAAF Project",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -2651,8 +2651,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 4,
-      "organisation": "SAAF",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -2706,8 +2706,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 4,
-      "organisation": "SAAF Project",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -2761,8 +2761,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 4,
-      "organisation": "SAAF Project",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -2816,8 +2816,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 4,
-      "organisation": "SAAF Project",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -2871,8 +2871,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 4,
-      "organisation": "SAAF Project",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -2921,8 +2921,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 4,
-      "organisation": "SAAF Project",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -2976,8 +2976,8 @@
       "pdca_known": true,
       "progress": 0.25,
       "quality_score": 4,
-      "organisation": "SAAF",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -3021,8 +3021,8 @@
       "pdca_known": true,
       "progress": 0.25,
       "quality_score": 0,
-      "organisation": "SAAF",
-      "submitter": "Frank Heldens",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -3071,9 +3071,9 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 0,
-      "organisation": "Wolters Kluwer",
-      "submitter": "Frank Lubbers",
-      "claimed_by": "Frank Lubbers",
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
       "sectors": [
         "General"
       ],
@@ -3132,8 +3132,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 4,
-      "organisation": "Schuberg Philis",
-      "submitter": "Schuberg Philis",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -3187,8 +3187,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 5,
-      "organisation": "Schuberg Philis",
-      "submitter": "Schuberg Philis",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -3242,8 +3242,8 @@
       "pdca_known": true,
       "progress": 0.75,
       "quality_score": 4,
-      "organisation": "SAAF",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -3293,8 +3293,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 4,
-      "organisation": "SAAF Project",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -3348,8 +3348,8 @@
       "pdca_known": true,
       "progress": 0.25,
       "quality_score": 4,
-      "organisation": "SAAF",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -3398,8 +3398,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 4,
-      "organisation": "SAAF Project",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -3453,8 +3453,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 4,
-      "organisation": "SAAF Project",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -3513,8 +3513,8 @@
       "pdca_known": true,
       "progress": 0.25,
       "quality_score": 4,
-      "organisation": "SAAF",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -3569,8 +3569,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 4,
-      "organisation": "SAAF Project",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -3619,8 +3619,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 4,
-      "organisation": "SAAF Project",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -3679,8 +3679,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 5,
-      "organisation": "SAAF Project",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -3729,8 +3729,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 4,
-      "organisation": "SAAF Project",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -3779,8 +3779,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 4,
-      "organisation": "SAAF Project",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -3834,8 +3834,8 @@
       "pdca_known": true,
       "progress": 0.375,
       "quality_score": 5,
-      "organisation": "SAAF Project",
-      "submitter": "Mathijs Schouten",
+      "organisation": "",
+      "submitter": "",
       "claimed_by": "",
       "sectors": [
         "General"
@@ -3961,9 +3961,9 @@
       "pdca_known": true,
       "progress": 0.125,
       "quality_score": 0,
-      "organisation": "Kouters Van der Meer",
-      "submitter": "Alex Zwijnenburg & Bas Rovers",
-      "claimed_by": "Alex Zwijnenburg & Bas Rovers",
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
       "sectors": [
         "General"
       ],
@@ -4006,9 +4006,9 @@
       "pdca_known": true,
       "progress": 0.625,
       "quality_score": 0,
-      "organisation": "AuCx",
-      "submitter": "René Volwerk",
-      "claimed_by": "René Volwerk — MVP shipped as v0.1.0 on [volwerk/compliance-harnas-configurator](https://github.com/volwerk/compliance-harnas-configurator); happy to transfer to SAAF-Project org upon community agreement",
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
       "sectors": [
         "General"
       ],
@@ -4055,9 +4055,9 @@
       "pdca_known": true,
       "progress": 0.5,
       "quality_score": 0,
-      "organisation": "Auditdienst Rijk",
-      "submitter": "Rohan Sobha",
-      "claimed_by": "Rohan Sobha",
+      "organisation": "",
+      "submitter": "",
+      "claimed_by": "",
       "sectors": [
         "Public sector"
       ],
