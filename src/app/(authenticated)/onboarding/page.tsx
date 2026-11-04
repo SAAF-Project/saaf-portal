@@ -84,7 +84,7 @@ const CONTRIBUTION_WAYS: ContribWay[] = [
     icon: "🗺️",
     title: "Put your agent on the Living Map",
     needsGit: true,
-    desc: "Add a small agent.yaml next to your README; required from Ready onward. The Living Map reads every agent's manifest hourly and renders them all on one map — island, maturity, dependencies and open slots. No list to keep up to date by hand.",
+    desc: "Add a small agent.yaml next to your README; required from Ready onward. The Living Map reads every agent's manifest on a schedule and renders them all on one map — island, maturity, dependencies and open slots. No list to keep up to date by hand.",
     href: "#living-map",
     cta: "How it works →",
     color: "border-saaf-green/30 bg-saaf-green/5",
@@ -437,7 +437,7 @@ Short description of the steps the agent takes.
           >
             SAAF Living Map
           </a>{" "}
-          collects these files once an hour and renders one map of every agent. Change your{" "}
+          collects these files on a schedule and renders one map of every agent. Change your{" "}
           <code className="px-1.5 py-0.5 bg-surface2 rounded text-xs text-text">agent.yaml</code> and
           the map changes; nobody maintains it by hand. Every agent repo should carry one; it is
           required once the agent reaches <em>ready</em>. Until then the map shows a seed entry drafted
