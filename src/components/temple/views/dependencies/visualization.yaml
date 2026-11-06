@@ -1,0 +1,35 @@
+# Agent dependencies: which plan's output is another plan's input. See views/README.md for the format.
+id: dependencies
+name: Agent dependencies
+short_name: Deps
+title: SAAF Agent Dependencies
+description: A flat map of which plan's output is another plan's input, with arrows between the plans.
+preview: preview.jpg
+access: community
+supports:
+  filters: true
+  display: [style]
+  relations: true
+calculation:
+  - The relations between plans are not calculated. An AI read them from the plan texts, and a plan owner has to confirm them. Solid arrows are confirmed, dashed arrows are suggestions.
+  - A plan's colour is its stage, as the legend at the bottom shows.
+tour:
+  - title: Which plan feeds which
+    text: This is a visual representation of how the plans in the SAAF-Project repositories connect. Each lane is a part of the work and each card is a plan. An arrow points to the plan that uses what the other one produces, and its label says what flows.
+    target: view
+    focus: { level: project }
+  - title: Confirmed and suggested
+    text: Solid arrows are confirmed by a plan owner. Dashed arrows are suggestions an AI read from the plan texts, and nobody has confirmed them yet. Treat them as a starting point, not as a fact.
+    target: panel
+  - title: Follow one plan
+    text: Click a plan to light up everything it depends on and everything that depends on it. Plans without a documented input or output are hidden until you switch them on. Drag to move, zoom with the slider, the mouse wheel or a pinch.
+    target: view
+  - title: Stage colours
+    text: A card's colour is its stage, from red (a draft plan) to green (in use or improving). A small tag means an alert.
+    target: legend
+  - title: Filters
+    text: Narrow the plans down by stage, type, alert or sector, or switch to your own plans.
+    target: filters
+  - title: Other views and this tour
+    text: The same data is available as a temple and as islands. You can replay this tour at any time.
+    target: tour

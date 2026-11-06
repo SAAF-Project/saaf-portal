@@ -1,0 +1,46 @@
+# The Islands: the same data as an archipelago. See views/README.md for the format.
+id: islands
+name: Islands
+title: The SAAF Archipelago
+description: The project as islands connected by bridges, with every plan as a robot, ring, gem or page on its island.
+preview: preview.jpg
+access: community
+supports:
+  filters: true
+  display: [scenery, style]
+  relations: false
+calculation:
+  - An island grows with its number of plans. It counts plans; it does not weigh how big a plan is.
+  - A plan's colour is its stage, red at the front of an island to green at the back. An island's percentage is the average of its plans.
+tour:
+  - title: The whole project as islands
+    text: This is a visual representation of the SAAF-Project repositories. Each island holds the plans of one part of the work. Drag to turn the view, scroll to zoom, click an island to open it.
+    target: view
+    focus: { level: project }
+  - title: The four audit stages
+    text: The islands in the middle are the audit stages - planning, collection and extraction, reporting and visualisation, monitoring. Bridges and dashed arrows show the flow of an audit.
+    focus: { level: part, part: planning }
+  - title: Shared infrastructure
+    text: The island in front supports all the others. It holds the shared infrastructure (Track 0).
+    focus: { level: part, part: foundation }
+  - title: Governance and quality assurance
+    text: The island at the back is AI governance and quality assurance, which covers all the work.
+    focus: { level: part, part: governance }
+  - title: The Repo Annex
+    text: A small island beside the others, for plans whose repository needs attention.
+    focus: { level: annex }
+  - title: Plans, types and colours
+    text: Every plan is an object on its island - a robot for an agent, a ring for a workflow, a gem for a skill, a page for a document. Its colour is its stage, from red (a draft plan) to green (in use or improving). A small tag means an alert.
+    target: legend
+  - title: Filters
+    text: Narrow the picture down by stage, type, alert or sector, or switch to your own plans.
+    target: filters
+  - title: The side panel
+    text: The numbers behind the picture. Click a plan for its details, and Esc takes you one level up.
+    target: panel
+  - title: Display
+    text: Scenery (trees and boats) and line style are personal preferences. They change how the islands look, not what they show.
+    target: display
+  - title: Other views and this tour
+    text: The same data is available as a temple and as a map of which plan feeds which. You can replay this tour at any time.
+    target: tour

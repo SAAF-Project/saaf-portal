@@ -228,7 +228,7 @@ interface PanelProps {
   filtersActive: boolean;
   onFocus: (f: Focus) => void;
   title: string; // what the whole picture is called
-  onInfo: () => void; // opens the "How to read this" screen
+  onInfo: () => void; // opens the "How this is calculated" screen
   onHide: () => void; // folds the panel away, to see the whole temple
   relations?: RelationEdge[]; // which plan feeds which; without it the "Inputs and outputs" section is left out
   relationsOpen?: boolean; // open that section (in the dependency view)
@@ -295,7 +295,7 @@ export function Panel({ data, focus, matches, filtersActive, onFocus, title, onI
     const p = data.project;
     const inView = filtersActive ? treePlans.filter(matches) : treePlans;
     return (
-      <aside className="panel" key={key}>
+      <aside className="panel" key={key} data-tour="panel">
         <Head kicker="Project overview" title={title} sub="Shared Audit Agents Framework" onHide={onHide} />
         <Stat value={pct(p.progress)} label={<>average progress over {p.plan_count} plans</>} onInfo={onInfo} />
         {matchLine(treePlans.filter(matches).length, treePlans.length)}
@@ -329,7 +329,7 @@ export function Panel({ data, focus, matches, filtersActive, onFocus, title, onI
     if (!part) return null;
     const members = shown(part).sort((a, b) => stageOf(b).id - stageOf(a).id || b.progress - a.progress);
     return (
-      <aside className="panel" key={key}>
+      <aside className="panel" key={key} data-tour="panel">
         <Head
           back={toProject}
           kicker={`${PART_KICKER[part.kind] ?? "Part"}${part.track !== null ? ` · Track ${part.track}` : ""}`}
@@ -370,7 +370,7 @@ export function Panel({ data, focus, matches, filtersActive, onFocus, title, onI
     const alerts = [...plan.alerts].sort((a, b) => severityRank(b.severity) - severityRank(a.severity));
     const repoIssue = plan.alerts.some((a) => a.id.includes("repo"));
     return (
-      <aside className="panel" key={key}>
+      <aside className="panel" key={key} data-tour="panel">
         <Head
           back={{ label: part?.stage ?? part?.name ?? "Back", go: () => onFocus(part ? { level: "part", partId: part.id } : { level: "project" }) }}
           kicker={<span className="kind-line"><GlyphIcon kind={plan.kind} /> {KIND_LABEL[plan.kind]}</span>}
@@ -457,7 +457,7 @@ export function Panel({ data, focus, matches, filtersActive, onFocus, title, onI
     const plan = plans.get(selected.plan);
     const stage = plan ? stageOf(plan) : undefined;
     return (
-      <aside className="panel" key={key}>
+      <aside className="panel" key={key} data-tour="panel">
         <Head
           back={{ label: data.annex.name, go: () => onFocus({ level: "annex" }) }}
           kicker="Repo Annex"
@@ -485,7 +485,7 @@ export function Panel({ data, focus, matches, filtersActive, onFocus, title, onI
   }
 
   return (
-    <aside className="panel" key={key}>
+    <aside className="panel" key={key} data-tour="panel">
       <Head back={toProject} kicker="Side building" title={data.annex.name} onHide={onHide} />
       <Stat value={pct(annexPart?.progress ?? null)} label={<>average progress over {annexPlans.length} plans</>} onInfo={onInfo} />
       <p className="mission">Plans whose repository needs attention: possible duplicate repos, and agents built inside the main repository that should move to their own repo.</p>
