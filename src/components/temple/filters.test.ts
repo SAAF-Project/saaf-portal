@@ -4,8 +4,8 @@ import { describe, expect, it } from "vitest";
 import { ATTENTION, NO_FILTERS, isActive, makeMatcher, ownedBy, parseFilters, serializeFilters, toggle, type Filters, type Submitter } from "./filters";
 import type { ProgressData } from "./types";
 
-const data = JSON.parse(readFileSync(resolve(process.cwd(), "public/data/progress.json"), "utf8")) as ProgressData;
-const submitters = JSON.parse(readFileSync(resolve(process.cwd(), "public/data/submitters.json"), "utf8")) as Submitter[];
+const data = JSON.parse(readFileSync(resolve(process.cwd(), "data/progress.json"), "utf8")) as ProgressData;
+const submitters = JSON.parse(readFileSync(resolve(process.cwd(), "src/components/temple/__fixtures__/submitters.sample.json"), "utf8")) as Submitter[];
 const count = (f: Filters, owned: Set<string> | null = null) => data.plans.filter(makeMatcher(f, owned)).length;
 
 describe("filters", () => {

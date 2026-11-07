@@ -8,7 +8,7 @@ import type { ProgressData } from "./types";
 
 const manifests = loadManifests();
 const views = buildViews(manifests);
-const data = JSON.parse(readFileSync(resolve(process.cwd(), "public/data/progress.json"), "utf8")) as ProgressData;
+const data = JSON.parse(readFileSync(resolve(process.cwd(), "data/progress.json"), "utf8")) as ProgressData;
 
 describe("visualisations", () => {
   it("every registered view has a visualization.yaml and the other way round", () => {

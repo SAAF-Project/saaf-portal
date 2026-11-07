@@ -5,7 +5,7 @@ import { withAnnexPart } from "../derive";
 import type { PlanRecord, ProgressData } from "../types";
 import { SLOT_SPACING, computeLandscape, needsSimplerObjects, pointInPolygon, slotOf, type LandscapeLayout } from "./layout";
 
-const data = withAnnexPart(JSON.parse(readFileSync(resolve(process.cwd(), "public/data/progress.json"), "utf8")) as ProgressData);
+const data = withAnnexPart(JSON.parse(readFileSync(resolve(process.cwd(), "data/progress.json"), "utf8")) as ProgressData);
 const layout = computeLandscape(data);
 
 /** The same data with many more plans, spread over the parts the way the real ones are. */

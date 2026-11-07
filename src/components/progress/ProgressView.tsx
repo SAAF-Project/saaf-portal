@@ -60,7 +60,8 @@ export default function ProgressView({ visualisations }: { visualisations: Visua
   if (!loaded) return <div className="p-8 text-muted">Loading progress data...</div>;
 
   return (
-    <div className="relative h-full w-full">
+    // isolate: the visualisation's own layers (z-index up to 60) stay inside this box, under the navbar menus
+    <div className="relative isolate h-full w-full">
       <ProgressApp data={loaded.progress} submitters={loaded.submitters} identity={identity} theme={theme} assetBase="/" visualisations={visualisations} />
       {(loaded.source === "bundled" || !loaded.repo_checks) && (
         <div className="pointer-events-none absolute bottom-[62px] left-4 z-[60] rounded bg-surface/80 px-2 py-1 text-[11px] text-muted">

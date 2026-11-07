@@ -8,7 +8,7 @@ import { applyRepoSignals } from "./liveAlerts";
 import { cleanRelations, relationsFor } from "./relations";
 import type { ProgressData } from "./types";
 
-const data = JSON.parse(readFileSync(resolve(process.cwd(), "public/data/progress.json"), "utf8")) as ProgressData;
+const data = JSON.parse(readFileSync(resolve(process.cwd(), "data/progress.json"), "utf8")) as ProgressData;
 const manifests = loadManifests();
 const view = (id: string) => manifests.find((m) => m.id === id)!;
 const html = (d: ProgressData, id = "temple") => renderToStaticMarkup(<CalculationDialog data={d} view={view(id)} relations={cleanRelations(relationsFor(d), d.plans).edges} onClose={() => {}} />);

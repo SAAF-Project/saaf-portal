@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Alex Example",
+    "plans": [
+      "auditflow-ai",
+      "group-5-hackers-ai-audit-agents"
+    ]
+  },
+  {
+    "name": "Sam Placeholder",
+    "plans": [
+      "mollie-group-x-evidence-audit"
+    ]
+  },
+  {
+    "name": "Sample team (synthetic)",
+    "plans": [
+      "team-67-intelligent-audit-agents",
+      "anonymous-audit-rep-analysis"
+    ]
+  }
+]

@@ -16,6 +16,7 @@ export interface TourStepContent {
   title: string;
   body: ReactNode;
   target?: string; // value of a data-tour attribute
+  side?: boolean; // the step moves a 3D view to a block: card at the left, no dimming, so the block stays visible
 }
 
 interface Props {
@@ -80,14 +81,14 @@ export function TourShell({ steps, step, onStep, onClose, finishLabel, skipLabel
   }, [step, box]);
 
   if (!current) return null;
-  const centred = !current.target;
+  const centred = !current.target && !current.side;
   const spotlight = box !== null;
   const style = spotlight
     ? { ...cardPosition(box, { width: window.innerWidth, height: window.innerHeight }, cardHeight), width: CARD_W }
     : undefined;
 
   const card = (
-    <div ref={cardRef} className={`bg-surface border border-border rounded-2xl shadow-2xl ${centred ? "w-full max-w-lg" : spotlight ? "fixed" : "fixed bottom-20 left-1/2 -translate-x-1/2 w-[min(460px,calc(100%-24px))]"}`} style={style}>
+    <div ref={cardRef} className={`bg-surface border border-border rounded-2xl shadow-2xl ${centred ? "w-full max-w-lg" : spotlight ? "fixed" : current.side ? "fixed left-4 top-1/2 -translate-y-1/2 w-[min(400px,calc(100%-32px))]" : "fixed bottom-20 left-1/2 -translate-x-1/2 w-[min(460px,calc(100%-24px))]"}`} style={style}>
       <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex gap-1.5">
           {steps.map((_, i) => (

@@ -8,8 +8,12 @@ export const splitHash = (hash: string): [string, string] => {
 
 export const viewFromHash = (hash: string): string | null => new URLSearchParams(splitHash(hash)[1]).get("view");
 
+/** `view=all` asks for the chooser, whatever this person picked before (the navbar's "All views"). */
+export const ALL_VIEWS = "all";
+
 /**
  * Which view a visit opens, or null when the chooser should show:
+ * 0. the chooser when the link asks for it (view=all);
  * 1. the view the link asks for (view=<id>);
  * 2. the view this person picked before;
  * 3. the first view, for an old link that points at a block or carries filters (it was made before there was a chooser);
@@ -17,6 +21,7 @@ export const viewFromHash = (hash: string): string | null => new URLSearchParams
  */
 export function startingView(viewIds: string[], hash: string, remembered: string | null): string | null {
   const linked = viewFromHash(hash);
+  if (linked === ALL_VIEWS) return null;
   if (linked && viewIds.includes(linked)) return linked;
   if (remembered && viewIds.includes(remembered)) return remembered;
   const [path, query] = splitHash(hash);

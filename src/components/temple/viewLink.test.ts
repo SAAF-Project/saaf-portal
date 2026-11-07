@@ -14,6 +14,11 @@ describe("which view a visit opens", () => {
     expect(startingView(ids, "#/part/planning?view=dependencies", null)).toBe("dependencies");
   });
 
+  it("shows the chooser for view=all, even when a view was picked before (navbar: All views)", () => {
+    expect(startingView(ids, "#/?view=all", "temple")).toBeNull();
+    expect(startingView(ids, "#/?view=all", null)).toBeNull();
+  });
+
   it("opens the view a person picked before", () => {
     expect(startingView(ids, "", "islands")).toBe("islands");
     expect(startingView(ids, "#/", "dependencies")).toBe("dependencies");

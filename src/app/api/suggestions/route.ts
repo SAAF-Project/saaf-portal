@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getPrisma } from "@/lib/prisma";
-import { readFileSync } from "fs";
-import { join } from "path";
+import { loadPlans, loadSubmitters } from "@/lib/progress-data";
 import { suggestPlans } from "@/lib/plan-suggestions";
 import { getUserPlans } from "@/lib/plan-match";
 import type { Plan, Submitter, UserProfile } from "@/types";
@@ -16,12 +15,9 @@ export async function GET() {
   const user = await getPrisma().user.findUnique({ where: { githubUsername: username } });
   if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-  let plans: Plan[] = [];
-  let submitters: Submitter[] = [];
-  try {
-    plans = JSON.parse(readFileSync(join(process.cwd(), "public", "data", "plans.json"), "utf-8"));
-    submitters = JSON.parse(readFileSync(join(process.cwd(), "public", "data", "submitters.json"), "utf-8"));
-  } catch {}
+  const [plansLoaded, submittersLoaded] = await Promise.all([loadPlans(), loadSubmitters()]);
+  const plans = plansLoaded.data as Plan[];
+  const submitters = submittersLoaded.data as Submitter[];
 
   const userPlans = getUserPlans(plans, user as unknown as UserProfile, submitters);
   const userPlanSlugs = new Set(userPlans.map((p) => p.slug));

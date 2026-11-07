@@ -6,7 +6,7 @@ import { GLYPH_KINDS, GLYPH_PATHS, KIND_LABEL, KIND_LABEL_PLURAL } from "./glyph
 import { glyphSize } from "./tags";
 import type { AlertRecord, ProgressData } from "./types";
 
-const data = JSON.parse(readFileSync(resolve(process.cwd(), "public/data/progress.json"), "utf8")) as ProgressData;
+const data = JSON.parse(readFileSync(resolve(process.cwd(), "data/progress.json"), "utf8")) as ProgressData;
 const alert = (id: string, severity: AlertRecord["severity"]): AlertRecord => ({ id, severity, message: id });
 
 describe("alert tags", () => {

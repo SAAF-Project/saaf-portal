@@ -45,6 +45,13 @@ describe("the shared step-by-step guide", () => {
     expect(render(1)).toContain("pointer-events-none");
   });
 
+  it("a step that moves the 3D view puts the card at the side without dimming, so the block stays visible", () => {
+    const html = renderToStaticMarkup(<TourShell steps={[{ title: "The foundation", body: <p>x</p>, side: true }]} step={0} onStep={noop} onClose={noop} />);
+    expect(html).not.toContain("bg-bg/85");
+    expect(html).toContain("left-4");
+    expect(html).toContain("pointer-events-none");
+  });
+
   it("is labelled by its title, for screen readers", () => {
     expect(renderToStaticMarkup(<TourShell steps={steps} step={0} onStep={noop} onClose={noop} labelId="my-title" />)).toContain('aria-labelledby="my-title"');
   });

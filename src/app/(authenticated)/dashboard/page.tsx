@@ -12,6 +12,7 @@ import AboutSAAFSection from "@/components/AboutSAAFSection";
 import OnboardingWizard from "@/components/OnboardingWizard";
 import { profileCompleteness } from "@/lib/profile-completeness";
 import { getUserPlans } from "@/lib/plan-match";
+import { fetchJson, fetchList } from "@/lib/fetch-json";
 import type { ScoreEntry, ActivityEntry, Plan, Submitter, Achievement, UserProfile } from "@/types";
 
 export default function DashboardPage() {
@@ -29,24 +30,20 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const loadAll = async () => {
-      const results = await Promise.allSettled([
-        fetch("/api/leaderboard?filter=all").then((r) => r.json()),
-        fetch("/data/plans.json").then((r) => r.json()),
-        fetch("/data/submitters.json").then((r) => r.json()),
-        fetch("/api/profile").then((r) => r.json()),
-        fetch("/api/achievements").then((r) => r.json()),
+      // Each call may fail on its own (for example without a GitHub username in the session, #16); the dashboard then
+      // shows what it has instead of crashing on an error object.
+      const [lb, plans, submitters, prof, ach] = await Promise.all([
+        fetchJson<{ scores: ScoreEntry[]; activity: ActivityEntry[] }>("/api/leaderboard?filter=all"),
+        fetchList<Plan>("/api/data/plans"),
+        fetchList<Submitter>("/api/data/submitters"),
+        fetchJson<UserProfile>("/api/profile"),
+        fetchJson<Achievement>("/api/achievements"),
       ]);
-      const [lbR, plansR, subR, profR, achR] = results;
-      const lb = lbR.status === "fulfilled" ? lbR.value : null;
-      const plans = plansR.status === "fulfilled" ? plansR.value : [];
-      const submitters = subR.status === "fulfilled" ? subR.value : [];
-      const prof = profR.status === "fulfilled" ? profR.value : null;
-      const ach = achR.status === "fulfilled" ? achR.value : null;
-      setLeaderboard(lb);
-      setAchievement(ach);
+      setLeaderboard(lb && Array.isArray(lb.scores) ? lb : null);
+      setAchievement(ach && Array.isArray(ach.badges) ? ach : null);
       setProfile(prof);
       if (prof) {
-        setMyPlans(getUserPlans(plans as Plan[], prof as UserProfile, submitters as Submitter[]));
+        setMyPlans(getUserPlans(plans, prof, submitters));
       }
       setLoading(false);
     };
@@ -86,7 +83,7 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-extrabold">
             Welcome back, {session?.user?.name || username}
           </h1>
-          <p className="text-muted text-sm">@{username}</p>
+          {username && <p className="text-muted text-sm">@{username}</p>}
         </div>
       </div>
 
