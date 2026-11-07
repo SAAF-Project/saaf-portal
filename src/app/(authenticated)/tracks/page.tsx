@@ -6,6 +6,7 @@ import PlanMarkdownViewer from "@/components/PlanMarkdownViewer";
 import ObservabilityPanel from "@/components/ObservabilityPanel";
 import Link from "next/link";
 import { getUserPlans } from "@/lib/plan-match";
+import { fetchJson, fetchList } from "@/lib/fetch-json";
 
 const TRACK_COLORS: Record<number, string> = {
   0: "from-saaf-orange/20 to-saaf-orange/5 border-saaf-orange/30",
@@ -124,10 +125,10 @@ export default function TracksPage() {
 
   useEffect(() => {
     Promise.all([
-      fetch("/data/tracks.json").then((r) => r.json()),
-      fetch("/data/plans.json").then((r) => r.json()),
-      fetch("/data/submitters.json").then((r) => r.json()),
-      fetch("/api/profile").then((r) => r.json()),
+      fetchList<Track>("/data/tracks.json"),
+      fetchList<Plan>("/api/data/plans"),
+      fetchList<Submitter>("/api/data/submitters"),
+      fetchJson<UserProfile>("/api/profile"),
     ]).then(([t, p, s, prof]) => {
       setTracks(t);
       setPlans(p);

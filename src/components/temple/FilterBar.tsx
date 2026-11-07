@@ -114,7 +114,7 @@ export function FilterBar({ plans, alertCatalog, sectors, submitters, filters, m
               ))}
             </select>
           )}
-          {!identityName && !owners.length && <span className="hint">submitters.json not found: run npm run sync-data</span>}
+          {!identityName && !owners.length && <span className="hint">no owner list: the live plan data is not available (GITHUB_PAT)</span>}
         </div>
       </div>
 

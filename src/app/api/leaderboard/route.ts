@@ -9,8 +9,7 @@ import {
 } from "@/lib/github";
 import { calculateScores, buildActivity } from "@/lib/scoring";
 import type { Plan } from "@/types";
-import { readFileSync } from "fs";
-import { join } from "path";
+import { loadPlans } from "@/lib/progress-data";
 
 let cachedData: {
   prCache: PRCache;
@@ -42,13 +41,8 @@ async function getCachedAgentContributions(): Promise<AgentContributions> {
   return data;
 }
 
-function loadPlansData(): Plan[] {
-  try {
-    const filePath = join(process.cwd(), "public", "data", "plans.json");
-    return JSON.parse(readFileSync(filePath, "utf-8"));
-  } catch {
-    return [];
-  }
+async function loadPlansData(): Promise<Plan[]> {
+  return (await loadPlans()).data as Plan[];
 }
 
 export async function GET(request: NextRequest) {
@@ -64,7 +58,7 @@ export async function GET(request: NextRequest) {
       getCachedPRs(),
       getCachedAgentContributions(),
     ]);
-    const plansData = loadPlansData();
+    const plansData = await loadPlansData();
     const scores = calculateScores(
       prCache,
       plansData,

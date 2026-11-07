@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { applyRepoSignals, INACTIVE_DAYS, liveAlertsFor, LIVE_ALERT_CATALOG, reposToInspect, type RepoSignal, type RepoSignals } from "./liveAlerts";
 import type { ProgressData } from "./types";
 
-const data = JSON.parse(readFileSync(resolve(process.cwd(), "public/data/progress.json"), "utf8")) as ProgressData;
+const data = JSON.parse(readFileSync(resolve(process.cwd(), "data/progress.json"), "utf8")) as ProgressData;
 const NOW = new Date("2026-10-08T00:00:00Z");
 
 const repo = (name = "my-agent") => ({ name, url: `https://github.com/SAAF-Project/${name}`, source: "text-link" });

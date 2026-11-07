@@ -6,7 +6,7 @@ import { Cell, computeLayout, polyArea, roofBandPolygon, tileRect, triangleCount
 import { STAGES, byMaturity, stageCounts, stageOf, stageSegments } from "./stages";
 import type { ProgressData } from "./types";
 
-const raw = JSON.parse(readFileSync(resolve(process.cwd(), "public/data/progress.json"), "utf8")) as ProgressData;
+const raw = JSON.parse(readFileSync(resolve(process.cwd(), "data/progress.json"), "utf8")) as ProgressData;
 const data = withAnnexPart(raw);
 const layout = computeLayout(data);
 

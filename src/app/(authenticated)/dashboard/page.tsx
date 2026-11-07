@@ -34,8 +34,8 @@ export default function DashboardPage() {
       // shows what it has instead of crashing on an error object.
       const [lb, plans, submitters, prof, ach] = await Promise.all([
         fetchJson<{ scores: ScoreEntry[]; activity: ActivityEntry[] }>("/api/leaderboard?filter=all"),
-        fetchList<Plan>("/data/plans.json"),
-        fetchList<Submitter>("/data/submitters.json"),
+        fetchList<Plan>("/api/data/plans"),
+        fetchList<Submitter>("/api/data/submitters"),
         fetchJson<UserProfile>("/api/profile"),
         fetchJson<Achievement>("/api/achievements"),
       ]);

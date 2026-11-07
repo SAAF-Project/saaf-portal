@@ -6,7 +6,7 @@ import { computeLayout, polyArea, type Cell, type Poly } from "./layout";
 import { cornerTriangle, faceMarks, facesOf, fitFont, tagCorners, tagSize } from "./tags";
 import type { ProgressData } from "./types";
 
-const data = withAnnexPart(JSON.parse(readFileSync(resolve(process.cwd(), "public/data/progress.json"), "utf8")) as ProgressData);
+const data = withAnnexPart(JSON.parse(readFileSync(resolve(process.cwd(), "data/progress.json"), "utf8")) as ProgressData);
 const layout = computeLayout(data);
 const square: Poly = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
 

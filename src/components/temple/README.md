@@ -55,7 +55,7 @@ curated in `SAAF-Project/plans/metadata/`.
 ## Tests
 
 `*.test.ts` next to the module (`npm test`, vitest) cover the geometry (equal surface per plan, exact tiling), the stages,
-the filters, the repo tags and the hand-drawn strokes, all against the real `public/data/progress.json`, so they also
+the filters, the repo tags and the hand-drawn strokes, all against the bundled `data/progress.json` (the real plans, without personal fields), so they also
 fail when the generated data no longer fits the module. They find the data from the project root, so they run
 unchanged in any host.
 

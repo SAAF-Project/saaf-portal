@@ -6,8 +6,7 @@ import { computeBadge, BADGE_KEYS } from "@/lib/achievements";
 import { fetchMergedPRs } from "@/lib/github";
 import { calculateScores } from "@/lib/scoring";
 import type { Plan } from "@/types";
-import { readFileSync } from "fs";
-import { join } from "path";
+import { loadPlans } from "@/lib/progress-data";
 
 let cachedScores: { data: ReturnType<typeof calculateScores>; ts: number } | null = null;
 const CACHE_TTL = 60_000;
@@ -17,11 +16,7 @@ async function getScores() {
     return cachedScores.data;
   }
   const prCache = await fetchMergedPRs();
-  let plansData: Plan[] = [];
-  try {
-    const filePath = join(process.cwd(), "public", "data", "plans.json");
-    plansData = JSON.parse(readFileSync(filePath, "utf-8"));
-  } catch {}
+  const plansData = (await loadPlans()).data as Plan[];
   const data = calculateScores(prCache, plansData, "all");
   cachedScores = { data, ts: Date.now() };
   return data;

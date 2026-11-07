@@ -6,7 +6,7 @@ import { BUNDLED_RELATIONS, cleanRelations } from "../relations";
 import type { ProgressData } from "../types";
 import { computeFlow } from "./layout";
 
-const data = withAnnexPart(JSON.parse(readFileSync(resolve(process.cwd(), "public/data/progress.json"), "utf8")) as ProgressData);
+const data = withAnnexPart(JSON.parse(readFileSync(resolve(process.cwd(), "data/progress.json"), "utf8")) as ProgressData);
 const { edges } = cleanRelations(BUNDLED_RELATIONS.relations, data.plans);
 const linked = new Set(edges.flatMap((e) => [e.from, e.to]));
 

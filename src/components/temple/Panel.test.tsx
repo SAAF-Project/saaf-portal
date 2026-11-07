@@ -7,7 +7,7 @@ import { Panel } from "./Panel";
 import { BUNDLED_RELATIONS, cleanRelations } from "./relations";
 import type { Focus, ProgressData } from "./types";
 
-const data = withAnnexPart(JSON.parse(readFileSync(resolve(process.cwd(), "public/data/progress.json"), "utf8")) as ProgressData);
+const data = withAnnexPart(JSON.parse(readFileSync(resolve(process.cwd(), "data/progress.json"), "utf8")) as ProgressData);
 const render = (focus: Focus) => renderToStaticMarkup(<Panel data={data} focus={focus} matches={() => true} filtersActive={false} onFocus={() => {}} title="The SAAF Temple" onInfo={() => {}} onHide={() => {}} />);
 const text = (html: string) => html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 const sections = (html: string) => [...html.matchAll(/<details class="sec"( open="")?><summary><span class="sec-title">([^<]*)/g)].map((m) => ({ title: m[2], open: m[1] !== undefined }));

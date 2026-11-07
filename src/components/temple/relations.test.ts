@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { BUNDLED_RELATIONS, cleanRelations, relationsOf } from "./relations";
 import type { ProgressData, Relation } from "./types";
 
-const data = JSON.parse(readFileSync(resolve(process.cwd(), "public/data/progress.json"), "utf8")) as ProgressData;
+const data = JSON.parse(readFileSync(resolve(process.cwd(), "data/progress.json"), "utf8")) as ProgressData;
 const slugs = new Set(data.plans.map((p) => p.slug));
 const rel = (from: string, to: string, extra: Partial<Relation> = {}): Relation => ({ from, to, what: "x", status: "suggested", sources: [{ file: "f.md", quote: "q" }], ...extra });
 

@@ -130,7 +130,8 @@ npx tsx scripts/import-registrations.ts --prod
 
 - **User profiles, observability checks, feedback, signup requests:** Postgres (Prisma)
 - **Leaderboard:** Computed live from GitHub merged PRs, cached 2 min
-- **Plans / tracks / submitters:** Static JSON in `public/data/` (mirrors `SAAF-Project/website/data/`)
+- **Plans / submitters:** behind login, read live from `SAAF-Project/website/data/` (`/api/data/plans`, `/api/data/submitters`); fallback copies without personal fields in `data/`
+- **Tracks:** static JSON in `public/data/tracks.json`
 - **Plan markdown:** Fetched on-demand via `/api/plan-content` (private repo, can't use raw URLs)
 - **Company logos:** Word-boundary matched against `saafproject.com/assets/logos/`
 - **Agent library:** Allowlist `AGENT_LIBRARY_REVIEWED` in `src/lib/github.ts` + auto-detection of unreviewed repos
@@ -250,8 +251,9 @@ prisma/
 scripts/                        # Local CLI utilities (--prod for production)
 skills/                         # Claude Code skills (SKILL.md format)
 public/
-├── data/                       # plans.json, tracks.json, submitters.json (mirror)
+├── data/                       # tracks.json, agent-reviews.json (no personal data)
 └── saaf-logo-white.png         # SAAF assets
+data/                           # fallback plan data without personal fields (plans, submitters, progress); not served
 backups/                        # gitignored — db backups
 ```
 
