@@ -1,7 +1,8 @@
 # Temple module
 
-The 3D progress visual of the SAAF project, as a self-contained React module. It has no dependency on Next.js or Vite:
-the host passes the data in and gives it a box to live in.
+The 3D progress visual of the SAAF project, as a React module. It has no dependency on Next.js: the host passes the data in
+and gives it a box to live in. The step-by-step tour uses the portal's shared `TourShell` (`src/components/TourShell.tsx`),
+the same guide as the dashboard's onboarding wizard.
 
 ```tsx
 import { ProgressApp } from "./ProgressApp";
@@ -13,6 +14,7 @@ import "./temple.css";
   identity={{ name, owned }}     // optional: the signed-in person; without it the personal view offers a name picker
   assetBase="/"                  // where accents/ (sky and ground pictures) are served from
   theme="dark"                   // "dark" | "light"; follow the host's theme
+  visualisations={manifests}     // the visualization.yaml of every view; the host reads them (src/lib/visualisations.ts)
   onToggleTheme={...}            // optional: omit when the host owns the theme
 />
 ```
@@ -23,11 +25,15 @@ The component fills its parent (`width/height: 100%`), so give the parent a heig
 
 | File | What |
 |---|---|
-| `views.ts` | the list of visualisations (one line each, loaded only when shown) and what each one receives |
+| `views.ts` | the registration of the visualisations (one entry each, loaded only when shown), what each one receives, and the join with its manifest |
+| `visualisation.ts`, `views/` | the `visualization.yaml` contract: the types and checks, and one folder per view with its yaml and preview picture. Format and "adding a view": `views/README.md` |
+| `viewLink.ts` | which view a visit opens (the link, the remembered choice, or the chooser) |
+| `ViewChooser.tsx`, `DisplayMenu.tsx` | the first-visit chooser with a tile per view; the Display menu (scenery, line style) with only the options the view supports |
+| `CalculationDialog.tsx`, `ScoreDiagram.tsx` | "How this is calculated": a few lines per view, a diagram drawn from the weights in the data, a link to the scoring code |
 | `flow/` | the Agent dependencies visualisation (a flat SVG map of which plan feeds which): `graph.ts` (cycles, columns, a plan's whole chain; pure and tested), `layout.ts` (lanes, columns, ordering, arrows; pure and tested), `Flow.tsx` (drawing, pan and zoom, the disclaimer) |
-| `relations.ts`, `relations.json` | which plan's output is another plan's input. `relations.json` is the **temporary** home of that list (see below); `relations.ts` checks it against the plans, merges duplicates, and holds the disclaimer text shown in the view, the panel and the information screen |
+| `relations.ts`, `relations.json` | which plan's output is another plan's input. `relations.json` is the **temporary** home of that list (see below); `relations.ts` checks it against the plans, merges duplicates, and holds the disclaimer text shown in the view, the panel and "How this is calculated" |
 | `landscape/` | the Islands visualisation: `layout.ts` (islands, slots, bridges; pure and tested), `objects.tsx` (robot, ring, gem, page), `Landscape.tsx` (scene, labels, camera), `camera.ts`, `palette.ts` |
-| `ProgressApp.tsx` | the whole UI: scene, side panel, filters, legend, tour, links (`#/part/<id>`, `#/plan/<slug>`, `#/annex`, `?stage=..&type=..&alert=..`) |
+| `ProgressApp.tsx` | the whole UI: chooser, scene, side panel, filters, legend, tour, links (`#/part/<id>`, `#/plan/<slug>`, `#/annex`, `?stage=..&type=..&alert=..`) |
 | `Temple.tsx` | the 3D scene (react-three-fiber): collapsed parts banded by stage, opened parts tiled with plans |
 | `layout.ts` | geometry: every plan covers the same surface of its part, the parts tile exactly |
 | `stages.ts` | the six stages (Draft plan ... Improving) and their red-to-green colours; the stage of a plan is decided by the generator |

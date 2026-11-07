@@ -1,0 +1,46 @@
+# The Temple: the whole SAAF project as one building. See views/README.md for the format.
+id: temple
+name: Temple
+title: The SAAF Temple
+description: The project as a building. Foundation, four pillars and a roof, with every plan as a tile on its block.
+preview: preview.jpg
+access: community
+supports:
+  filters: true
+  display: [scenery, style]
+  relations: false
+calculation:
+  - Every plan covers the same surface of its block, so a colour band's share of a block is its share of the plans. It counts plans; it does not weigh how big a plan is.
+  - A block's percentage is the average of its plans. The Plan, Do, Check and Act bars are the same average per phase.
+tour:
+  - title: The whole project in one picture
+    text: This is a visual representation of the SAAF-Project repositories. Each block holds the plans of one part of the work, and its colours show how far those plans have come. Drag to turn it, scroll to zoom, click a block to open it.
+    target: view
+    focus: { level: project }
+  - title: The foundation
+    text: The shared infrastructure (Track 0) that every audit agent builds on.
+    focus: { level: part, part: foundation }
+  - title: The four pillars
+    text: The four audit stages, from planning through collection and extraction and reporting and visualisation to monitoring. Open one to see its plans as tiles.
+    focus: { level: part, part: planning }
+  - title: The roof
+    text: AI governance and quality assurance, which covers all the work underneath.
+    focus: { level: part, part: governance }
+  - title: The Repo Annex
+    text: Plans whose repository needs attention, for example because there is no repo yet or its place is only a proposal. It sits beside the temple.
+    focus: { level: annex }
+  - title: Stage colours, types and tags
+    text: Colours run from red (a draft plan) to green (in use or improving) and are the same for every type of plan. A symbol shows the type of a plan once a block is open. A small tag means an alert - a conflict or a warning - and a light tag means the place in the temple is a proposal.
+    target: legend
+  - title: Filters
+    text: Narrow the picture down by stage, type, alert or sector, or switch to your own plans. The numbers and the side panel follow the filter.
+    target: filters
+  - title: The side panel
+    text: The numbers behind the picture. Click a plan for its details, and Esc takes you one level up. "How is this calculated?" explains the percentages.
+    target: panel
+  - title: Display
+    text: Scenery and line style are personal preferences. They change how the temple looks, not what it shows.
+    target: display
+  - title: Other views and this tour
+    text: The same data is available as islands and as a map of which plan feeds which. You can replay this tour at any time.
+    target: tour

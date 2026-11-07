@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type { Identity } from "@/components/temple/ProgressApp";
 import type { Submitter } from "@/components/temple/filters";
 import type { ProgressData } from "@/components/temple/types";
+import type { VisualisationManifest } from "@/components/temple/visualisation";
 import "@/components/temple/temple.css";
 import { getUserPlans } from "@/lib/plan-match";
 import type { Plan, UserProfile } from "@/types";
@@ -30,7 +31,7 @@ function subscribeTheme(onChange: () => void) {
 }
 const currentTheme = () => (document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark");
 
-export default function ProgressView() {
+export default function ProgressView({ visualisations }: { visualisations: VisualisationManifest[] }) {
   const theme = useSyncExternalStore(subscribeTheme, currentTheme, () => "dark" as const);
   const [loaded, setLoaded] = useState<Loaded | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -60,7 +61,7 @@ export default function ProgressView() {
 
   return (
     <div className="relative h-full w-full">
-      <ProgressApp data={loaded.progress} submitters={loaded.submitters} identity={identity} theme={theme} assetBase="/" />
+      <ProgressApp data={loaded.progress} submitters={loaded.submitters} identity={identity} theme={theme} assetBase="/" visualisations={visualisations} />
       {(loaded.source === "bundled" || !loaded.repo_checks) && (
         <div className="pointer-events-none absolute bottom-[62px] left-4 z-[60] rounded bg-surface/80 px-2 py-1 text-[11px] text-muted">
           {loaded.source === "bundled" && "Showing the copy bundled with the portal: the live data could not be fetched. "}

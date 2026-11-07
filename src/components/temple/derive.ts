@@ -1,7 +1,16 @@
 import type { PartRecord, PhaseKey, PlanRecord, ProgressData, RepoStatus, Rollup } from "./types";
 
 const PHASES: PhaseKey[] = ["plan", "do", "check", "act"];
-const WEIGHT = { complete: 1, in_progress: 0.5, not_started: 0 };
+/**
+ * What one phase (Plan, Do, Check or Act) of a plan counts for. A plan's score is the average of its four phases, and a
+ * block's score is the average of its plans. These are the same numbers the generator writes into progress.json as
+ * `weights` (PHASE_WEIGHTS in SAAF-Project tools/scripts/generate_dashboard.py), and "How this is calculated" shows them.
+ */
+const WEIGHT = {
+  complete: 1, // the phase is done: counts in full
+  in_progress: 0.5, // started but not finished: counts as half, so a plan does not look finished too early
+  not_started: 0, // nothing yet: counts as zero
+};
 
 /** Same roll-up as tools/scripts/generate_dashboard.py: plans without a PDCA table are counted, not averaged. */
 export function rollup(plans: PlanRecord[]): Rollup {

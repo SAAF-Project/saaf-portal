@@ -6,11 +6,16 @@ import { GlyphIcon } from "./GlyphIcon";
 import { GLYPH_KINDS, KIND_LABEL } from "./glyphs";
 import { withAnnexPart } from "./derive";
 import { FilterBar } from "./FilterBar";
-import { InfoDialog } from "./InfoDialog";
+import { CalculationDialog } from "./CalculationDialog";
+import { DisplayMenu } from "./DisplayMenu";
+import { ViewChooser } from "./ViewChooser";
+import { TourShell } from "../TourShell";
 import { cleanRelations, relationsFor } from "./relations";
 import { isActive, makeMatcher, ownedBy, parseFilters, serializeFilters, toggle, type Filters, type Submitter } from "./filters";
 import { STAGES } from "./stages";
-import { DEFAULT_VIEW, VIEWS, resolveView } from "./views";
+import { splitHash, startingView, viewFromHash } from "./viewLink";
+import { buildViews, displayOptionsOf, findView, type ViewDefinition } from "./views";
+import type { VisualisationManifest } from "./visualisation";
 import type { Focus, ProgressData } from "./types";
 
 /** The signed-in person (portal): their plans are known, so the personal view needs no name picker. */
@@ -26,15 +31,11 @@ export interface ProgressAppProps {
   assetBase?: string; // where accents/ lives (default "/")
   theme: Theme;
   onToggleTheme?: () => void; // omit when the host owns the theme (the portal)
+  visualisations: VisualisationManifest[]; // the visualization.yaml of every view (the host reads them, see src/lib/visualisations.ts)
   debug?: boolean; // development only: exposes the camera to scripts/colorcheck.mjs
 }
 
-// Deep links: #/  #/part/<id>  #/plan/<slug>  #/annex  #/annex/<slug>, optionally with ?stage=2,3&repo=missing&sector=Banking&me=Name
-const splitHash = (hash: string): [string, string] => {
-  const [path, query = ""] = hash.replace(/^#/, "").split("?");
-  return [path, query];
-};
-
+// Deep links: #/  #/part/<id>  #/plan/<slug>  #/annex  #/annex/<slug>, optionally with ?stage=2,3&repo=missing&sector=Banking&me=Name&view=<id>
 function parseHash(hash: string): Focus {
   const [, kind, id] = splitHash(hash)[0].split("/");
   if (kind === "part" && id) return { level: "part", partId: decodeURIComponent(id) };
@@ -56,12 +57,10 @@ function toHash(f: Focus): string {
   }
 }
 
-function buildHash(f: Focus, filters: Filters, view: string): string {
-  const q = [serializeFilters(filters), view !== DEFAULT_VIEW ? `view=${encodeURIComponent(view)}` : ""].filter(Boolean).join("&");
+function buildHash(f: Focus, filters: Filters, view: string | null): string {
+  const q = [serializeFilters(filters), view ? `view=${encodeURIComponent(view)}` : ""].filter(Boolean).join("&");
   return toHash(f) + (q ? `?${q}` : "");
 }
-
-const viewFromHash = (hash: string): string | null => new URLSearchParams(splitHash(hash)[1]).get("view");
 
 // Small per-viewer conveniences in localStorage. Every access is guarded: the page works without storage.
 function readStored(key: string): string | null {
@@ -96,20 +95,17 @@ function readScenery(): boolean {
   return readStored(SCENERY_KEY) !== "off";
 }
 
-const TOUR: Focus[] = [
-  { level: "project" },
-  { level: "part", partId: "foundation" },
-  { level: "part", partId: "planning" },
-  { level: "part", partId: "collection" },
-  { level: "part", partId: "reporting" },
-  { level: "part", partId: "monitoring" },
-  { level: "part", partId: "governance" },
-  { level: "annex" },
-  { level: "project" },
-];
-const TOUR_STEP_MS = 5500;
+const OVERVIEW: Focus = { level: "project" };
+const TOUR_SEEN_KEY = (view: string) => `saaf-tour-seen-${view}`;
+const TOUR_START_DELAY_MS = 1200; // let the picture appear before the first tour starts by itself
 
-export function ProgressApp({ data: raw, submitters, identity = null, assetBase = "/", theme, onToggleTheme, debug = false }: ProgressAppProps) {
+/** The steps of a tour that make sense on this page: a step that points at a button the view does not have is left out. */
+function availableSteps(steps: ViewDefinition["tour"]) {
+  return steps.filter((st) => !st.target || st.target === "view" || document.querySelector(`[data-tour="${st.target}"]`));
+}
+
+export function ProgressApp({ data: raw, submitters, identity = null, assetBase = "/", theme, onToggleTheme, visualisations, debug = false }: ProgressAppProps) {
+  const views = useMemo(() => buildViews(visualisations), [visualisations]);
   const data = useMemo(() => withAnnexPart(raw), [raw]);
   // which plan feeds which: from progress.json once the generator writes it, until then from relations.json
   const relations = useMemo(() => {
@@ -118,14 +114,15 @@ export function ProgressApp({ data: raw, submitters, identity = null, assetBase 
     return edges;
   }, [data]);
   const [focus, setFocus] = useState<Focus>(() => parseHash(window.location.hash));
-  const [tourStep, setTourStep] = useState<number | null>(null);
+  const [tour, setTour] = useState<{ steps: ViewDefinition["tour"]; step: number; from: Focus } | null>(null);
   const [style, setStyle] = useState<"sketch" | "clean">(readStyle);
   const [scenery, setScenery] = useState<boolean>(readScenery);
   const [rememberedOwner] = useState<string | null>(() => readStored(OWNER_KEY));
   const [filters, setFilters] = useState<Filters>(() => parseFilters(splitHash(window.location.hash)[1]));
-  const [viewId, setViewId] = useState<string>(() => resolveView(viewFromHash(window.location.hash) ?? readStored(VIEW_KEY)).id);
+  // null = no view picked yet: the chooser is shown, and the link says nothing about a view
+  const [viewId, setViewId] = useState<string | null>(() => startingView(views.map((v) => v.id), window.location.hash, readStored(VIEW_KEY)));
   const viewRef = useRef(viewId);
-  const view = resolveView(viewId);
+  const view = findView(views, viewId);
   const [infoOpen, setInfoOpen] = useState(false);
   const [infoTopic, setInfoTopic] = useState<"relations" | undefined>(undefined);
   const openInfo = (topic?: "relations") => {
@@ -135,6 +132,10 @@ export function ProgressApp({ data: raw, submitters, identity = null, assetBase 
   const [panelOpen, setPanelOpen] = useState(true);
   const [filtersOpen, setFiltersOpen] = useState<boolean>(() => isActive(parseFilters(splitHash(window.location.hash)[1])));
   const filtersRef = useRef(filters);
+  const focusRef = useRef(focus);
+  useEffect(() => {
+    focusRef.current = focus;
+  }, [focus]);
   useEffect(() => {
     filtersRef.current = filters;
   }, [filters]);
@@ -153,10 +154,31 @@ export function ProgressApp({ data: raw, submitters, identity = null, assetBase 
   };
 
   const chooseView = (id: string) => {
+    setTour(null);
     setViewId(id);
     viewRef.current = id;
     writeStored(VIEW_KEY, id);
     window.history.replaceState(null, "", buildHash(focus, filtersRef.current, id));
+  };
+
+  // "All views": back to the chooser. The remembered choice stays, so a reload opens that view again.
+  const showChooser = () => {
+    setTour(null);
+    setViewId(null);
+    viewRef.current = null;
+    window.history.replaceState(null, "", buildHash(focus, filtersRef.current, null));
+  };
+
+  const startTour = () => {
+    if (!view) return;
+    const steps = availableSteps(view.tour);
+    if (steps.length) setTour({ steps, step: 0, from: focus });
+  };
+
+  // Skip or Done: back to where the visitor was before the tour moved the view around.
+  const endTour = () => {
+    if (tour) go(tour.from);
+    setTour(null);
   };
 
   const go = useCallback((f: Focus) => {
@@ -176,10 +198,10 @@ export function ProgressApp({ data: raw, submitters, identity = null, assetBase 
   useEffect(() => {
     const onPop = () => {
       setFocus(parseHash(window.location.hash));
-      const linked = viewFromHash(window.location.hash);
+      const linked = findView(views, viewFromHash(window.location.hash));
       if (linked) {
-        setViewId(resolveView(linked).id);
-        viewRef.current = resolveView(linked).id;
+        setViewId(linked.id);
+        viewRef.current = linked.id;
       }
       const restored = parseFilters(splitHash(window.location.hash)[1]);
       setFilters(restored);
@@ -187,7 +209,7 @@ export function ProgressApp({ data: raw, submitters, identity = null, assetBase 
     };
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
-  }, []);
+  }, [views]);
 
   // Esc = one level up.
   useEffect(() => {
@@ -197,7 +219,7 @@ export function ProgressApp({ data: raw, submitters, identity = null, assetBase 
         setInfoOpen(false); // Esc closes the information screen first, and does not also zoom out
         return;
       }
-      setTourStep(null);
+      setTour(null);
       if (focus.level === "plan") {
         const plan = data.plans.find((p) => p.slug === focus.slug);
         go(plan ? { level: "part", partId: plan.part } : { level: "project" });
@@ -208,16 +230,28 @@ export function ProgressApp({ data: raw, submitters, identity = null, assetBase 
     return () => window.removeEventListener("keydown", onKey);
   }, [data, focus, go, infoOpen]);
 
-  // Tour: fly through the whole temple like a presentation. State changes happen in timers, not in the effect body.
+  // A tour step can move the view to a block first; the card then explains it. State changes happen in a timer, not in the effect body.
+  const tourStepNow = tour?.steps[tour.step];
+  // a step about a button or the legend is easier to follow from the overview
+  const tourFocus = tourStepNow?.focus ?? (tourStepNow?.target && tourStepNow.target !== "view" ? OVERVIEW : undefined);
   useEffect(() => {
-    if (tourStep === null) return;
-    const arrive = window.setTimeout(() => go(TOUR[tourStep]), 0);
-    const advance = window.setTimeout(() => setTourStep(tourStep >= TOUR.length - 1 ? null : tourStep + 1), TOUR_STEP_MS);
-    return () => {
-      window.clearTimeout(arrive);
-      window.clearTimeout(advance);
-    };
-  }, [tourStep, go]);
+    if (!tourFocus) return;
+    const arrive = window.setTimeout(() => go(tourFocus), 0);
+    return () => window.clearTimeout(arrive);
+  }, [tourFocus, go]);
+
+  // The first time someone opens a view, its tour starts by itself (once per view); the Tour button replays it.
+  useEffect(() => {
+    if (!viewId) return;
+    const picked = findView(views, viewId);
+    if (!picked || readStored(TOUR_SEEN_KEY(picked.id))) return;
+    const timer = window.setTimeout(() => {
+      writeStored(TOUR_SEEN_KEY(picked.id), "yes");
+      const steps = availableSteps(picked.tour);
+      if (steps.length) setTour({ steps, step: 0, from: focusRef.current });
+    }, TOUR_START_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [viewId, views]);
 
   // Whose plans the personal view shows: the signed-in person's, or the picked name.
   const owned = useMemo(() => {
@@ -233,9 +267,26 @@ export function ProgressApp({ data: raw, submitters, identity = null, assetBase 
   const plan = focus.level === "plan" ? data.plans.find((p) => p.slug === focus.slug) : undefined;
   const planPart = plan ? data.parts.find((p) => p.id === plan.part) : undefined;
   const open = (f: Focus) => {
-    setTourStep(null);
+    setTour(null);
     go(f);
   };
+
+  // No view picked yet: the page says what it is and offers a tile per view.
+  if (!view) {
+    return (
+      <div className="temple-app">
+        <div className="app chooser-page">
+          <header className="pagehead">
+            <h1>SAAF project progress</h1>
+            <span className="pagehead-sub">
+              {data.project.plan_count} plans{data.generated ? ` · data of ${data.generated}` : ""}
+            </span>
+          </header>
+          <ViewChooser views={views} onPick={chooseView} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="temple-app">
@@ -249,16 +300,17 @@ export function ProgressApp({ data: raw, submitters, identity = null, assetBase 
           <span className="pagehead-sub">
             {data.project.plan_count} plans{data.generated ? ` · data of ${data.generated}` : ""}
           </span>
-          {VIEWS.length > 1 && (
-            <div className="viewswitch segmented" role="group" aria-label="Visualisation">
-              {VIEWS.map((v) => (
-                <button key={v.id} className={v.id === view.id ? "on" : ""} aria-pressed={v.id === view.id} onClick={() => chooseView(v.id)} title={v.title}>
-                  <span className={v.shortLabel ? "vl-long" : undefined}>{v.label}</span>
-                  {v.shortLabel && <span className="vl-short">{v.shortLabel}</span>}
-                </button>
-              ))}
-            </div>
-          )}
+          <div className="viewswitch segmented" role="group" aria-label="Visualisation" data-tour="views">
+            {views.length > 1 && (
+              <button onClick={showChooser} title="Back to the overview of all views">All views</button>
+            )}
+            {views.map((v) => (
+              <button key={v.id} className={v.id === view.id ? "on" : ""} aria-pressed={v.id === view.id} onClick={() => chooseView(v.id)} title={v.title}>
+                <span className={v.shortName ? "vl-long" : undefined}>{v.name}</span>
+                {v.shortName && <span className="vl-short">{v.shortName}</span>}
+              </button>
+            ))}
+          </div>
         </header>
 
         <div className="topbar">
@@ -276,40 +328,57 @@ export function ProgressApp({ data: raw, submitters, identity = null, assetBase 
             )}
           </nav>
           <div className="actions">
-            <button className={filtersActive ? "has-filters" : ""} aria-expanded={filtersOpen} onClick={() => setFiltersOpen(!filtersOpen)}>
-              ⚲ Filters{filtersActive && <span className="fbadge">{matchCount}</span>}
-            </button>
-            <button onClick={() => setTourStep(tourStep === null ? 0 : null)}>{tourStep === null ? "▶ Tour" : "■ Stop tour"}</button>
-            <button onClick={() => chooseScenery(!scenery)} title="Photoreal sky and stone ground behind the temple (AI-generated pictures)">{scenery ? "Scenery" : "No scenery"}</button>
-            <button onClick={() => chooseStyle(style === "sketch" ? "clean" : "sketch")} title="Switch between hand-drawn and clean lines">{style === "sketch" ? "Sketch" : "Clean"}</button>
-            <button className="info-button" onClick={() => openInfo()} aria-label="How to read this" title="How the information is gathered and what the percentages mean">ⓘ</button>
-            {onToggleTheme && <button onClick={onToggleTheme}>{theme === "dark" ? "Light" : "Dark"}</button>}
+            {view.supports.filters && (
+              <button data-tour="filters" className={filtersActive ? "has-filters" : ""} aria-expanded={filtersOpen} onClick={() => setFiltersOpen(!filtersOpen)}>
+                ⚲ Filters{filtersActive && <span className="fbadge">{matchCount}</span>}
+              </button>
+            )}
+            <button data-tour="tour" onClick={startTour} title="A short tour of this view">▶ Tour</button>
+            <span className="actions-gap" aria-hidden="true" />
+            <DisplayMenu options={displayOptionsOf(view)} scenery={scenery} onScenery={chooseScenery} style={style} onStyle={chooseStyle} theme={theme} onToggleTheme={onToggleTheme} />
           </div>
         </div>
 
-        {filtersOpen && (
-          <FilterBar
-            plans={data.plans}
-            alertCatalog={data.alert_catalog}
-            sectors={data.sector_vocabulary}
-            submitters={submitters}
-            filters={filters}
-            matchCount={matchCount}
-            rememberedOwner={rememberedOwner}
-            identityName={identity?.name ?? null}
-            onChange={(next) => changeFilters(next, focus)}
-          />
+        {(panelOpen || (filtersOpen && view.supports.filters)) && (
+          <div className="rightcol">
+            {filtersOpen && view.supports.filters && (
+              <FilterBar
+                plans={data.plans}
+                alertCatalog={data.alert_catalog}
+                sectors={data.sector_vocabulary}
+                submitters={submitters}
+                filters={filters}
+                matchCount={matchCount}
+                rememberedOwner={rememberedOwner}
+                identityName={identity?.name ?? null}
+                onChange={(next) => changeFilters(next, focus)}
+                onClose={() => setFiltersOpen(false)}
+              />
+            )}
+            {panelOpen && (
+              <Panel data={data} focus={focus} matches={matches} filtersActive={filtersActive} onFocus={open} title={view.title} onInfo={() => openInfo()} onHide={() => setPanelOpen(false)} relations={relations} relationsOpen={view.supports.relations} activeAlerts={filters.alerts} onToggleAlert={(id) => { changeFilters({ ...filters, alerts: toggle(filters.alerts, id) }, focus); setFiltersOpen(true); }} />
+            )}
+          </div>
         )}
-
-        {panelOpen ? (
-          <Panel data={data} focus={focus} matches={matches} filtersActive={filtersActive} onFocus={open} title={view.title} onInfo={() => openInfo()} onHide={() => setPanelOpen(false)} relations={relations} relationsOpen={view.id === "dependencies"} activeAlerts={filters.alerts} onToggleAlert={(id) => { changeFilters({ ...filters, alerts: toggle(filters.alerts, id) }, focus); setFiltersOpen(true); }} />
-        ) : (
+        {!panelOpen && (
           <button className="panel-tab" onClick={() => setPanelOpen(true)} title="Show the side panel">‹ Details</button>
         )}
 
-        {infoOpen && <InfoDialog data={data} about={view.about} viewTitle={view.title} relations={relations} topic={infoTopic} onClose={() => setInfoOpen(false)} />}
+        {infoOpen && <CalculationDialog data={data} view={view} relations={relations} topic={infoTopic} onClose={() => setInfoOpen(false)} />}
 
-        <footer className="legend" aria-label="Legend">
+        {tour && (
+          <TourShell
+            steps={tour.steps.map((st) => ({ title: st.title, body: <p className="text-muted text-sm">{st.text}</p>, target: st.target }))}
+            step={tour.step}
+            onStep={(next) => setTour({ ...tour, step: next })}
+            onClose={endTour}
+            finishLabel="Done"
+            skipLabel="Skip tour"
+            labelId="view-tour-title"
+          />
+        )}
+
+        <footer className="legend" aria-label="Legend" data-tour="legend">
           <span className="legend-title">Stage</span>
           {STAGES.map((st) => (
             <span key={st.key} className="legend-item" title={st.hint}>

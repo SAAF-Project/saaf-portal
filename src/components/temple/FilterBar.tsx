@@ -38,12 +38,13 @@ interface FilterBarProps {
   filters: Filters;
   matchCount: number;
   onChange: (next: Filters) => void;
+  onClose: () => void;
   rememberedOwner: string | null;
   identityName?: string | null; // signed-in person: the personal view is theirs, no picker
 }
 
 /** Filters on stage, type, alert and sector, plus the general / personal view. All counts are live. */
-export function FilterBar({ plans, alertCatalog, sectors, submitters, filters, matchCount, onChange, rememberedOwner, identityName = null }: FilterBarProps) {
+export function FilterBar({ plans, alertCatalog, sectors, submitters, filters, matchCount, onChange, onClose, rememberedOwner, identityName = null }: FilterBarProps) {
   const stageCount = (id: number) => plans.filter((p) => p.stage === id).length;
   const kindCount = (k: PlanKind) => plans.filter((p) => p.kind === k).length;
   const alertCount = (id: string) => plans.filter((p) => p.alerts.some((a) => a.id === id)).length;
@@ -57,6 +58,10 @@ export function FilterBar({ plans, alertCatalog, sectors, submitters, filters, m
 
   return (
     <section className="filterbar" aria-label="Filters">
+      <header className="filterhead">
+        <b>Filters</b>
+        <button onClick={onClose} aria-label="Close the filters" title="Close the filters (the filter stays on)">✕</button>
+      </header>
       <div className="fgroup">
         <span className="flabel">Stage</span>
         <div className="fchips">

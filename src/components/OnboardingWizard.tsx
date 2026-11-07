@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { UserProfile } from "@/types";
 import { profileCompleteness } from "@/lib/profile-completeness";
+import { TourShell } from "./TourShell";
 
 const STORAGE_KEY = "saaf-onboarding-completed";
 
 export default function OnboardingWizard({ profile }: { profile: UserProfile | null }) {
   const [show, setShow] = useState(false);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
 
   useEffect(() => {
     if (!profile) return;
@@ -119,50 +120,14 @@ export default function OnboardingWizard({ profile }: { profile: UserProfile | n
     },
   ];
 
-  const current = steps[step - 1];
-
+  // The card, progress bar and Back / Next / Skip are the shared guide (TourShell), the same one the visualisation tours use.
   return (
-    <div className="fixed inset-0 bg-bg/85 z-50 flex items-center justify-center p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
-      <div className="bg-surface border border-border rounded-2xl w-full max-w-lg shadow-2xl">
-        <div className="flex items-center justify-between p-4 border-b border-border">
-          <div className="flex gap-1.5">
-            {steps.map((_, i) => (
-              <div
-                key={i}
-                className={`h-1.5 w-8 rounded-full ${i + 1 <= step ? "bg-accent" : "bg-border"}`}
-              />
-            ))}
-          </div>
-          <button
-            onClick={skip}
-            className="px-3 py-1 text-xs text-muted hover:text-text border border-border rounded-lg cursor-pointer"
-          >
-            Skip for now
-          </button>
-        </div>
-        <div className="p-6">
-          <h2 id="onboarding-title" className="text-lg font-bold mb-3">{current.title}</h2>
-          {current.content}
-        </div>
-        <div className="flex gap-2 p-4 border-t border-border">
-          <button
-            onClick={() => setStep(Math.max(1, step - 1))}
-            disabled={step === 1}
-            className="px-4 py-2 text-sm border border-border rounded-lg text-muted hover:text-text disabled:opacity-30 cursor-pointer"
-          >
-            ← Back
-          </button>
-          <div className="flex-1" />
-          {step < steps.length && (
-            <button
-              onClick={() => setStep(step + 1)}
-              className="px-4 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold cursor-pointer"
-            >
-              Next →
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
+    <TourShell
+      steps={steps.map((st) => ({ title: st.title, body: st.content }))}
+      step={step}
+      onStep={setStep}
+      onClose={skip}
+      labelId="onboarding-title"
+    />
   );
 }
