@@ -13,7 +13,7 @@ import { TourShell } from "../TourShell";
 import { cleanRelations, relationsFor } from "./relations";
 import { isActive, makeMatcher, ownedBy, parseFilters, serializeFilters, toggle, type Filters, type Submitter } from "./filters";
 import { STAGES } from "./stages";
-import { splitHash, startingView, viewFromHash } from "./viewLink";
+import { ALL_VIEWS, splitHash, startingView, viewFromHash } from "./viewLink";
 import { buildViews, displayOptionsOf, findView, type ViewDefinition } from "./views";
 import type { VisualisationManifest } from "./visualisation";
 import type { Focus, ProgressData } from "./types";
@@ -198,17 +198,28 @@ export function ProgressApp({ data: raw, submitters, identity = null, assetBase 
   useEffect(() => {
     const onPop = () => {
       setFocus(parseHash(window.location.hash));
-      const linked = findView(views, viewFromHash(window.location.hash));
+      const asked = viewFromHash(window.location.hash);
+      const linked = findView(views, asked);
       if (linked) {
         setViewId(linked.id);
         viewRef.current = linked.id;
+        writeStored(VIEW_KEY, linked.id);
+      } else if (asked === ALL_VIEWS) {
+        // the navbar's "All views": back to the chooser
+        setTour(null);
+        setViewId(null);
+        viewRef.current = null;
       }
       const restored = parseFilters(splitHash(window.location.hash)[1]);
       setFilters(restored);
       if (isActive(restored)) setFiltersOpen(true);
     };
     window.addEventListener("popstate", onPop);
-    return () => window.removeEventListener("popstate", onPop);
+    window.addEventListener("hashchange", onPop); // a plain <a href="#..."> link (navbar) also fires this
+    return () => {
+      window.removeEventListener("popstate", onPop);
+      window.removeEventListener("hashchange", onPop);
+    };
   }, [views]);
 
   // Esc = one level up.

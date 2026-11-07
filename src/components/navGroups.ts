@@ -34,7 +34,18 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: "/leaderboard", label: "Leaderboard", icon: "★" },
       { href: "/participants", label: "Participants", icon: "👥" },
       { href: "/tracks", label: "Tracks", icon: "▶" },
-      { href: "/visualised", label: "SAAF Visualised", icon: "▲" },
+    ],
+  },
+  {
+    id: "visualised",
+    label: "SAAF Visualised",
+    hint: "The SAAF-Project repos as a picture",
+    // One entry per view (src/components/temple/views/<id>/); a test checks this list against those folders.
+    items: [
+      { href: "/visualised#/?view=all", label: "All views", icon: "▦" },
+      { href: "/visualised#/?view=temple", label: "Temple", icon: "▲" },
+      { href: "/visualised#/?view=islands", label: "Islands", icon: "◒" },
+      { href: "/visualised#/?view=dependencies", label: "Agent dependencies", icon: "⇄" },
     ],
   },
   {
@@ -60,12 +71,16 @@ export const NAV_GROUPS: NavGroup[] = [
 
 export const ADMIN_ITEM: NavItem = { href: "/admin", label: "Admin", icon: "⚙" };
 
-/** True when the current page is this item or one of its sub-pages. */
+/** The page an item opens, without the part after # (the views of SAAF Visualised share one page). */
+export const pageOf = (href: string): string => href.split("#")[0];
+
+/** True when the current page is this item or one of its sub-pages. Items that differ only after # are not marked. */
 export function isActive(pathname: string, href: string): boolean {
+  if (href.includes("#")) return false;
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 /** The group that holds the current page, or null when the page is not in the navigation. */
 export function activeGroupId(pathname: string, groups: NavGroup[] = NAV_GROUPS): string | null {
-  return groups.find((g) => g.items.some((item) => isActive(pathname, item.href)))?.id ?? null;
+  return groups.find((g) => g.items.some((item) => isActive(pathname, pageOf(item.href))))?.id ?? null;
 }

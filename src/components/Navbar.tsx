@@ -40,6 +40,26 @@ export default function Navbar() {
       isActive(pathname, item.href) ? "text-accent bg-accent/8" : "text-muted hover:text-text hover:bg-hover"
     }`;
 
+  // Items that differ only after # (the SAAF Visualised views) are plain links: on /visualised the browser then changes
+  // the view in place (the page listens to history changes), from another page it opens /visualised on that view.
+  const navLink = (item: NavItem, close: () => void) => {
+    const content = (
+      <>
+        <span className="opacity-50 w-4 text-center">{item.icon}</span>
+        {item.label}
+      </>
+    );
+    return item.href.includes("#") ? (
+      <a key={item.href} href={item.href} onClick={close} className={itemClass(item)}>
+        {content}
+      </a>
+    ) : (
+      <Link key={item.href} href={item.href} onClick={close} className={itemClass(item)}>
+        {content}
+      </Link>
+    );
+  };
+
   return (
     <>
       {/* Top bar: above the page content so its menus open on top; below the modals (z-50) so they still cover it */}
@@ -79,12 +99,7 @@ export default function Navbar() {
                 {open && (
                   <div className="absolute left-0 top-full mt-1 z-50 min-w-[220px] bg-surface border border-border rounded-xl shadow-lg p-1.5">
                     <div className="px-3 pt-1 pb-1.5 text-[10px] font-bold text-muted uppercase tracking-wider">{group.hint}</div>
-                    {group.items.map((item) => (
-                      <Link key={item.href} href={item.href} onClick={() => setOpenGroup(null)} className={itemClass(item)}>
-                        <span className="opacity-50 w-4 text-center">{item.icon}</span>
-                        {item.label}
-                      </Link>
-                    ))}
+                    {group.items.map((item) => navLink(item, () => setOpenGroup(null)))}
                   </div>
                 )}
               </div>
@@ -148,12 +163,7 @@ export default function Navbar() {
               <div className="px-3 pt-2 pb-1 text-[10px] font-bold text-muted uppercase tracking-wider">
                 {group.label} <span className="normal-case font-normal tracking-normal">· {group.hint}</span>
               </div>
-              {group.items.map((item) => (
-                <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)} className={itemClass(item)}>
-                  <span className="opacity-50 w-4 text-center">{item.icon}</span>
-                  {item.label}
-                </Link>
-              ))}
+              {group.items.map((item) => navLink(item, () => setMobileOpen(false)))}
             </div>
           ))}
           {isAdmin && (
