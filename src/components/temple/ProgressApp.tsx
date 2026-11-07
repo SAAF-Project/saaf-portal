@@ -379,7 +379,7 @@ export function ProgressApp({ data: raw, submitters, identity = null, assetBase 
 
         {tour && (
           <TourShell
-            steps={tour.steps.map((st) => ({ title: st.title, body: <p className="text-muted text-sm">{st.text}</p>, target: st.target }))}
+            steps={tour.steps.map((st) => ({ title: st.title, body: <p className="text-muted text-sm">{st.text}</p>, target: st.target, side: !st.target && !!st.focus }))}
             step={tour.step}
             onStep={(next) => setTour({ ...tour, step: next })}
             onClose={endTour}
