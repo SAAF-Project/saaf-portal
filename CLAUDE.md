@@ -16,6 +16,7 @@ Deployed on Vercel at https://saaf-portal.vercel.app/. The portal button lives o
 npm run dev          # Start dev server (localhost:3000)
 npm run build        # prisma generate + next build
 npm run lint         # ESLint
+npm test             # vitest: the progress visual's geometry, stage, filter and tag tests (src/components/temple/)
 npx prisma generate  # Regenerate Prisma client after schema changes
 npx prisma db push   # Push schema (uses prisma.config.ts → PROD_DATABASE_URL or DATABASE_URL)
 
@@ -62,6 +63,7 @@ Uses CSS-based config with `@theme inline` in `globals.css` — no `tailwind.con
 - **User profiles + observability checks + feedback + signup requests:** Postgres (Prisma)
 - **Leaderboard + activity:** Computed live from GitHub API (merged PRs). Scoring logic in `src/lib/scoring.ts`.
 - **Plans + tracks + submitters:** Static JSON in `public/data/` (mirrors `SAAF-Project/website/data/`)
+- **SAAF Visualised (`/visualised`):** `SAAF-Project/website/data/progress.json` (+ `submitters.json`), fetched live by `/api/progress` through `src/lib/progress-data.ts` (server-side `GITHUB_PAT`, 10 min cache); the copy in `public/data/` is only the fallback (the page says when it shows that). `/api/progress` also adds live repo alerts (no AUDIT-CRITERIA.md, no tests, quiet, not found/archived) from `src/lib/repo-signals.ts` (org repo list + one git-tree call per Ready+ agent repo; rules in `components/temple/liveAlerts.ts`; no GitHub answer = no live alerts, never a false alert). The 3D module in `src/components/temple/` is self-contained (see its `README.md`) and has its own tests (`npm test`, vitest). Three.js stack: `three`, `@react-three/fiber`, `@react-three/drei`.
 - **Plan markdown content:** Fetched on-demand via `/api/plan-content` (proxies GitHub API with PAT — needed because SAAF-Project repo is private so raw.githubusercontent.com URLs don't work)
 - **Company logos:** Word-boundary matched from organisation name via `src/lib/logo-match.ts` against logos hosted on saafproject.com
 - **Agent library:** Allowlist in `src/lib/github.ts` (`AGENT_LIBRARY_REVIEWED`) — manually curated subset of org repos with quality metadata. Other org repos shown with auto-detected status (work-in-progress / needs-readme / not-reviewed).
