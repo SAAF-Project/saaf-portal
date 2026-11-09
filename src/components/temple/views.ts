@@ -26,6 +26,7 @@ export interface VisualProps {
   onFocus: (f: Focus) => void;
   relations: RelationEdge[]; // which plan feeds which (checked against the plans)
   onInfo: (topic?: "relations") => void; // opens "How this is calculated", optionally at one topic
+  panelOpen?: boolean; // the side panel (a sheet on a phone) is open: a view that frames itself leaves room for it
   onReady?: () => void; // the picture has been drawn, textures and all: render <ViewReady onReady={onReady} /> last
 }
 

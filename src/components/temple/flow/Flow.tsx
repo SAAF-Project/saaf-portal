@@ -94,7 +94,7 @@ const SLIDER_STEPS = 100;
 const toSlider = (s: number) => Math.round((Math.log(s / MIN_SCALE) / Math.log(MAX_SCALE / MIN_SCALE)) * SLIDER_STEPS);
 const fromSlider = (n: number) => MIN_SCALE * Math.pow(MAX_SCALE / MIN_SCALE, n / SLIDER_STEPS);
 
-export function Flow({ data, theme, focus, matches, filtersActive, sketch, relations, onFocus, onInfo, onReady }: VisualProps) {
+export function Flow({ data, theme, focus, matches, filtersActive, sketch, relations, onFocus, onInfo, onReady, panelOpen = true }: VisualProps) {
   const palette = PALETTE[theme];
   const [showUnlinked, setShowUnlinked] = useState(() => readStored(UNLINKED_KEY) === "on");
   const [hover, setHover] = useState<string | null>(null);
@@ -168,10 +168,10 @@ export function Flow({ data, theme, focus, matches, filtersActive, sketch, relat
   const freeArea = useCallback(() => {
     const narrow = size.w < 800;
     const top = 40 + 60 + (noticeRef.current?.offsetHeight ?? 0) + 16;
-    const left = 16, right = narrow ? 16 : PANEL_W + 8;
-    const bottom = narrow ? size.h * 0.42 + 64 : 70;
+    const left = 16, right = narrow || !panelOpen ? 16 : PANEL_W + 8;
+    const bottom = narrow ? (panelOpen ? size.h * 0.42 + 64 : 64) : 70;
     return { top, left, aw: Math.max(120, size.w - left - right), ah: Math.max(120, size.h - top - bottom) };
-  }, [size]);
+  }, [size, panelOpen]);
 
   const fit = useCallback(
     (box: Box, animate: boolean) => {

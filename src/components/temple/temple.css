@@ -306,4 +306,35 @@
   .sd-line { stroke: var(--muted); stroke-width: 1.2; }
   .sd-head { fill: var(--muted); }
   .info details summary { cursor: pointer; font-weight: 600; margin: 6px 0; }
+
+  /* Phones: one header row, a top bar that stays on one line, the side panel as a sheet you open, a one-row legend and
+     smaller labels, so the picture gets the screen. */
+  @media (max-width: 800px) {
+    .pagehead { justify-content: center; align-items: center; padding: 0 8px; }
+    .pagehead h1 { display: none; }
+    .viewswitch { position: static; max-width: 100%; overflow-x: auto; }
+    .topbar { padding: 8px; gap: 8px; }
+    .crumbs { flex: 1 1 auto; min-width: 0; padding: 4px 6px; overflow: hidden; }
+    .crumbs button { min-width: 0; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 13px; }
+    .actions { flex: none; gap: 4px; padding: 4px 6px; }
+    .actions button { white-space: nowrap; font-size: 13px; padding: 4px 8px; }
+    .actions-gap { margin: 0 2px; }
+    .legend { flex-wrap: nowrap; overflow-x: auto; white-space: nowrap; gap: 0 14px; padding: 6px 10px; }
+    .rightcol { bottom: 52px; }
+    .panel-tab { z-index: 49; top: auto; bottom: 56px; right: 8px; border-right: 1px solid var(--border); border-radius: 10px; }
+    .part-label { width: 66px; padding: 2px 3px; font-size: 9px; line-height: 1.2; }
+    .part-label:not(.wide) span:last-child { display: none; } /* the count of plans; it is in the panel */
+    .part-label.wide { width: 150px; }
+    .part-label span { font-size: 9px; }
+    .part-label .pct { font-size: 13px; }
+    .banner { padding: 2px 10px; }
+    .banner-title { font-size: 10px; letter-spacing: 0.15em; }
+    .banner-pct { font-size: 24px; }
+    .banner-sub { font-size: 10px; }
+    .plate.on { max-width: 140px; font-size: 11px; }
+    .dmenu-pop { right: -4px; min-width: 210px; }
+    .info-backdrop { padding: 8px; }
+    .info { padding: 14px 16px; }
+    .info header { margin: -14px -16px 6px; padding: 12px 16px 10px; }
+  }
 }

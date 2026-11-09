@@ -63,6 +63,12 @@ describe("the shared step-by-step guide", () => {
     expect(html).toContain("bottom-20");
   });
 
+  it("the stage card shows a short step counter for small screens; the centred wizard keeps its progress bar only", () => {
+    const tour = renderToStaticMarkup(<TourShell steps={[{ title: "A", body: <p>x</p>, placement: "stage" }, { title: "B", body: <p>y</p> }]} step={0} onStep={noop} onClose={noop} />);
+    expect(tour).toContain("1 / 2");
+    expect(render(0)).not.toContain(" / 3");
+  });
+
   it("is labelled by its title, for screen readers", () => {
     expect(renderToStaticMarkup(<TourShell steps={steps} step={0} onStep={noop} onClose={noop} labelId="my-title" />)).toContain('aria-labelledby="my-title"');
   });

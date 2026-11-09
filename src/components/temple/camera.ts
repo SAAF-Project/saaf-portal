@@ -37,7 +37,9 @@ export function frame(center: V3, width: number, height: number, elevationDeg: n
   const dist = Math.max((width * padding) / free / (k * view.aspect), (height * padding) / k);
   const shift = (view.panelFrac / 2) * k * dist * view.aspect; // moves the subject into the free area
   const el = (elevationDeg * Math.PI) / 180;
-  const target: V3 = [center[0] + shift, center[1], center[2]];
+  // on a portrait screen the subject sits in the upper part, so the bottom stays free for the side panel and the tour card
+  const lift = view.aspect < 1 ? 0.14 * k * dist : 0;
+  const target: V3 = [center[0] + shift, center[1] - lift, center[2]];
   return { target, pos: [target[0], target[1] + dist * Math.sin(el), target[2] + dist * Math.cos(el)] };
 }
 
@@ -46,7 +48,8 @@ export function cameraFor(focus: Focus, layout: Layout, partKind: (id: string) =
   const overview = () => {
     const w = layout.maxX - layout.minX;
     const h = layout.topY + 3.2;
-    return frame([(layout.minX + layout.maxX) / 2, h / 2 - 0.4, 0], w, h + 1.5, 15, view, 1.12);
+    // a portrait screen is width-limited: less air around the temple, so it is as big as it can be
+    return frame([(layout.minX + layout.maxX) / 2, h / 2 - 0.4, 0], w, h + 1.5, 15, view, view.aspect < 1 ? 1.06 : 1.12);
   };
 
   switch (focus.level) {

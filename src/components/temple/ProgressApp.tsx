@@ -132,7 +132,8 @@ export function ProgressApp({ data: raw, submitters, identity = null, assetBase 
     setInfoTopic(topic);
     setInfoOpen(true);
   };
-  const [panelOpen, setPanelOpen] = useState(true);
+  // on a phone the side panel is a sheet over the picture, so it starts closed (the Details button opens it)
+  const [panelOpen, setPanelOpen] = useState(() => window.innerWidth > 800);
   const [filtersOpen, setFiltersOpen] = useState<boolean>(() => isActive(parseFilters(splitHash(window.location.hash)[1])));
   const filtersRef = useRef(filters);
   const focusRef = useRef(focus);
@@ -316,7 +317,7 @@ export function ProgressApp({ data: raw, submitters, identity = null, assetBase 
     <div className="temple-app">
       <div className={style === "sketch" ? "app sketch" : "app"}>
         <Suspense fallback={<div className="view-loading">Loading the view...</div>}>
-          <view.component data={data} theme={theme} focus={focus} matches={matches} filtersActive={filtersActive} sketch={style === "sketch"} scenery={scenery} assetBase={assetBase} debug={debug} onFocus={open} relations={relations} onInfo={openInfo} onReady={() => setReadyView(view.id)} />
+          <view.component data={data} theme={theme} focus={focus} matches={matches} filtersActive={filtersActive} sketch={style === "sketch"} scenery={scenery} assetBase={assetBase} debug={debug} onFocus={open} relations={relations} onInfo={openInfo} panelOpen={panelOpen} onReady={() => setReadyView(view.id)} />
         </Suspense>
 
         <header className="pagehead">
@@ -392,14 +393,14 @@ export function ProgressApp({ data: raw, submitters, identity = null, assetBase 
 
         {tour && (
           <TourShell
-            steps={tour.steps.map((st) => ({ title: st.title, body: <p className="text-muted text-sm">{st.text}</p>, target: st.target, placement: !st.target || st.target === "view" || st.target === "legend" ? "stage" : "auto" }))}
+            steps={tour.steps.map((st) => ({ title: st.title, body: <p className="text-muted text-[13px] leading-snug min-[801px]:text-sm min-[801px]:leading-normal">{st.text}</p>, target: st.target, placement: !st.target || st.target === "view" || st.target === "legend" ? "stage" : "auto" }))}
             step={tour.step}
             onStep={(next) => setTour({ ...tour, step: next })}
             onClose={endTour}
             finishLabel="Done"
             skipLabel="Skip tour"
             labelId="view-tour-title"
-            stageClassName="top-[104px] right-4 md:right-[404px] w-[min(420px,calc(100%-32px))]"
+            stageClassName="bottom-[56px] left-2 right-2 min-[801px]:bottom-auto min-[801px]:top-[104px] min-[801px]:left-auto min-[801px]:right-[404px] min-[801px]:w-[min(420px,calc(100%-32px))]"
           />
         )}
 

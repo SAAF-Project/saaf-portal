@@ -98,13 +98,14 @@ export function TourShell({ steps, step, onStep, onClose, finishLabel, skipLabel
   const centred = !current.target && !stage;
   const spotlight = box !== null;
   const style = spotlight && !stage
-    ? { ...cardPosition(box, { width: window.innerWidth, height: window.innerHeight }, cardHeight), width: CARD_W }
+    ? { ...cardPosition(box, { width: window.innerWidth, height: window.innerHeight }, cardHeight), width: Math.min(CARD_W, window.innerWidth - 24) }
     : undefined;
 
   const card = (
     <div ref={cardRef} className={`bg-surface border border-border rounded-2xl shadow-2xl ${centred ? "w-full max-w-lg" : stage || !spotlight ? `fixed ${stageClassName}` : "fixed"}`} style={style}>
       <div className={`flex items-center justify-between border-b border-border ${stage ? "p-3" : "p-4"}`}>
-        <div className="flex gap-1.5">
+        {stage && <span className="text-xs text-muted min-[801px]:hidden" aria-label={`Step ${step + 1} of ${steps.length}`}>{step + 1} / {steps.length}</span>}
+        <div className={`gap-1.5 ${stage ? "hidden min-[801px]:flex" : "flex"}`}>
           {steps.map((_, i) => (
             <div key={i} className={`h-1.5 rounded-full ${steps.length > 6 ? "w-4" : "w-8"} ${i <= step ? "bg-accent" : "bg-border"}`} />
           ))}
@@ -113,11 +114,11 @@ export function TourShell({ steps, step, onStep, onClose, finishLabel, skipLabel
           {skipLabel}
         </button>
       </div>
-      <div className={stage ? "p-4" : "p-6"}>
+      <div className={stage ? "p-3 min-[801px]:p-4" : "p-6"}>
         <h2 id={labelId} className={`text-lg font-bold ${stage ? "mb-2" : "mb-3"}`}>{current.title}</h2>
         {current.body}
       </div>
-      <div className={`flex gap-2 border-t border-border ${stage ? "p-3" : "p-4"}`}>
+      <div className={`flex gap-2 border-t border-border ${stage ? "p-2 min-[801px]:p-3" : "p-4"}`}>
         <button
           onClick={() => onStep(Math.max(0, step - 1))}
           disabled={step === 0}

@@ -54,6 +54,8 @@ mistake fails the build or the page with the file name and the field in the mess
 4. `npm test`: it checks that every registered view has a manifest and the other way round, that the tour only points at
    real targets and blocks, and that a view without scenery does not promise a Display menu.
 
+Phones (800 px and narrower): the engine gives the header one row, keeps the top bar on one line, starts the side panel closed (a sheet the Details button opens) and shows the legend as one scrolling row. A view that frames itself should work in a portrait box: the shared `frame()` in `../camera.ts` already pulls the camera back and lifts the subject on a portrait screen, and `panelOpen` tells a view whether the sheet is open, so it can leave room for it. The tour card then sits at the bottom, below the picture.
+
 Nothing else changes: not the engine, not the chooser, not the tour. Removing a view is deleting its folder and its
 entry; links that still say `view=<id>` then show the chooser.
 
