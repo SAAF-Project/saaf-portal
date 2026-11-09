@@ -5,6 +5,7 @@ import { CameraControls, Line } from "@react-three/drei";
 import type CameraControlsImpl from "camera-controls";
 import { cameraFor, focusKey, type View } from "./camera";
 import { LabelLayer, LabelProjector, buildLabels } from "./labels";
+import { ViewReady } from "./ViewReady";
 import { Outline, SketchContext } from "./Outline";
 import { rayFor } from "./raycast";
 import { Paving, SkyArc, useAccents, type Accents } from "./Scenery";
@@ -379,6 +380,7 @@ interface TempleProps {
   assetBase: string;
   debug: boolean;
   onFocus: (f: Focus) => void;
+  onReady?: () => void;
 }
 
 const PANEL_WIDTH_PX = 392; // side panel (360) plus its margin
@@ -410,7 +412,7 @@ function CameraRig({ data, layout, focus, debug }: { data: ProgressData; layout:
   return <CameraControls ref={controls} makeDefault smoothTime={0.7} minDistance={2.5} maxDistance={110} maxPolarAngle={Math.PI / 2 - 0.05} />;
 }
 
-export function Temple({ data, theme, focus, matches, filtersActive, sketch, scenery, assetBase, debug, onFocus }: TempleProps) {
+export function Temple({ data, theme, focus, matches, filtersActive, sketch, scenery, assetBase, debug, onFocus, onReady }: TempleProps) {
   const layout = useMemo(() => computeLayout(data), [data]);
   const accents = useAccents(theme, scenery, assetBase);
   const palette = PALETTE[theme];
@@ -434,6 +436,7 @@ export function Temple({ data, theme, focus, matches, filtersActive, sketch, sce
           <Scene data={data} layout={layout} palette={palette} focus={focus} hover={hover} matches={matches} filtersActive={filtersActive} accents={accents} theme={theme} onHover={setHover} onFocus={onFocus} />
         </SketchContext.Provider>
         <LabelProjector specs={specs} elements={elements} />
+        <ViewReady onReady={onReady} />
       </Canvas>
       <LabelLayer specs={specs} elements={elements} />
     </>

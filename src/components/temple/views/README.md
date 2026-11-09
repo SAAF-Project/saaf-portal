@@ -39,6 +39,7 @@ tour:                       # the onboarding tour of this view, at least one ste
   highlight, the card sits at the bottom). A step whose target is not on the page is skipped, so a tour never points at
   a button the view does not have. A step that explains a button or the legend returns to the overview first.
 - **`focus`** moves the view to a block before the card is shown, so the step zooms in on the real part of the visual.
+- The card of a step that moves the view (`focus`), has no target, or points at the legend sits in a free corner at the top of the picture, next to the side panel, so it never covers what it explains. A step about a button or the side panel puts the card next to that element, with a light dim around it.
 - **`supports.display`** decides what the Display menu offers. Without any option there is no Display button.
 - **`calculation`** must say nothing about other views (the tests check for the words temple / island).
 
@@ -48,10 +49,12 @@ mistake fails the build or the page with the file name and the field in the mess
 ## Adding a view
 
 1. Make the folder `views/<id>/` with `visualization.yaml` and `preview.jpg`.
-2. Write the component. It gets `VisualProps` (see `../views.ts`). Put it in its own folder next to this one.
+2. Write the component. It gets `VisualProps` (see `../views.ts`). Put it in its own folder next to this one. Render `<ViewReady onReady={onReady} />` as the **last** child of everything that can still be loading (inside a `<Canvas>` for a 3D view): the tour starts by itself only after the picture reports it is drawn, so a first visit on a slow connection never shows a tour card on an empty page. A view that never reports gets its tour after 15 seconds.
 3. Add **one entry** to `REGISTRY` in `../views.ts` (id, the preview import, the lazy component).
 4. `npm test`: it checks that every registered view has a manifest and the other way round, that the tour only points at
    real targets and blocks, and that a view without scenery does not promise a Display menu.
+
+Phones (800 px and narrower): the engine gives the header one row, keeps the top bar on one line, starts the side panel closed (a sheet the Details button opens) and shows the legend as one scrolling row. A view that frames itself should work in a portrait box: the shared `frame()` in `../camera.ts` already pulls the camera back and lifts the subject on a portrait screen, and `panelOpen` tells a view whether the sheet is open, so it can leave room for it. The tour card then sits at the bottom, below the picture.
 
 Nothing else changes: not the engine, not the chooser, not the tour. Removing a view is deleting its folder and its
 entry; links that still say `view=<id>` then show the chooser.

@@ -8,15 +8,16 @@ import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "re
  * use it, so a guide looks and behaves the same everywhere.
  *
  * - A step without `target` is a centred dialog over a dimmed page (what the wizard always did).
- * - A step with `target` dims the page except that element (`data-tour="<target>"`) and puts the card next to it.
- * - A step with `target: "view"`, or a target that is not on the page, shows the card at the bottom without dimming, so
- *   the picture stays visible (the host moves the camera for such a step).
+ * - A step with `target` dims the page lightly except that element (`data-tour="<target>"`) and puts the card next to it.
+ * - A step with `placement: "stage"` keeps the card in a free corner of the picture (`stageClassName`) so it never sits on
+ *   what it explains; the host uses it for steps that move a 3D view, and for steps about the legend.
+ * - A target that is not on the page just shows the card without dimming.
  */
 export interface TourStepContent {
   title: string;
   body: ReactNode;
   target?: string; // value of a data-tour attribute
-  side?: boolean; // the step moves a 3D view to a block: card at the left, no dimming, so the block stays visible
+  placement?: "auto" | "stage"; // "stage": the card goes to the free corner, whatever the target is
 }
 
 interface Props {
@@ -28,12 +29,16 @@ interface Props {
   finishLabel?: string;
   skipLabel?: string;
   labelId?: string;
+  /** Position classes of the card for `placement: "stage"`. The default is the bottom centre of the window. */
+  stageClassName?: string;
 }
 
 interface Box { top: number; left: number; width: number; height: number }
 
 const PAD = 6;
 const CARD_W = 360;
+const DEFAULT_STAGE = "bottom-20 left-1/2 -translate-x-1/2 w-[min(460px,calc(100%-24px))]";
+const DIM = "rgb(5 10 25 / 0.4)"; // light enough that the picture stays readable in dark mode
 
 function findTarget(target: string | undefined): HTMLElement | null {
   if (!target || target === "view") return null;
@@ -45,16 +50,24 @@ function boxOf(el: HTMLElement): Box {
   return { top: r.top - PAD, left: r.left - PAD, width: r.width + PAD * 2, height: r.height + PAD * 2 };
 }
 
-/** Where the card goes next to a highlighted box: below it, or above when there is no room, kept inside the window. */
+/**
+ * Where the card goes next to a highlighted box: below it, or above when there is no room, kept inside the window.
+ * Next to a tall box (the side panel) it goes beside it instead, so it does not climb over the page header.
+ */
 export function cardPosition(box: Box, viewport: { width: number; height: number }, cardHeight = 220): { top: number; left: number } {
   const margin = 12;
+  if (box.height > viewport.height * 0.5) {
+    const beside = box.left - CARD_W - margin;
+    const left = beside >= margin ? beside : Math.min(box.left + box.width + margin, Math.max(margin, viewport.width - CARD_W - margin));
+    return { top: Math.min(Math.max(margin, box.top), Math.max(margin, viewport.height - cardHeight - margin)), left };
+  }
   const left = Math.min(Math.max(margin, box.left + box.width / 2 - CARD_W / 2), Math.max(margin, viewport.width - CARD_W - margin));
   const below = box.top + box.height + margin;
   const top = below + cardHeight <= viewport.height ? below : Math.max(margin, box.top - cardHeight - margin);
   return { top, left };
 }
 
-export function TourShell({ steps, step, onStep, onClose, finishLabel, skipLabel = "Skip for now", labelId = "tour-title" }: Props) {
+export function TourShell({ steps, step, onStep, onClose, finishLabel, skipLabel = "Skip for now", labelId = "tour-title", stageClassName = DEFAULT_STAGE }: Props) {
   const current = steps[step];
   const last = step === steps.length - 1;
   const [box, setBox] = useState<Box | null>(null);
@@ -81,16 +94,18 @@ export function TourShell({ steps, step, onStep, onClose, finishLabel, skipLabel
   }, [step, box]);
 
   if (!current) return null;
-  const centred = !current.target && !current.side;
+  const stage = current.placement === "stage";
+  const centred = !current.target && !stage;
   const spotlight = box !== null;
-  const style = spotlight
-    ? { ...cardPosition(box, { width: window.innerWidth, height: window.innerHeight }, cardHeight), width: CARD_W }
+  const style = spotlight && !stage
+    ? { ...cardPosition(box, { width: window.innerWidth, height: window.innerHeight }, cardHeight), width: Math.min(CARD_W, window.innerWidth - 24) }
     : undefined;
 
   const card = (
-    <div ref={cardRef} className={`bg-surface border border-border rounded-2xl shadow-2xl ${centred ? "w-full max-w-lg" : spotlight ? "fixed" : current.side ? "fixed left-4 top-1/2 -translate-y-1/2 w-[min(400px,calc(100%-32px))]" : "fixed bottom-20 left-1/2 -translate-x-1/2 w-[min(460px,calc(100%-24px))]"}`} style={style}>
-      <div className="flex items-center justify-between p-4 border-b border-border">
-        <div className="flex gap-1.5">
+    <div ref={cardRef} className={`bg-surface border border-border rounded-2xl shadow-2xl ${centred ? "w-full max-w-lg" : stage || !spotlight ? `fixed ${stageClassName}` : "fixed"}`} style={style}>
+      <div className={`flex items-center justify-between border-b border-border ${stage ? "p-3" : "p-4"}`}>
+        {stage && <span className="text-xs text-muted min-[801px]:hidden" aria-label={`Step ${step + 1} of ${steps.length}`}>{step + 1} / {steps.length}</span>}
+        <div className={`gap-1.5 ${stage ? "hidden min-[801px]:flex" : "flex"}`}>
           {steps.map((_, i) => (
             <div key={i} className={`h-1.5 rounded-full ${steps.length > 6 ? "w-4" : "w-8"} ${i <= step ? "bg-accent" : "bg-border"}`} />
           ))}
@@ -99,11 +114,11 @@ export function TourShell({ steps, step, onStep, onClose, finishLabel, skipLabel
           {skipLabel}
         </button>
       </div>
-      <div className="p-6">
-        <h2 id={labelId} className="text-lg font-bold mb-3">{current.title}</h2>
+      <div className={stage ? "p-3 min-[801px]:p-4" : "p-6"}>
+        <h2 id={labelId} className={`text-lg font-bold ${stage ? "mb-2" : "mb-3"}`}>{current.title}</h2>
         {current.body}
       </div>
-      <div className="flex gap-2 p-4 border-t border-border">
+      <div className={`flex gap-2 border-t border-border ${stage ? "p-2 min-[801px]:p-3" : "p-4"}`}>
         <button
           onClick={() => onStep(Math.max(0, step - 1))}
           disabled={step === 0}
@@ -138,7 +153,7 @@ export function TourShell({ steps, step, onStep, onClose, finishLabel, skipLabel
     <div className="fixed inset-0 z-[60] pointer-events-none" role="dialog" aria-modal="false" aria-labelledby={labelId}>
       {spotlight && (
         // the dim comes from a huge shadow around the highlighted box, so the box itself stays clear and clickable-looking
-        <div className="fixed rounded-xl border-2 border-accent pointer-events-none" style={{ top: box.top, left: box.left, width: box.width, height: box.height, boxShadow: "0 0 0 9999px rgb(5 10 25 / 0.55)" }} />
+        <div className="fixed rounded-xl border-2 border-accent pointer-events-none" style={{ top: box.top, left: box.left, width: box.width, height: box.height, boxShadow: `0 0 0 9999px ${DIM}` }} />
       )}
       <div className="pointer-events-auto">{card}</div>
     </div>
