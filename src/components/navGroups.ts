@@ -34,6 +34,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: "/leaderboard", label: "Leaderboard", icon: "★" },
       { href: "/participants", label: "Participants", icon: "👥" },
       { href: "/tracks", label: "Tracks", icon: "▶" },
+      { href: "/quiz", label: "Quiz", icon: "?" },
     ],
   },
   {
