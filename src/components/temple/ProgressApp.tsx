@@ -97,7 +97,8 @@ function readScenery(): boolean {
 
 const OVERVIEW: Focus = { level: "project" };
 const TOUR_SEEN_KEY = (view: string) => `saaf-tour-seen-${view}`;
-const TOUR_START_DELAY_MS = 1200; // let the picture appear before the first tour starts by itself
+const TOUR_START_DELAY_MS = 600; // after the picture reports it is drawn, a moment before the first tour starts by itself
+const READY_FALLBACK_MS = 15000; // a view that never reports "ready" still gets its tour, just late
 
 /** The steps of a tour that make sense on this page: a step that points at a button the view does not have is left out. */
 function availableSteps(steps: ViewDefinition["tour"]) {
@@ -115,6 +116,8 @@ export function ProgressApp({ data: raw, submitters, identity = null, assetBase 
   }, [data]);
   const [focus, setFocus] = useState<Focus>(() => parseHash(window.location.hash));
   const [tour, setTour] = useState<{ steps: ViewDefinition["tour"]; step: number; from: Focus } | null>(null);
+  // Which view has reported that its picture is drawn. A tour never starts on an empty page (slow first load).
+  const [readyView, setReadyView] = useState<string | null>(null);
   const [style, setStyle] = useState<"sketch" | "clean">(readStyle);
   const [scenery, setScenery] = useState<boolean>(readScenery);
   const [rememberedOwner] = useState<string | null>(() => readStored(OWNER_KEY));
@@ -170,7 +173,7 @@ export function ProgressApp({ data: raw, submitters, identity = null, assetBase 
   };
 
   const startTour = () => {
-    if (!view) return;
+    if (!view || !ready) return;
     const steps = availableSteps(view.tour);
     if (steps.length) setTour({ steps, step: 0, from: focus });
   };
@@ -251,9 +254,19 @@ export function ProgressApp({ data: raw, submitters, identity = null, assetBase 
     return () => window.clearTimeout(arrive);
   }, [tourFocus, go]);
 
-  // The first time someone opens a view, its tour starts by itself (once per view); the Tour button replays it.
+  const ready = viewId !== null && readyView === viewId;
+
+  // A view that never reports "ready" is treated as ready after a while, so its tour is late but not lost.
   useEffect(() => {
-    if (!viewId) return;
+    if (!viewId || ready) return;
+    const timer = window.setTimeout(() => setReadyView(viewId), READY_FALLBACK_MS);
+    return () => window.clearTimeout(timer);
+  }, [viewId, ready]);
+
+  // The first time someone opens a view, its tour starts by itself (once per view), as soon as the picture is drawn;
+  // the Tour button replays it.
+  useEffect(() => {
+    if (!viewId || !ready) return;
     const picked = findView(views, viewId);
     if (!picked || readStored(TOUR_SEEN_KEY(picked.id))) return;
     const timer = window.setTimeout(() => {
@@ -262,7 +275,7 @@ export function ProgressApp({ data: raw, submitters, identity = null, assetBase 
       if (steps.length) setTour({ steps, step: 0, from: focusRef.current });
     }, TOUR_START_DELAY_MS);
     return () => window.clearTimeout(timer);
-  }, [viewId, views]);
+  }, [viewId, views, ready]);
 
   // Whose plans the personal view shows: the signed-in person's, or the picked name.
   const owned = useMemo(() => {
@@ -303,7 +316,7 @@ export function ProgressApp({ data: raw, submitters, identity = null, assetBase 
     <div className="temple-app">
       <div className={style === "sketch" ? "app sketch" : "app"}>
         <Suspense fallback={<div className="view-loading">Loading the view...</div>}>
-          <view.component data={data} theme={theme} focus={focus} matches={matches} filtersActive={filtersActive} sketch={style === "sketch"} scenery={scenery} assetBase={assetBase} debug={debug} onFocus={open} relations={relations} onInfo={openInfo} />
+          <view.component data={data} theme={theme} focus={focus} matches={matches} filtersActive={filtersActive} sketch={style === "sketch"} scenery={scenery} assetBase={assetBase} debug={debug} onFocus={open} relations={relations} onInfo={openInfo} onReady={() => setReadyView(view.id)} />
         </Suspense>
 
         <header className="pagehead">
@@ -344,7 +357,7 @@ export function ProgressApp({ data: raw, submitters, identity = null, assetBase 
                 ⚲ Filters{filtersActive && <span className="fbadge">{matchCount}</span>}
               </button>
             )}
-            <button data-tour="tour" onClick={startTour} title="A short tour of this view">▶ Tour</button>
+            <button data-tour="tour" onClick={startTour} disabled={!ready} title={ready ? "A short tour of this view" : "The view is still loading"}>▶ Tour</button>
             <span className="actions-gap" aria-hidden="true" />
             <DisplayMenu options={displayOptionsOf(view)} scenery={scenery} onScenery={chooseScenery} style={style} onStyle={chooseStyle} theme={theme} onToggleTheme={onToggleTheme} />
           </div>
@@ -379,13 +392,14 @@ export function ProgressApp({ data: raw, submitters, identity = null, assetBase 
 
         {tour && (
           <TourShell
-            steps={tour.steps.map((st) => ({ title: st.title, body: <p className="text-muted text-sm">{st.text}</p>, target: st.target, side: !st.target && !!st.focus }))}
+            steps={tour.steps.map((st) => ({ title: st.title, body: <p className="text-muted text-sm">{st.text}</p>, target: st.target, placement: !st.target || st.target === "view" || st.target === "legend" ? "stage" : "auto" }))}
             step={tour.step}
             onStep={(next) => setTour({ ...tour, step: next })}
             onClose={endTour}
             finishLabel="Done"
             skipLabel="Skip tour"
             labelId="view-tour-title"
+            stageClassName="top-[104px] right-4 md:right-[404px] w-[min(420px,calc(100%-32px))]"
           />
         )}
 

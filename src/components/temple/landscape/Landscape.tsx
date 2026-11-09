@@ -6,6 +6,7 @@ import type CameraControlsImpl from "camera-controls";
 import type { View } from "../camera";
 import { focusKey } from "../camera";
 import { LabelLayer, LabelProjector, type LabelSpec } from "../labels";
+import { ViewReady } from "../ViewReady";
 import { Outline, SketchContext } from "../Outline";
 import { KIND_LABEL } from "../glyphs";
 import { hash } from "../sketch";
@@ -407,7 +408,7 @@ function CameraRig({ data, layout, focus, debug }: { data: ProgressData; layout:
 
 // ---- scene -------------------------------------------------------------------------------------------------------
 
-export function Landscape({ data, theme, focus, matches, filtersActive, sketch, scenery, debug, onFocus }: VisualProps) {
+export function Landscape({ data, theme, focus, matches, filtersActive, sketch, scenery, debug, onFocus, onReady }: VisualProps) {
   const layout = useMemo(() => computeLandscape(data), [data]);
   const palette = PALETTE[theme];
   const [hover, setHover] = useState<string | null>(null);
@@ -488,6 +489,7 @@ export function Landscape({ data, theme, focus, matches, filtersActive, sketch, 
           ))}
         </SketchContext.Provider>
         <LabelProjector specs={specs} elements={elements} />
+        <ViewReady onReady={onReady} />
       </Canvas>
       <LabelLayer specs={specs} elements={elements} />
     </>

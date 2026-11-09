@@ -4,6 +4,7 @@ import { PALETTE } from "../colors";
 import { GLYPH_PATHS, KIND_LABEL } from "../glyphs";
 import { DISCLAIMER } from "../relations";
 import { hashString, wobblyRectPath } from "../sketch";
+import { ViewReady } from "../ViewReady";
 import { stageOf } from "../stages";
 import type { VisualProps } from "../views";
 import { buildGraph, chainOf } from "./graph";
@@ -93,7 +94,7 @@ const SLIDER_STEPS = 100;
 const toSlider = (s: number) => Math.round((Math.log(s / MIN_SCALE) / Math.log(MAX_SCALE / MIN_SCALE)) * SLIDER_STEPS);
 const fromSlider = (n: number) => MIN_SCALE * Math.pow(MAX_SCALE / MIN_SCALE, n / SLIDER_STEPS);
 
-export function Flow({ data, theme, focus, matches, filtersActive, sketch, relations, onFocus, onInfo }: VisualProps) {
+export function Flow({ data, theme, focus, matches, filtersActive, sketch, relations, onFocus, onInfo, onReady }: VisualProps) {
   const palette = PALETTE[theme];
   const [showUnlinked, setShowUnlinked] = useState(() => readStored(UNLINKED_KEY) === "on");
   const [hover, setHover] = useState<string | null>(null);
@@ -305,6 +306,7 @@ export function Flow({ data, theme, focus, matches, filtersActive, sketch, relat
 
   return (
     <div className="flow" ref={hostRef} style={{ background: palette.background }}>
+      <ViewReady onReady={onReady} />
       <svg
         className="flow-svg"
         width={size.w}

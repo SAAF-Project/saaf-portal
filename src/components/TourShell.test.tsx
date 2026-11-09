@@ -45,11 +45,22 @@ describe("the shared step-by-step guide", () => {
     expect(render(1)).toContain("pointer-events-none");
   });
 
-  it("a step that moves the 3D view puts the card at the side without dimming, so the block stays visible", () => {
-    const html = renderToStaticMarkup(<TourShell steps={[{ title: "The foundation", body: <p>x</p>, side: true }]} step={0} onStep={noop} onClose={noop} />);
+  it("a step with the stage placement keeps the card in the given free corner and does not dim the page", () => {
+    const html = renderToStaticMarkup(<TourShell steps={[{ title: "The foundation", body: <p>x</p>, placement: "stage" }]} step={0} onStep={noop} onClose={noop} stageClassName="top-[104px] right-4" />);
     expect(html).not.toContain("bg-bg/85");
-    expect(html).toContain("left-4");
+    expect(html).toContain("top-[104px] right-4");
     expect(html).toContain("pointer-events-none");
+  });
+
+  it("the stage placement wins over a target: the card stays off the picture, the highlight stays on the target", () => {
+    const html = renderToStaticMarkup(<TourShell steps={[{ title: "Legend", body: <p>x</p>, target: "legend", placement: "stage" }]} step={0} onStep={noop} onClose={noop} stageClassName="top-[104px]" />);
+    expect(html).toContain("top-[104px]");
+    expect(html).not.toContain("bg-bg/85");
+  });
+
+  it("without a stage class the card goes to the bottom centre", () => {
+    const html = renderToStaticMarkup(<TourShell steps={[{ title: "View", body: <p>x</p>, target: "view" }]} step={0} onStep={noop} onClose={noop} />);
+    expect(html).toContain("bottom-20");
   });
 
   it("is labelled by its title, for screen readers", () => {
@@ -67,6 +78,15 @@ describe("where the card goes next to a highlighted box", () => {
   it("moves above the box when there is no room below", () => {
     const pos = cardPosition({ top: 800, left: 600, width: 100, height: 40 }, viewport, 220);
     expect(pos.top).toBe(800 - 220 - 12);
+  });
+  it("goes beside a tall box (the side panel), not above it over the page header", () => {
+    const pos = cardPosition({ top: 98, left: 1058, width: 372, height: 740 }, viewport);
+    expect(pos.left).toBe(1058 - 360 - 12);
+    expect(pos.top).toBe(98);
+  });
+  it("goes to the right of a tall box at the left edge when there is no room on its left", () => {
+    const pos = cardPosition({ top: 98, left: 10, width: 372, height: 740 }, viewport);
+    expect(pos.left).toBe(10 + 372 + 12);
   });
   it("stays inside the window at the edges", () => {
     expect(cardPosition({ top: 50, left: 0, width: 40, height: 40 }, viewport).left).toBe(12);
