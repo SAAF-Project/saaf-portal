@@ -319,7 +319,8 @@
     .actions { flex: none; gap: 4px; padding: 4px 6px; }
     .actions button { white-space: nowrap; font-size: 13px; padding: 4px 8px; }
     .actions-gap { margin: 0 2px; }
-    .legend { flex-wrap: nowrap; overflow-x: auto; white-space: nowrap; gap: 0 14px; padding: 6px 10px; }
+    /* Leave the bottom-right corner free for the Feedback button. */
+    .legend { flex-wrap: nowrap; overflow-x: auto; white-space: nowrap; gap: 0 14px; padding: 6px 10px; max-width: calc(100% - 64px); }
     .rightcol { bottom: 52px; }
     .panel-tab { z-index: 49; top: auto; bottom: 56px; right: 8px; border-right: 1px solid var(--border); border-radius: 10px; }
     .part-label { width: 66px; padding: 2px 3px; font-size: 9px; line-height: 1.2; }
