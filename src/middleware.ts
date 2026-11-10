@@ -20,5 +20,6 @@ export const config = {
     "/participants/:path*",
     "/about/:path*",
     "/quiz/:path*",
+    "/demo/:path*",
   ],
 };

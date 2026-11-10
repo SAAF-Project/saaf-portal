@@ -54,6 +54,8 @@ export default function QuizPage() {
 
   return (
     <div className="max-w-[560px] mx-auto py-8">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/brand/saaf-lockup-ink.png" alt="SAAF, Shared Audit Agents Framework" className="h-6 w-auto mb-8 dark:invert" />
       <p className="text-xs font-mono text-muted mb-2">Security Challenge · 10 November 2026</p>
       <h1 className="text-2xl font-medium mb-3">How many findings will we have at 17:00.</h1>
       <p className="text-sm text-muted leading-relaxed mb-6">
