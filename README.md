@@ -265,8 +265,41 @@ See `CLAUDE.md` for AI-specific guidance — Prisma 7 quirks, build gotchas, and
 
 ---
 
+## Observability
+
+What the portal records today, as far as the code shows:
+
+- **Application code (`src/`):** no logging calls (`console.*` or a logging library) were found. Errors in API routes are returned to the client as JSON responses, not logged.
+- **Admin scripts (`scripts/`):** print progress and errors to the console of the person running them. `backup-db.ts` writes a JSON dump to `backups/` (gitignored).
+- **Database:** user profiles, observability checks, feedback and signup requests are stored in Postgres (see `prisma/schema.prisma`). This is application data, not an audit log of who changed what.
+- **Not recorded:** a request or access log owned by the portal, an audit trail of admin actions (signup approvals, feedback triage), and error monitoring.
+
+TODO(owner): confirm which Vercel platform logs (function logs, retention) are enabled and who can see them.
+TODO(owner): decide whether admin actions need an audit trail.
+
+---
+
+## Limitations & human review
+
+- The portal does not call an AI model. Leaderboard points, badges, plan suggestions and plan matching are computed by deterministic code (`src/lib/scoring.ts`, `src/lib/achievements.ts`, `src/lib/plan-suggestions.ts`, `src/lib/plan-match.ts`).
+- The agent-library **reviewed** badge records a SAAF maintainer review of code quality (`public/data/agent-reviews.json`, `reviews/`). It is not assurance on an agent. The agent-library page says so: "We cannot provide assurance on these agents [...] Validate all output before relying on it in real audit work."
+- Leaderboard scores are a participation measure derived from GitHub activity, not a quality judgement on a contribution.
+- Signup requests are approved or denied by a person (`scripts/process-signups.ts`); nothing is approved automatically.
+
+TODO(owner): add any other limitation users should know about (e.g. data freshness of the cached GitHub data).
+
+---
+
 ## License & data
 
-- Code: see repo settings
+- Code: see [`LICENSE`](LICENSE). All rights reserved; licence terms are to be published by Stichting SAAF (in formation). Contributions: see [`CONTRIBUTING.md`](CONTRIBUTING.md) and the draft [`CLA.md`](CLA.md).
 - User data: stored only in Vercel Postgres. GDPR — users can request deletion via feedback button.
 - No real audit evidence is processed by the portal. Plans reference synthetic data only.
+
+---
+
+## Maintainers & contact
+
+- Copyright holder per [`LICENSE`](LICENSE): Mathijs Schouten, on behalf of Stichting SAAF (in formation). Portal admin: GitHub user `MSACC`.
+- TODO(owner): name the maintainer(s) and a contact channel for questions about the portal (e.g. the feedback button or an e-mail address).
+- Plan: no plan for the portal was found in `SAAF-Project/plans/`. TODO(owner): link one if it exists.
