@@ -1,4 +1,5 @@
 import Link from "next/link";
+import FindingRules from "@/components/FindingRules";
 
 // The Security Challenge handout (10 November 2026) as a page, with the printable PDF next to it.
 // Keep the text in step with public/challenge/saaf-security-challenge-handout.pdf.
@@ -18,13 +19,6 @@ const handIn = [
   { k: "Deadline", v: "Last CSV before 16:30." },
 ];
 
-const counts = [
-  { k: "Counts", v: "One weakness in one place: a repo plus file, endpoint or site; behaviour that is not what was intended or safe; a plausible security, privacy or audit impact." },
-  { k: "Once", v: "The same root cause in one repo counts once." },
-  { k: "Per repo", v: "The same issue in three repos counts three times." },
-  { k: "Not new", v: "Anything already among the 127 found before today, false positives, third-party services, repos outside SAAF-Project." },
-  { k: "Never", v: "No live keys or secret values, no personal data, no attacks on live systems. Local copies only; live sites passive only." },
-];
 
 const afternoon = [
   { t: "14:15", v: "Build in teams. Mail your CSV whenever you have one." },
@@ -101,7 +95,7 @@ export default function ChallengePage() {
 
         <section className="bg-surface border border-border rounded-2xl p-5 min-w-0">
           <h2 className="text-xs font-mono text-muted mb-3">What counts as one finding</h2>
-          <Rows rows={counts} />
+          <FindingRules />
           <p className="text-xs text-muted leading-relaxed mt-3">
             Tip for your agent: <i>&ldquo;Export our findings as CSV with exactly these columns, one row per distinct weakness, no secret values.&rdquo;</i>
           </p>
