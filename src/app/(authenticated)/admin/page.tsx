@@ -41,7 +41,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 export default function AdminPage() {
   const { data: session } = useSession();
   const router = useRouter();
-  const [tab, setTab] = useState<"signups" | "feedback" | "quiz">("signups");
+  const [tab, setTab] = useState<"signups" | "feedback" | "quiz" | "demos">("signups");
   const [requests, setRequests] = useState<SignupRequest[]>([]);
   const [feedback, setFeedback] = useState<FeedbackItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -125,9 +125,18 @@ export default function AdminPage() {
         >
           Quiz
         </button>
+        <button
+          onClick={() => setTab("demos")}
+          className={`px-4 py-2 text-sm font-semibold cursor-pointer transition-colors border-b-2 ${
+            tab === "demos" ? "text-accent border-accent" : "text-muted border-transparent hover:text-text"
+          }`}
+        >
+          Demos
+        </button>
       </div>
 
       {tab === "quiz" && <QuizTab />}
+      {tab === "demos" && <DemosTab />}
 
       {tab === "signups" && (
         <SignupsTab requests={requests} pendingCount={pendingSignups.length} />
@@ -396,6 +405,96 @@ function QuizTab() {
           </table>
         </div>
       )}
+    </>
+  );
+}
+
+interface DemoSlotAdmin {
+  slot: string;
+  taken: boolean;
+  team?: string;
+  title?: string;
+  id?: string;
+  githubUsername?: string;
+  name?: string | null;
+  organisation?: string | null;
+}
+
+function DemosTab() {
+  const [slots, setSlots] = useState<DemoSlotAdmin[] | null>(null);
+
+  const load = () => {
+    fetch("/api/demo")
+      .then((r) => (r.ok ? r.json() : { slots: [] }))
+      .then((d) => setSlots(Array.isArray(d.slots) ? d.slots : []))
+      .catch(() => setSlots([]));
+  };
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/demo")
+      .then((r) => (r.ok ? r.json() : { slots: [] }))
+      .then((d) => {
+        if (active) setSlots(Array.isArray(d.slots) ? d.slots : []);
+      })
+      .catch(() => active && setSlots([]));
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const release = async (id: string) => {
+    await fetch(`/api/demo?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+    load();
+  };
+
+  if (slots === null) return <div className="text-muted text-center py-12">Loading...</div>;
+  const taken = slots.filter((s) => s.taken).length;
+
+  return (
+    <>
+      <div className="bg-surface border border-border rounded-xl p-4 mb-6 flex flex-wrap items-center gap-4">
+        <div className="text-3xl font-black text-accent">{taken}/{slots.length}</div>
+        <div className="flex-1 min-w-[200px]">
+          <div className="font-semibold text-sm">Demo slots, 16:30 to 17:00</div>
+          <p className="text-muted text-xs">Members sign up at /demo. Release a slot to free it for another team.</p>
+        </div>
+        <button onClick={load} className="text-xs px-3 py-2 rounded-lg border border-border hover:border-accent cursor-pointer">
+          Refresh
+        </button>
+      </div>
+      <div className="bg-surface border border-border rounded-xl overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-border text-left text-xs text-muted">
+              <th className="px-4 py-3 font-medium">Slot</th>
+              <th className="px-4 py-3 font-medium">Team</th>
+              <th className="px-4 py-3 font-medium">Guard</th>
+              <th className="px-4 py-3 font-medium">Signed up by</th>
+              <th className="px-4 py-3 font-medium"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {slots.map((s) => (
+              <tr key={s.slot} className="border-b border-border">
+                <td className="px-4 py-3 font-mono">{s.slot}</td>
+                <td className="px-4 py-3 font-semibold">{s.team || <span className="text-muted font-normal">Free</span>}</td>
+                <td className="px-4 py-3">{s.title || ""}</td>
+                <td className="px-4 py-3 text-muted text-xs">
+                  {s.githubUsername ? `${s.name || s.githubUsername} @${s.githubUsername}${s.organisation ? " · " + s.organisation : ""}` : ""}
+                </td>
+                <td className="px-4 py-3 text-right">
+                  {s.id && (
+                    <button onClick={() => release(s.id!)} className="text-xs px-2 py-1 rounded-lg border border-border hover:border-saaf-red cursor-pointer">
+                      Release
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 }
