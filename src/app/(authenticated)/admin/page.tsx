@@ -409,86 +409,160 @@ function QuizTab() {
   );
 }
 
-interface DemoSlotAdmin {
-  slot: string;
-  taken: boolean;
-  team?: string;
-  title?: string;
-  id?: string;
-  githubUsername?: string;
+interface DemoTeamAdmin {
+  id: string;
+  team: string;
+  title: string;
+  what?: string;
+  why?: string;
+  repo: string;
+  githubUsername: string;
   name?: string | null;
   organisation?: string | null;
+  start?: string;
+  end?: string;
+}
+
+interface DemoAdminState {
+  drawn: boolean;
+  secondsPerTeam: number;
+  teams: DemoTeamAdmin[];
+  schedule: DemoTeamAdmin[] | null;
 }
 
 function DemosTab() {
-  const [slots, setSlots] = useState<DemoSlotAdmin[] | null>(null);
+  const [state, setState] = useState<DemoAdminState | null>(null);
+  const [confirm, setConfirm] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const load = () => {
     fetch("/api/demo")
-      .then((r) => (r.ok ? r.json() : { slots: [] }))
-      .then((d) => setSlots(Array.isArray(d.slots) ? d.slots : []))
-      .catch(() => setSlots([]));
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setState(d))
+      .catch(() => setState(null));
   };
 
   useEffect(() => {
     let active = true;
     fetch("/api/demo")
-      .then((r) => (r.ok ? r.json() : { slots: [] }))
+      .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
-        if (active) setSlots(Array.isArray(d.slots) ? d.slots : []);
+        if (active) setState(d);
       })
-      .catch(() => active && setSlots([]));
+      .catch(() => undefined);
     return () => {
       active = false;
     };
   }, []);
 
-  const release = async (id: string) => {
+  const draw = async () => {
+    setError(null);
+    const res = await fetch("/api/demo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "draw" }),
+    });
+    if (!res.ok) setError((await res.json().catch(() => ({}))).error || "Draw failed");
+    setConfirm(false);
+    load();
+  };
+  const clearDraw = async () => {
+    await fetch("/api/demo?draw=clear", { method: "DELETE" });
+    load();
+  };
+  const remove = async (id: string) => {
     await fetch(`/api/demo?id=${encodeURIComponent(id)}`, { method: "DELETE" });
     load();
   };
 
-  if (slots === null) return <div className="text-muted text-center py-12">Loading...</div>;
-  const taken = slots.filter((s) => s.taken).length;
+  if (state === null) return <div className="text-muted text-center py-12">Loading...</div>;
+  const per = state.secondsPerTeam;
+  const perLabel = per % 60 ? `${Math.floor(per / 60)} min ${per % 60} s` : `${per / 60} min`;
+  const rows = state.schedule ?? state.teams;
 
   return (
     <>
       <div className="bg-surface border border-border rounded-xl p-4 mb-6 flex flex-wrap items-center gap-4">
-        <div className="text-3xl font-black text-accent">{taken}/{slots.length}</div>
-        <div className="flex-1 min-w-[200px]">
-          <div className="font-semibold text-sm">Demo slots, 16:30 to 17:00</div>
-          <p className="text-muted text-xs">Members sign up at /demo. Release a slot to free it for another team.</p>
+        <div className="text-3xl font-black text-accent">{state.teams.length}</div>
+        <div className="flex-1 min-w-[220px]">
+          <div className="font-semibold text-sm">
+            {state.drawn ? "Order drawn" : "Teams signed up"} · {perLabel} each, 16:30 to 17:00
+          </div>
+          <p className="text-muted text-xs">
+            Teams sign up at /demo. Draw just before 16:30; drawing closes sign-up and shows the order to everyone.
+          </p>
         </div>
         <button onClick={load} className="text-xs px-3 py-2 rounded-lg border border-border hover:border-accent cursor-pointer">
           Refresh
         </button>
+        <a href="/api/demo?format=csv" className="text-xs px-3 py-2 rounded-lg border border-border hover:border-accent">
+          Download CSV
+        </a>
+        <a href="/api/demo?format=json" className="text-xs px-3 py-2 rounded-lg border border-border hover:border-accent">
+          JSON
+        </a>
+        {confirm ? (
+          <>
+            <button onClick={draw} className="text-xs px-3 py-2 rounded-lg bg-indigo-600 text-white cursor-pointer">
+              {state.drawn ? "Yes, draw again" : "Yes, draw now"}
+            </button>
+            <button onClick={() => setConfirm(false)} className="text-xs px-3 py-2 rounded-lg border border-border cursor-pointer">
+              Cancel
+            </button>
+          </>
+        ) : (
+          <button onClick={() => setConfirm(true)} disabled={state.teams.length === 0}
+            className="text-xs px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer disabled:opacity-50">
+            {state.drawn ? "Draw again" : "Draw order at random"}
+          </button>
+        )}
+        {state.drawn && (
+          <button onClick={clearDraw} className="text-xs px-3 py-2 rounded-lg border border-border hover:border-saaf-red cursor-pointer">
+            Clear draw
+          </button>
+        )}
       </div>
+      {error && <p className="text-sm text-saaf-red mb-4">{error}</p>}
       <div className="bg-surface border border-border rounded-xl overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border text-left text-xs text-muted">
-              <th className="px-4 py-3 font-medium">Slot</th>
-              <th className="px-4 py-3 font-medium">Team</th>
-              <th className="px-4 py-3 font-medium">Guard</th>
+              <th className="px-4 py-3 font-medium">{state.drawn ? "Start" : "#"}</th>
+              <th className="px-4 py-3 font-medium">Team and guard</th>
+              <th className="px-4 py-3 font-medium">What they built · why they should win</th>
+              <th className="px-4 py-3 font-medium">Repo</th>
               <th className="px-4 py-3 font-medium">Signed up by</th>
               <th className="px-4 py-3 font-medium"></th>
             </tr>
           </thead>
           <tbody>
-            {slots.map((s) => (
-              <tr key={s.slot} className="border-b border-border">
-                <td className="px-4 py-3 font-mono">{s.slot}</td>
-                <td className="px-4 py-3 font-semibold">{s.team || <span className="text-muted font-normal">Free</span>}</td>
-                <td className="px-4 py-3">{s.title || ""}</td>
+            {rows.map((t, i) => (
+              <tr key={t.id} className="border-b border-border align-top">
+                <td className="px-4 py-3 font-mono">{t.start ?? i + 1}</td>
+                <td className="px-4 py-3">
+                  <div className="font-semibold">{t.team}</div>
+                  <div className="text-muted text-xs">{t.title}</div>
+                </td>
+                <td className="px-4 py-3 text-xs max-w-[420px]">
+                  <div>{t.what}</div>
+                  <div className="text-muted mt-1">{t.why}</div>
+                </td>
+                <td className="px-4 py-3 text-xs font-mono">
+                  {t.repo ? (
+                    <a href={`https://github.com/${t.repo}`} target="_blank" rel="noopener noreferrer" className="hover:text-accent">
+                      {t.repo.replace("SAAF-Project/", "")}
+                    </a>
+                  ) : (
+                    <span className="text-muted">none</span>
+                  )}
+                </td>
                 <td className="px-4 py-3 text-muted text-xs">
-                  {s.githubUsername ? `${s.name || s.githubUsername} @${s.githubUsername}${s.organisation ? " · " + s.organisation : ""}` : ""}
+                  {`${t.name || t.githubUsername} @${t.githubUsername}${t.organisation ? " · " + t.organisation : ""}`}
                 </td>
                 <td className="px-4 py-3 text-right">
-                  {s.id && (
-                    <button onClick={() => release(s.id!)} className="text-xs px-2 py-1 rounded-lg border border-border hover:border-saaf-red cursor-pointer">
-                      Release
-                    </button>
-                  )}
+                  <button onClick={() => remove(t.id)} className="text-xs px-2 py-1 rounded-lg border border-border hover:border-saaf-red cursor-pointer">
+                    Remove
+                  </button>
                 </td>
               </tr>
             ))}
