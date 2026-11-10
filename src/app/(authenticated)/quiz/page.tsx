@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import FindingRules from "@/components/FindingRules";
+import PizzaToggle from "@/components/PizzaToggle";
 
 type QuizState = { count: number; guess: number | null; locked: boolean; lockAt: string };
 
@@ -97,6 +99,18 @@ export default function QuizPage() {
       <p className="text-xs font-mono text-muted">
         {state ? `${state.count} ${state.count === 1 ? "guess" : "guesses"} so far · closes at 17:00` : "Loading…"}
       </p>
+
+      <div className="mt-8">
+        <PizzaToggle />
+      </div>
+
+      <section className="mt-10">
+        <h2 className="text-xs font-mono text-muted mb-3">What counts as one finding</h2>
+        <FindingRules />
+        <p className="text-xs text-muted leading-relaxed mt-3">
+          Severity does not change the count. The full handout is under Security Challenge, Handout.
+        </p>
+      </section>
     </div>
   );
 }

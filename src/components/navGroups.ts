@@ -34,8 +34,16 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: "/leaderboard", label: "Leaderboard", icon: "★" },
       { href: "/participants", label: "Participants", icon: "👥" },
       { href: "/tracks", label: "Tracks", icon: "▶" },
+    ],
+  },
+  {
+    id: "challenge",
+    label: "Security Challenge",
+    hint: "10 November 2026",
+    items: [
+      { href: "/challenge", label: "Handout", icon: "▤" },
+      { href: "/demo", label: "Demo sign-up", icon: "▷" },
       { href: "/quiz", label: "Quiz", icon: "?" },
-      { href: "/demo", label: "Demo slots", icon: "▷" },
     ],
   },
   {
