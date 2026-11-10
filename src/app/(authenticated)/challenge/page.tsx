@@ -1,5 +1,6 @@
 import Link from "next/link";
 import FindingRules from "@/components/FindingRules";
+import PizzaToggle from "@/components/PizzaToggle";
 
 // The Security Challenge handout (10 November 2026) as a page, with the printable PDF next to it.
 // Keep the text in step with public/challenge/saaf-security-challenge-handout.pdf.
@@ -26,6 +27,7 @@ const afternoon = [
   { t: "16:30", v: "Demos: click-through, offline on your own laptop. No live cloud fixes. Order drawn at random; the half hour is split evenly, five minutes at most.", accent: true },
   { t: "17:00", v: "The jury deliberates for ten minutes. Grab a drink." },
   { t: "17:10", v: "Prizes, and the quiz winner." },
+  { t: "17:30", v: "Pizza and drinks. Tell us below whether you stay." },
 ];
 
 function Rows({ rows }: { rows: { k: string; v: React.ReactNode }[] }) {
@@ -135,6 +137,10 @@ export default function ChallengePage() {
             </Link>
           </div>
         </section>
+      </div>
+
+      <div className="mt-10">
+        <PizzaToggle />
       </div>
     </div>
   );

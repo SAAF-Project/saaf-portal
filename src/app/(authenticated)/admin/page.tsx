@@ -41,7 +41,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 export default function AdminPage() {
   const { data: session } = useSession();
   const router = useRouter();
-  const [tab, setTab] = useState<"signups" | "feedback" | "quiz" | "demos">("signups");
+  const [tab, setTab] = useState<"signups" | "feedback" | "quiz" | "demos" | "pizza">("signups");
   const [requests, setRequests] = useState<SignupRequest[]>([]);
   const [feedback, setFeedback] = useState<FeedbackItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -133,10 +133,19 @@ export default function AdminPage() {
         >
           Demos
         </button>
+        <button
+          onClick={() => setTab("pizza")}
+          className={`px-4 py-2 text-sm font-semibold cursor-pointer transition-colors border-b-2 ${
+            tab === "pizza" ? "text-accent border-accent" : "text-muted border-transparent hover:text-text"
+          }`}
+        >
+          Pizza
+        </button>
       </div>
 
       {tab === "quiz" && <QuizTab />}
       {tab === "demos" && <DemosTab />}
+      {tab === "pizza" && <PizzaTab />}
 
       {tab === "signups" && (
         <SignupsTab requests={requests} pendingCount={pendingSignups.length} />
@@ -564,6 +573,75 @@ function DemosTab() {
                     Remove
                   </button>
                 </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
+interface PizzaAdmin {
+  yes: number;
+  no: number;
+  locked: boolean;
+  people?: { choice: string; githubUsername: string; name?: string | null; organisation?: string | null }[];
+}
+
+function PizzaTab() {
+  const [state, setState] = useState<PizzaAdmin | null>(null);
+
+  const load = () => {
+    fetch("/api/pizza")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setState(d))
+      .catch(() => setState(null));
+  };
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/pizza")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (active) setState(d);
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (state === null) return <div className="text-muted text-center py-12">Loading...</div>;
+  const people = state.people ?? [];
+
+  return (
+    <>
+      <div className="bg-surface border border-border rounded-xl p-4 mb-6 flex flex-wrap items-center gap-4">
+        <div className="text-3xl font-black text-accent">{state.yes}</div>
+        <div className="flex-1 min-w-[200px]">
+          <div className="font-semibold text-sm">Want pizza at 17:30 · {state.no} said no</div>
+          <p className="text-muted text-xs">Members choose on the Quiz and Handout pages. Closes at 16:00.</p>
+        </div>
+        <button onClick={load} className="text-xs px-3 py-2 rounded-lg border border-border hover:border-accent cursor-pointer">
+          Refresh
+        </button>
+      </div>
+      <div className="bg-surface border border-border rounded-xl overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-border text-left text-xs text-muted">
+              <th className="px-4 py-3 font-medium">Pizza</th>
+              <th className="px-4 py-3 font-medium">Member</th>
+              <th className="px-4 py-3 font-medium">Organisation</th>
+            </tr>
+          </thead>
+          <tbody>
+            {people.map((p) => (
+              <tr key={p.githubUsername} className="border-b border-border">
+                <td className={`px-4 py-3 font-medium ${p.choice === "yes" ? "text-accent" : "text-muted"}`}>{p.choice}</td>
+                <td className="px-4 py-3">{p.name || p.githubUsername} <span className="text-muted text-xs">@{p.githubUsername}</span></td>
+                <td className="px-4 py-3 text-muted text-xs">{p.organisation || ""}</td>
               </tr>
             ))}
           </tbody>
