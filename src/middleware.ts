@@ -22,5 +22,6 @@ export const config = {
     "/quiz/:path*",
     "/demo/:path*",
     "/challenge/:path*",
+    "/teams/:path*",
   ],
 };

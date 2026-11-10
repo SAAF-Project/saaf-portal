@@ -42,6 +42,7 @@ export const NAV_GROUPS: NavGroup[] = [
     hint: "10 November 2026",
     items: [
       { href: "/challenge", label: "Handout", icon: "▤" },
+      { href: "/teams", label: "Teams", icon: "◎" },
       { href: "/demo", label: "Demo sign-up", icon: "▷" },
       { href: "/quiz", label: "Quiz", icon: "?" },
     ],

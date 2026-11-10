@@ -41,7 +41,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 export default function AdminPage() {
   const { data: session } = useSession();
   const router = useRouter();
-  const [tab, setTab] = useState<"signups" | "feedback" | "quiz" | "demos" | "pizza">("signups");
+  const [tab, setTab] = useState<"signups" | "feedback" | "quiz" | "teams" | "demos" | "pizza">("signups");
   const [requests, setRequests] = useState<SignupRequest[]>([]);
   const [feedback, setFeedback] = useState<FeedbackItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -126,6 +126,14 @@ export default function AdminPage() {
           Quiz
         </button>
         <button
+          onClick={() => setTab("teams")}
+          className={`px-4 py-2 text-sm font-semibold cursor-pointer transition-colors border-b-2 ${
+            tab === "teams" ? "text-accent border-accent" : "text-muted border-transparent hover:text-text"
+          }`}
+        >
+          Teams
+        </button>
+        <button
           onClick={() => setTab("demos")}
           className={`px-4 py-2 text-sm font-semibold cursor-pointer transition-colors border-b-2 ${
             tab === "demos" ? "text-accent border-accent" : "text-muted border-transparent hover:text-text"
@@ -144,6 +152,7 @@ export default function AdminPage() {
       </div>
 
       {tab === "quiz" && <QuizTab />}
+      {tab === "teams" && <TeamsTab />}
       {tab === "demos" && <DemosTab />}
       {tab === "pizza" && <PizzaTab />}
 
@@ -646,6 +655,114 @@ function PizzaTab() {
             ))}
           </tbody>
         </table>
+      </div>
+    </>
+  );
+}
+
+type TeamsRole = "hacker" | "dev" | "auditor";
+type TeamsAdmin = {
+  counts: Record<TeamsRole, number>;
+  drawn: boolean;
+  waiting: number;
+  teams: { number: number; members: { githubUsername: string; name: string | null; organisation: string | null; role: TeamsRole }[] }[];
+};
+const ROLE_LABEL: Record<TeamsRole, string> = { hacker: "Hacker", dev: "Developer", auditor: "Auditor" };
+
+function TeamsTab() {
+  const [state, setState] = useState<TeamsAdmin | null>(null);
+  const [confirm, setConfirm] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = () => {
+    fetch("/api/teams")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setState(d))
+      .catch(() => setState(null));
+  };
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/teams")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (active) setState(d);
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const act = async (action: "draw" | "late") => {
+    setError(null);
+    const res = await fetch("/api/teams", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action }) });
+    if (!res.ok) setError((await res.json().catch(() => ({}))).error || "Something went wrong");
+    setConfirm(false);
+    load();
+  };
+
+  const clear = async () => {
+    await fetch("/api/teams", { method: "DELETE" });
+    load();
+  };
+
+  if (state === null) return <div className="text-muted text-center py-12">Loading...</div>;
+  const total = state.counts.hacker + state.counts.dev + state.counts.auditor;
+
+  return (
+    <>
+      <div className="bg-surface border border-border rounded-xl p-4 mb-6 flex flex-wrap items-center gap-4">
+        <div className="text-3xl font-black text-accent">{total}</div>
+        <div className="flex-1 min-w-[200px]">
+          <div className="font-semibold text-sm">
+            {state.counts.hacker} hackers · {state.counts.dev} developers · {state.counts.auditor} auditors
+          </div>
+          <p className="text-muted text-xs">
+            Members pick a role on the Teams page. Every team gets a hacker or developer; about four per team.
+            {state.drawn && state.waiting > 0 ? ` ${state.waiting} picked a role after the draw.` : ""}
+          </p>
+        </div>
+        <button onClick={load} className="text-xs px-3 py-2 rounded-lg border border-border hover:border-accent cursor-pointer">
+          Refresh
+        </button>
+        {state.drawn && state.waiting > 0 && (
+          <button onClick={() => act("late")} className="text-xs px-3 py-2 rounded-lg border border-border hover:border-accent cursor-pointer">
+            Add late arrivals
+          </button>
+        )}
+        {confirm ? (
+          <span className="flex gap-2 items-center text-xs">
+            {state.drawn ? "Make new teams? The current ones are replaced." : "Make the teams now?"}
+            <button onClick={() => act("draw")} className="px-3 py-2 rounded-lg bg-indigo-600 text-white cursor-pointer">Yes</button>
+            <button onClick={() => setConfirm(false)} className="px-3 py-2 rounded-lg border border-border cursor-pointer">No</button>
+          </span>
+        ) : (
+          <button onClick={() => setConfirm(true)} className="text-xs px-3 py-2 rounded-lg bg-indigo-600 text-white cursor-pointer">
+            {state.drawn ? "Make new teams" : "Make teams"}
+          </button>
+        )}
+        {state.drawn && (
+          <button onClick={clear} className="text-xs px-3 py-2 rounded-lg border border-border hover:border-accent cursor-pointer">
+            Clear teams
+          </button>
+        )}
+      </div>
+      {error && <p className="text-sm text-red-500 mb-4">{error}</p>}
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {state.teams.map((t) => (
+          <div key={t.number} className="bg-surface border border-border rounded-xl p-4">
+            <p className="text-xs font-mono text-muted mb-2">Team {t.number} · {t.members.length}</p>
+            <ul className="grid gap-1 text-sm">
+              {t.members.map((m) => (
+                <li key={m.githubUsername} className="flex justify-between gap-3">
+                  <span>{m.name || m.githubUsername} <span className="text-muted text-xs">@{m.githubUsername}</span></span>
+                  <span className="text-xs font-mono text-muted">{ROLE_LABEL[m.role]}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </div>
     </>
   );

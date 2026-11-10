@@ -23,6 +23,7 @@ const handIn = [
 
 const afternoon = [
   { t: "14:15", v: "Guest hackers present what they found, five minutes each." },
+  { t: "14:55", v: <>Pick hacker, developer or auditor on <Link href="/teams" className="text-accent hover:underline">Teams</Link>; we mix the teams. Guess the quiz total.</> },
   { t: "15:00", v: "Build in teams. Mail your CSV whenever you have one." },
   { t: "by 16:15", v: <>Sign up your team at <Link href="/demo" className="text-accent hover:underline">Demo sign-up</Link>: team name, guard name, what you built, why you should win, your SAAF repo.</> },
   { t: "16:30", v: "Demos: click-through, offline on your own laptop. No live cloud fixes. Order drawn at random; the half hour is split evenly, five minutes at most.", accent: true },
