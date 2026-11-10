@@ -28,6 +28,26 @@ export async function GET(request: NextRequest) {
 
   const prisma = getPrisma();
 
+  if (request.nextUrl.searchParams.get("format") === "json") {
+    if (username !== ADMIN_USERNAME) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    const rows = await prisma.feedback.findMany({
+      where: { category: QUIZ_CATEGORY },
+      include: { user: { select: { githubUsername: true, name: true, organisation: true } } },
+      orderBy: { createdAt: "asc" },
+    });
+    return NextResponse.json(
+      rows.map((r) => ({
+        githubUsername: r.user.githubUsername,
+        name: r.user.name,
+        organisation: r.user.organisation,
+        guess: Number(r.text),
+        createdAt: r.createdAt,
+      })),
+    );
+  }
+
   if (request.nextUrl.searchParams.get("format") === "csv") {
     if (username !== ADMIN_USERNAME) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });

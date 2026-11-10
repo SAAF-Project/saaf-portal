@@ -41,7 +41,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 export default function AdminPage() {
   const { data: session } = useSession();
   const router = useRouter();
-  const [tab, setTab] = useState<"signups" | "feedback">("signups");
+  const [tab, setTab] = useState<"signups" | "feedback" | "quiz">("signups");
   const [requests, setRequests] = useState<SignupRequest[]>([]);
   const [feedback, setFeedback] = useState<FeedbackItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -117,7 +117,17 @@ export default function AdminPage() {
             </span>
           )}
         </button>
+        <button
+          onClick={() => setTab("quiz")}
+          className={`px-4 py-2 text-sm font-semibold cursor-pointer transition-colors border-b-2 ${
+            tab === "quiz" ? "text-accent border-accent" : "text-muted border-transparent hover:text-text"
+          }`}
+        >
+          Quiz
+        </button>
       </div>
+
+      {tab === "quiz" && <QuizTab />}
 
       {tab === "signups" && (
         <SignupsTab requests={requests} pendingCount={pendingSignups.length} />
@@ -289,4 +299,103 @@ function FeedbackStatusBadge({ status }: { status: string }) {
     : status === "reviewed" ? "bg-saaf-yellow/15 text-saaf-yellow"
     : "bg-saaf-green/15 text-saaf-green";
   return <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${styles}`}>{status}</span>;
+}
+
+interface QuizGuess {
+  githubUsername: string;
+  name: string | null;
+  organisation: string | null;
+  guess: number;
+  createdAt: string;
+}
+
+function QuizTab() {
+  const [guesses, setGuesses] = useState<QuizGuess[] | null>(null);
+  const [answer, setAnswer] = useState("");
+
+  const load = () => {
+    fetch("/api/quiz?format=json")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((d) => setGuesses(Array.isArray(d) ? d : []))
+      .catch(() => setGuesses([]));
+  };
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/quiz?format=json")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((d) => {
+        if (active) setGuesses(Array.isArray(d) ? d : []);
+      })
+      .catch(() => active && setGuesses([]));
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (guesses === null) return <div className="text-muted text-center py-12">Loading...</div>;
+
+  const total = answer.trim() === "" ? null : Number(answer);
+  const ranked = [...guesses]
+    .map((g) => ({ ...g, off: total === null || Number.isNaN(total) ? null : Math.abs(g.guess - total) }))
+    .sort((a, b) => (a.off === null || b.off === null ? a.guess - b.guess : a.off - b.off || a.createdAt.localeCompare(b.createdAt)));
+
+  return (
+    <>
+      <div className="bg-surface border border-border rounded-xl p-4 mb-6 flex flex-wrap items-center gap-4">
+        <div className="text-3xl font-black text-accent">{guesses.length}</div>
+        <div className="flex-1 min-w-[200px]">
+          <div className="font-semibold text-sm">Guesses for the 10 November quiz</div>
+          <p className="text-muted text-xs">Enter the distinct total from the tally to rank by closest guess. Ties go to the earliest guess.</p>
+        </div>
+        <input
+          type="number"
+          inputMode="numeric"
+          placeholder="Actual total"
+          value={answer}
+          onChange={(e) => setAnswer(e.target.value)}
+          className="w-36 bg-bg border border-border rounded-lg px-3 py-2 text-sm"
+        />
+        <button onClick={load} className="text-xs px-3 py-2 rounded-lg border border-border hover:border-accent cursor-pointer">
+          Refresh
+        </button>
+        <a href="/api/quiz?format=csv" className="text-xs px-3 py-2 rounded-lg border border-border hover:border-accent no-underline">
+          Download CSV
+        </a>
+      </div>
+
+      {guesses.length === 0 ? (
+        <div className="bg-surface border border-border rounded-xl p-8 text-center">
+          <p className="text-muted text-sm">No guesses yet.</p>
+        </div>
+      ) : (
+        <div className="bg-surface border border-border rounded-xl overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border text-left text-xs text-muted">
+                <th className="px-4 py-3 font-medium">#</th>
+                <th className="px-4 py-3 font-medium">Member</th>
+                <th className="px-4 py-3 font-medium">Organisation</th>
+                <th className="px-4 py-3 font-medium text-right">Guess</th>
+                <th className="px-4 py-3 font-medium text-right">Off by</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ranked.map((g, i) => (
+                <tr key={g.githubUsername} className={`border-b border-border ${g.off !== null && i < 3 ? "font-semibold" : ""}`}>
+                  <td className="px-4 py-3 text-muted">{i + 1}</td>
+                  <td className="px-4 py-3">
+                    {g.name || g.githubUsername} <span className="text-muted text-xs">@{g.githubUsername}</span>
+                  </td>
+                  <td className="px-4 py-3 text-muted">{g.organisation || "—"}</td>
+                  <td className="px-4 py-3 text-right font-mono">{g.guess}</td>
+                  <td className="px-4 py-3 text-right font-mono">{g.off === null ? "—" : g.off}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </>
+  );
 }
