@@ -6,7 +6,7 @@ import StandardsChecklist from "@/components/temple/standards/StandardsChecklist
 
 // The printable handout. Set this to "/hardening/saaf-hardening-day-handout.pdf" once that file is in public/hardening/;
 // until then the page shows no download button. Keep the text below in step with the PDF.
-const HANDOUT_PDF = null as string | null;
+const HANDOUT_PDF: string | null = "/hardening/saaf-hardening-day-handout.pdf";
 
 const routes = [
   { name: "Harden", text: "Take an existing agent and add what is missing from the nine." },
