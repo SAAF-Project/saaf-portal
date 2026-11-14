@@ -59,6 +59,21 @@ describe("visualisations", () => {
     expect(displayOptionsOf(findView(views, "dependencies")!)).toEqual(["style"]);
   });
 
+  it("gives the Standards view no display options and no filters, and a tour that stays on its own page", () => {
+    const standards = findView(views, "standards")!;
+    expect(displayOptionsOf(standards)).toEqual([]);
+    expect(standards.supports).toEqual({ filters: false, display: [], relations: false });
+    expect(standards.shortName).toBe("Std");
+    // the view has no Filters button, no Display menu and no step about the legend
+    expect(standards.tour.map((s) => s.target)).toEqual(["view", "view", "panel", "tour"]);
+    expect(standards.calculation.join(" ")).toMatch(/default branch/);
+    expect(standards.calculation.join(" ")).toMatch(/every minute/);
+  });
+
+  it("still has the three earlier views, in their order, before the new one", () => {
+    expect(REGISTRY.map((r) => r.id)).toEqual(["temple", "islands", "dependencies", "standards"]);
+  });
+
   it("finds a view by id and says nothing for a missing or unknown one, so the chooser shows instead", () => {
     expect(findView(views, undefined)).toBeUndefined();
     expect(findView(views, null)).toBeUndefined();

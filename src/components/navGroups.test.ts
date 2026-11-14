@@ -49,6 +49,8 @@ describe("navigation groups", () => {
     const ids = group.items.map((i) => new URLSearchParams(i.href.split("?")[1] ?? "").get("view")).filter((v) => v && v !== "all");
     expect(ids.sort()).toEqual(folders);
     expect(group.items[0].href).toBe("/visualised#/?view=all");
+    expect(group.items.map((i) => i.href)).toContain("/visualised#/?view=standards");
+    expect(group.items.at(-1)).toMatchObject({ href: "/visualised#/?view=standards", label: "Standards" });
   });
 
   it("does not treat a page as active for a longer route with the same start", () => {

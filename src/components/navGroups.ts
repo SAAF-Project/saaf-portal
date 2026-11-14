@@ -66,6 +66,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: "/visualised#/?view=temple", label: "Temple", icon: "▲" },
       { href: "/visualised#/?view=islands", label: "Islands", icon: "◒" },
       { href: "/visualised#/?view=dependencies", label: "Agent dependencies", icon: "⇄" },
+      { href: "/visualised#/?view=standards", label: "Standards", icon: "▩" },
     ],
   },
   {

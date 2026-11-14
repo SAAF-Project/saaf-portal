@@ -6,6 +6,7 @@ import type { Focus, ProgressData } from "./types";
 import type { VisualisationManifest } from "./visualisation";
 import dependenciesPreview from "./views/dependencies/preview.jpg";
 import islandsPreview from "./views/islands/preview.jpg";
+import standardsPreview from "./views/standards/preview.jpg";
 import templePreview from "./views/temple/preview.jpg";
 
 /**
@@ -49,6 +50,7 @@ export const REGISTRY: { id: string; preview: string | { src: string }; componen
   { id: "temple", preview: templePreview, component: lazy(() => import("./Temple").then((m) => ({ default: m.Temple }))) },
   { id: "islands", preview: islandsPreview, component: lazy(() => import("./landscape/Landscape").then((m) => ({ default: m.Landscape }))) },
   { id: "dependencies", preview: dependenciesPreview, component: lazy(() => import("./flow/Flow").then((m) => ({ default: m.Flow }))) },
+  { id: "standards", preview: standardsPreview, component: lazy(() => import("./standards/WallView").then((m) => ({ default: m.StandardsWallView }))) },
 ];
 
 /**

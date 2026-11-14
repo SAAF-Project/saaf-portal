@@ -1,0 +1,34 @@
+# Standards: per repo, how many of the nine standards are built in. See views/README.md for the format.
+id: standards
+name: Standards
+short_name: Std
+title: The last layer
+description: Every repo as one face of nine tiles, one tile per standard. A tile fills in when the standard is in the repo, and a full face gets a ring.
+preview: preview.jpg
+access: community
+supports:
+  filters: false
+  display: []
+  relations: false
+calculation:
+  - This picture does not use the percentages above. It counts files. Each repo is checked against nine standards, and each standard is one tile.
+  - The nine checks look only at a repo's list of files. A README.md in the root of at least 500 bytes. An agent.yaml or agent.yml in the root. An AUDIT-CRITERIA.md in the root. A SECURITY.md in the root, .github/ or docs/. A LICENSE, LICENSE.md, LICENSE.txt or COPYING in the root. A tests folder or test files such as test_*.py or *.test.ts. A dependency manifest or lockfile such as requirements.txt, pyproject.toml, package.json, go.mod or Cargo.toml. A workflow in .github/workflows/. A CODEOWNERS in the root, .github/ or docs/.
+  - Only the default branch is read. A file on another branch, or in a pull request that is not merged yet, does not count.
+  - Archived repos, the organisation's meta repos and repos whose name starts with a dot are left out.
+  - A dashed tile means the file list could not be read or was cut off. That is "not checked", and it is never counted as missing.
+  - The picture asks for fresh data every minute while its tab is in front. If GitHub does not answer, the last result stays on screen and the line above the wall says so.
+  - A small square in a stage colour next to a repo's count means a plan names that repo as its own or as an alternative. The match is on the repo name.
+tour:
+  - title: Solve the last layer.
+    text: Every repo of the SAAF-Project organisation is one face of nine tiles. A filled tile is a standard that is in the repo. The faces are in alphabetical order, so a repo stays in the same place all day.
+    target: view
+    focus: { level: project }
+  - title: Nine tiles, nine standards.
+    text: The tiles are always in the same order. The key above the wall names the nine positions. A hairline tile is missing, a dashed tile could not be checked, and a face with all nine in place gets a ring.
+    target: view
+  - title: Click a face.
+    text: A click lists the nine standards of that repo by name, under the wall. When a plan is linked to the repo, the side panel opens that plan, and the small square under the face shows its stage.
+    target: panel
+  - title: It refreshes by itself.
+    text: The line above the wall counts the tiles in place and says when the repos were last checked. The picture refreshes every minute. You can replay this tour at any time.
+    target: tour
