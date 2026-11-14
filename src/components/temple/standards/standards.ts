@@ -76,7 +76,7 @@ export const STANDARDS: readonly Standard[] = [
     id: "security",
     label: "SECURITY.md",
     file: "SECURITY.md in the root, .github/ or docs/",
-    why: "Where to report a weakness, and how fast you get an answer.",
+    why: "The vulnerability disclosure policy: where to report a weakness, and what the finder can expect.",
     check: (files) => hasPath(files, inRootGithubOrDocs("SECURITY.md")),
   },
   {
