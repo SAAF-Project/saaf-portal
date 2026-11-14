@@ -11,7 +11,7 @@ const HANDOUT_PDF: string | null = "/hardening/saaf-hardening-day-handout.pdf";
 const routes = [
   { name: "Harden", text: "Take an existing agent and add what is missing from the nine." },
   { name: "Build", text: "Start an open plan from the starter template, with all nine built in." },
-  { name: "Merge", text: "Fold duplicate repos into one and archive the old ones, with a yes from the owner." },
+  { name: "Merge or revive", text: "Fold duplicate repos into one: the builders of both decide which one stays. Or revive a quiet agent and become its owner." },
 ];
 
 const layers = [
@@ -35,7 +35,7 @@ const tile = [
     k: "3",
     v: (
       <>
-        After a maintainer merges it to the default branch, the board at{" "}
+        After a maintainer merges it to the default branch (for example main or master), the board at{" "}
         <Link href="/standards" className="text-accent hover:underline">/standards</Link> turns the tile on within two minutes.
       </>
     ),
