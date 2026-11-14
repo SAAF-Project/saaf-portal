@@ -40,7 +40,10 @@ export const NAV_GROUPS: NavGroup[] = [
     id: "hardening",
     label: "Hardening day",
     hint: "17 November 2026",
-    items: [{ href: "/hardening", label: "Handout", icon: "▤" }],
+    items: [
+      { href: "/hardening", label: "Handout", icon: "▤" },
+      { href: "/standards", label: "Standards board", icon: "▥" },
+    ],
   },
   {
     id: "challenge",

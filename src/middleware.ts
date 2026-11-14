@@ -23,5 +23,6 @@ export const config = {
     "/demo/:path*",
     "/challenge/:path*",
     "/hardening/:path*",
+    "/standards/:path*",
   ],
 };

@@ -34,6 +34,7 @@ describe("navigation groups", () => {
     expect(activeGroupId("/visualised")).toBe("visualised");
     expect(activeGroupId("/e-learning")).toBe("learn");
     expect(activeGroupId("/hardening")).toBe("hardening");
+    expect(activeGroupId("/standards")).toBe("hardening");
     expect(activeGroupId("/demo")).toBe("challenge");
     expect(activeGroupId("/agent-library/some-agent")).toBe("build");
     expect(activeGroupId("/login")).toBeNull();

@@ -7,7 +7,7 @@ const ORG = "SAAF-Project";
 const REPO = "SAAF-Project/SAAF-Project";
 
 // Repos that aren't agents (meta repos)
-const META_REPOS = new Set(["saaf-portal", "SAAF-Project", "website"]);
+export const META_REPOS = new Set(["saaf-portal", "SAAF-Project", "website"]);
 
 export interface ReviewedAgent {
   category: string;

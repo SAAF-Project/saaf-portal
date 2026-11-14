@@ -51,7 +51,7 @@ async function inspectRepo(name: string, token: string, fetchImpl: Fetch) {
 }
 
 /** Runs `fn` over `items`, at most `limit` at a time. */
-async function mapLimited<T, R>(items: T[], limit: number, fn: (item: T) => Promise<R>): Promise<R[]> {
+export async function mapLimited<T, R>(items: T[], limit: number, fn: (item: T) => Promise<R>): Promise<R[]> {
   const out: R[] = new Array(items.length);
   let next = 0;
   await Promise.all(
