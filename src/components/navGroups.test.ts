@@ -6,8 +6,8 @@ import { ADMIN_ITEM, NAV_GROUPS, activeGroupId, isActive, pageOf } from "./navGr
 const items = NAV_GROUPS.flatMap((g) => g.items);
 
 describe("navigation groups", () => {
-  it("has six groups, each with at least one page", () => {
-    expect(NAV_GROUPS.map((g) => g.id)).toEqual(["work", "community", "challenge", "visualised", "learn", "build"]);
+  it("has seven groups, each with at least one page", () => {
+    expect(NAV_GROUPS.map((g) => g.id)).toEqual(["work", "community", "hardening", "challenge", "visualised", "learn", "build"]);
     for (const g of NAV_GROUPS) expect(g.items.length).toBeGreaterThan(0);
   });
 
@@ -33,6 +33,7 @@ describe("navigation groups", () => {
     expect(activeGroupId("/dashboard")).toBe("work");
     expect(activeGroupId("/visualised")).toBe("visualised");
     expect(activeGroupId("/e-learning")).toBe("learn");
+    expect(activeGroupId("/hardening")).toBe("hardening");
     expect(activeGroupId("/demo")).toBe("challenge");
     expect(activeGroupId("/agent-library/some-agent")).toBe("build");
     expect(activeGroupId("/login")).toBeNull();

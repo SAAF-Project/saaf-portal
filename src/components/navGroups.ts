@@ -37,8 +37,15 @@ export const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
+    id: "hardening",
+    label: "Hardening day",
+    hint: "17 November 2026",
+    items: [{ href: "/hardening", label: "Handout", icon: "▤" }],
+  },
+  {
     id: "challenge",
-    label: "Security Challenge",
+    // Short on purpose: with seven groups the full "Security Challenge" no longer fits the bar at 1024 px.
+    label: "Challenge",
     hint: "10 November 2026",
     items: [
       { href: "/challenge", label: "Handout", icon: "▤" },

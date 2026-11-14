@@ -1,4 +1,5 @@
 import { reposToInspect, type RepoSignal, type RepoSignals } from "../components/temple/liveAlerts";
+import { SKIPPED_PATH, TEST_PATH } from "../components/temple/standards/standards";
 
 // Repo state for the live alerts of the /progress visual (see components/temple/liveAlerts.ts for the rules).
 // One paged call lists every repo of the organisation (existence, archived, last push); for the repos of agents that
@@ -9,9 +10,6 @@ const ORG = "SAAF-Project";
 const API = "https://api.github.com";
 const REVALIDATE_SECONDS = 600;
 const CONCURRENCY = 6;
-
-const TEST_PATH = /(^|\/)(tests?|__tests__|spec)\/|(^|\/)test_[^/]+\.py$|_test\.(py|go)$|\.(test|spec)\.[cm]?[jt]sx?$/i;
-const SKIPPED_PATH = /(^|\/)(node_modules|vendor|\.venv|venv|site-packages)\//;
 
 /** What a repo's file list says. `null` = cannot tell (the list was cut off, or there is no list). */
 export function inspectTree(paths: string[], truncated: boolean): Pick<RepoSignal, "hasAuditCriteria" | "hasTests"> {
