@@ -77,6 +77,12 @@ const BADGE_DEFINITIONS = {
     howToEarn: "Set 'Claimed By' to your name in any plan's metadata. Capped at 2 claims.",
     levels: SHORT_LEVELS_2([1, 2]),
   },
+  revived: {
+    title: "Reviver",
+    description: "Revive a quiet agent: take it through the nine standards and become its owner.",
+    howToEarn: "Pick an agent that has been quiet for months, bring all nine standards to its default branch and put your GitHub handle in CODEOWNERS. Becoming owner alone does not count.",
+    levels: SHORT_LEVELS_3([1, 2, 3]),
+  },
 } as const;
 
 export function computeBadge(key: keyof typeof BADGE_DEFINITIONS, count: number): Badge {
@@ -113,4 +119,5 @@ export const BADGE_KEYS: (keyof typeof BADGE_DEFINITIONS)[] = [
   "newPlans",
   "planUpdates",
   "claims",
+  "revived",
 ];
