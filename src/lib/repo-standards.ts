@@ -27,8 +27,8 @@ export interface RepoStandards {
   url: string;
   private: boolean;
   pushed_at: string | null;
-  /** When the repo was made. `null` = GitHub did not say. */
-  created_at: string | null;
+  /** When the repo was made. `null` or absent = GitHub did not say. */
+  created_at?: string | null;
   checks: Checks;
 }
 

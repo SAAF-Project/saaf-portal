@@ -195,8 +195,8 @@ async function compute(board: StandardsPayload, token: string, fetchImpl: Fetch,
   if (phase === "before" || !board.repos) return { ...empty, computed_at: board.repos ? nowIso : null };
 
   const until = phase === "after" ? end : nowIso;
-  const existing = board.repos.filter((r) => r.created_at !== null && r.created_at < start);
-  const made = board.repos.filter((r) => r.created_at !== null && r.created_at >= start);
+  const existing = board.repos.filter((r) => !!r.created_at && r.created_at < start);
+  const made = board.repos.filter((r) => !!r.created_at && r.created_at >= start);
 
   const rows = await mapLimited(existing, CONCURRENCY, async (repo): Promise<PrizeRow | null> => {
     let before = startMet.get(repo.name);
