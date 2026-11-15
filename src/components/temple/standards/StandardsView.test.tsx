@@ -63,10 +63,20 @@ describe("standards board", () => {
   });
 
   it("sums the tiles in one line, with the time of the check", () => {
-    expect(text(html)).toMatch(/11 of 27 tiles in place · 1 repo complete · checked \d\d:\d\d/);
-    expect(text(html)).toContain("3 repos on the board · 9 tiles not checked");
+    expect(text(html)).toMatch(/11 of 27 standards met · 1 repo complete · checked \d\d:\d\d/);
+    expect(text(html)).toContain("3 repos on the board · 9 standards not checked");
     expect(text(html)).not.toContain("archived");
     expect(text(html)).not.toContain("may be behind");
+  });
+
+  it("makes the standards that came in today glow, keeps the rest in place, and counts them in the key", () => {
+    const html = renderToStaticMarkup(<StandardsView payload={payload()} loaded fresh={{ "sample-service": ["licence"] }} />);
+    const [, sample] = rows(html);
+    expect(marks(sample).filter((m) => m === "added today")).toHaveLength(1);
+    expect(marks(sample).filter((m) => m === "in place")).toHaveLength(1);
+    expect(text(html)).toContain("added today (1)");
+    // without anything new, no glow and no extra key
+    expect(render(payload())).not.toContain("added today");
   });
 
   it("says so when it shows an earlier result", () => {
@@ -79,7 +89,7 @@ describe("standards board", () => {
     for (const none of [render(payload({ repos: null, checked_at: null, archived: null })), render(null)]) {
       expect(text(none)).toContain("The board has no answer from GitHub right now. It tries again every minute.");
       expect(none).not.toContain("<table");
-      expect(text(none)).not.toContain("tiles in place");
+      expect(text(none)).not.toContain("standards met");
     }
     const waiting = render(null, false);
     expect(text(waiting)).toContain("Checking the repos.");
@@ -94,10 +104,10 @@ describe("board summary", () => {
   });
 
   it("writes the line in plain words, singular and plural", () => {
-    expect(summaryParts({ repos: 45, tiles: 405, met: 212, unknown: 0, complete: 6 }, "14:32")).toEqual(["212 of 405 tiles in place", "6 repos complete", "checked 14:32"]);
-    expect(summaryParts({ repos: 1, tiles: 9, met: 9, unknown: 0, complete: 1 }, null)).toEqual(["9 of 9 tiles in place", "1 repo complete"]);
+    expect(summaryParts({ repos: 45, tiles: 405, met: 212, unknown: 0, complete: 6 }, "14:32")).toEqual(["212 of 405 standards met", "6 repos complete", "checked 14:32"]);
+    expect(summaryParts({ repos: 1, tiles: 9, met: 9, unknown: 0, complete: 1 }, null)).toEqual(["9 of 9 standards met", "1 repo complete"]);
     expect(summaryNotes({ repos: 45, tiles: 405, met: 212, unknown: 0, complete: 6 }, 0)).toEqual(["45 repos on the board"]);
-    expect(summaryNotes({ repos: 1, tiles: 9, met: 0, unknown: 1, complete: 0 }, 1)).toEqual(["1 repo on the board", "1 tile not checked", "1 archived repo left out"]);
+    expect(summaryNotes({ repos: 1, tiles: 9, met: 0, unknown: 1, complete: 0 }, 1)).toEqual(["1 repo on the board", "1 standard not checked", "1 archived repo left out"]);
   });
 });
 

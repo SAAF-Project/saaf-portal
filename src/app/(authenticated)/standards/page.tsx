@@ -21,7 +21,7 @@ export default function StandardsPage() {
 
       <p className="text-xs text-muted leading-relaxed mt-6 max-w-[680px]">
         The board reads the default branch of every repo in the SAAF-Project organisation that is not archived, once a
-        minute. A tile turns on after a pull request is merged. What each standard asks for is on the{" "}
+        minute. A standard counts once a pull request is merged into the default branch; what came in since 09:00 on the day glows. What each standard asks for is on the{" "}
         <Link href="/hardening" className="text-accent hover:underline">handout</Link>.
       </p>
     </div>

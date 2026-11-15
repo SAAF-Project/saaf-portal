@@ -26,6 +26,7 @@ function fakeGitHub() {
     size: 10,
     pushed_at: "2026-11-01T00:00:00Z",
     created_at: "2026-10-01T00:00:00Z",
+    default_branch: "main",
     ...extra,
   });
   const state = {
@@ -83,6 +84,7 @@ describe("loadRepoStandards", () => {
       private: false,
       pushed_at: "2026-11-01T00:00:00Z",
       created_at: "2026-10-01T00:00:00Z",
+      default_branch: "main",
       checks: all(true),
     });
     expect(p.repos?.[2]).toMatchObject({ private: true, checks: { ...all(false), readme: true, licence: true } });
@@ -124,7 +126,7 @@ describe("loadRepoStandards", () => {
     expect(b.checked_at).not.toBe(a.checked_at);
   });
 
-  it("reads one file list again when that repo was pushed, and turns the tile on", async () => {
+  it("reads one file list again when that repo was pushed, and marks the standard as met", async () => {
     const gh = fakeGitHub();
     let t = 0;
     const before = await loadRepoStandards(gh.fetchImpl, "t", () => t);
