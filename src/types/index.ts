@@ -119,6 +119,8 @@ export interface Badge {
 
 export interface Achievement {
   badges: Badge[];
+  /** The agent repos this member revived (the Reviver badge). Only the member's own; absent in older answers. */
+  revived?: string[];
 }
 
 export interface ActivityStats {

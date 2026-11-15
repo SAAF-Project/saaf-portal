@@ -10,6 +10,7 @@ import ActivityStatsBanner from "@/components/ActivityStatsBanner";
 import SuggestedPlans from "@/components/SuggestedPlans";
 import AboutSAAFSection from "@/components/AboutSAAFSection";
 import OnboardingWizard from "@/components/OnboardingWizard";
+import RevivedModal from "@/components/RevivedModal";
 import { profileCompleteness } from "@/lib/profile-completeness";
 import { getUserPlans } from "@/lib/plan-match";
 import { fetchJson, fetchList } from "@/lib/fetch-json";
@@ -69,6 +70,9 @@ export default function DashboardPage() {
     <div>
       {/* Onboarding wizard for new users */}
       <OnboardingWizard profile={profile} />
+
+      {/* Shown once per newly revived agent (the Reviver badge) */}
+      <RevivedModal login={username} repos={achievement?.revived} />
 
       {/* Profile completeness banner */}
       {completeness && <ProfileCompletenessBanner completeness={completeness} />}
@@ -153,7 +157,7 @@ export default function DashboardPage() {
             <h2 className="text-xs font-bold text-muted uppercase tracking-wider">Your achievements</h2>
             <Link href="/profile" className="text-xs text-accent hover:underline">View all →</Link>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             {achievement.badges.map((badge) => {
               const earned = badge.level > 0;
               const data = badge.currentLevelData;
