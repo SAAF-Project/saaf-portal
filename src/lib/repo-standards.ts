@@ -27,6 +27,8 @@ export interface RepoStandards {
   url: string;
   private: boolean;
   pushed_at: string | null;
+  /** When the repo was made. `null` = GitHub did not say. */
+  created_at: string | null;
   checks: Checks;
 }
 
@@ -72,6 +74,7 @@ async function listRepos(token: string, fetchImpl: Fetch): Promise<Listed[] | nu
         private: !!r.private,
         archived: !!r.archived,
         pushed_at: typeof r.pushed_at === "string" ? r.pushed_at : null,
+        created_at: typeof r.created_at === "string" ? r.created_at : null,
       });
     }
     if (body.length < 100) return repos;
@@ -125,7 +128,7 @@ async function refresh(fetchImpl: Fetch, token: string, now: () => number): Prom
     checked_at: new Date(now()).toISOString(),
     stale: false,
     ttl_seconds: TTL_SECONDS,
-    repos: live.map((r, i) => ({ name: r.name, url: r.url, private: r.private, pushed_at: r.pushed_at, checks: checks[i] })),
+    repos: live.map((r, i) => ({ name: r.name, url: r.url, private: r.private, pushed_at: r.pushed_at, created_at: r.created_at, checks: checks[i] })),
     archived: candidates.length - live.length,
   };
   return lastGood;
