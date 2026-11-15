@@ -45,8 +45,8 @@ const tile = [
 
 const day = [
   { t: "09:00", v: "Welcome and the assignment" },
-  { t: "09:30", v: "Adriaan Heijstek" },
-  { t: "10:05", v: "Sjoerd de Vries" },
+  { t: "09:30", v: "Adriaan Heijstek, BDO" },
+  { t: "10:05", v: "Sjoerd de Vries, BDO" },
   { t: "11:00", v: "Faissal Assakkach, BDO" },
   { t: "11:45", v: "Orq.ai workshop, Bauke Brenninkmeijer" },
   { t: "12:15", v: "Start hacking, then lunch" },
@@ -105,7 +105,8 @@ export default function HardeningPage() {
         )}
       </div>
 
-      <p className="text-xs font-mono text-muted mb-2">Session #11 · Hackathon #10 · 17 November 2026 · TAG, The Stack, Amsterdam</p>
+      <p className="text-xs font-mono text-muted mb-1">Session #11 · Hackathon #10 · 17 November 2026 · TAG, The Stack, Amsterdam</p>
+      <p className="text-xs font-mono text-muted mb-2">Sponsors of the day · BDO, title sponsor · TAG, venue and developer community</p>
       <h1 className="text-3xl font-medium leading-tight mb-3">
         Take one agent through <span className="text-accent">the car wash.</span>
       </h1>
@@ -144,6 +145,7 @@ export default function HardeningPage() {
 
       <section className="mb-10">
         <h2 className="text-lg font-medium mb-3">Tools from our guests.</h2>
+        <p className="text-sm text-muted leading-relaxed mb-3">Select a tool to open it. Each one is an external site.</p>
         <ExternalReferences references={references} />
         <p className="text-xs text-muted leading-relaxed mt-3">
           Keep keys in environment variables, never in your repository. Use synthetic data when you try a tool.

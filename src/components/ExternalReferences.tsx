@@ -86,9 +86,11 @@ export default function ExternalReferences({ references }: { references: Externa
             <button
               type="button"
               onClick={() => setOpen(r)}
-              className="w-full text-left grid sm:grid-cols-[160px_1fr_auto] gap-x-3 gap-y-1 py-2 text-sm hover:bg-surface"
+              className="group w-full cursor-pointer text-left grid sm:grid-cols-[170px_1fr_auto] gap-x-3 gap-y-1 py-2 px-1 text-sm hover:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
             >
-              <span className="font-medium">{r.name}</span>
+              <span className="font-medium text-accent group-hover:underline">
+                {r.name} <span aria-hidden="true">↗</span>
+              </span>
               <span className="text-muted leading-relaxed">{r.text}</span>
               <span className="font-mono text-xs text-muted whitespace-nowrap">{hostOf(r.url)} · external site</span>
             </button>
