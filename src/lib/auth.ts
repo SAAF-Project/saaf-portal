@@ -3,6 +3,7 @@ import GitHubProvider from "next-auth/providers/github";
 import { getPrisma } from "./prisma";
 import { isOrgMember } from "./github";
 import { matchCompanyLogo } from "./logo-match";
+import { isAllowedLogin } from "./allowed-logins";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -17,6 +18,8 @@ export const authOptions: NextAuthOptions = {
       const ghProfile = profile as { login?: string };
       const username = ghProfile?.login;
       if (!username) return false;
+      // Acceptance environment only: a short list of logins. Unset in production.
+      if (!isAllowedLogin(username)) return "/login?error=not-allowed";
 
       const isMember = await isOrgMember(username);
       if (!isMember) return `/login?error=not-member&username=${encodeURIComponent(username)}`;
@@ -25,7 +28,7 @@ export const authOptions: NextAuthOptions = {
 
       // Look up by githubId first (immutable), then fall back to username.
       // Username lookup alone breaks when someone renames their GitHub account.
-      let existingUser =
+      const existingUser =
         await getPrisma().user.findUnique({ where: { githubId } }) ??
         await getPrisma().user.findUnique({ where: { githubUsername: username } });
 
