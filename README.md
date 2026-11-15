@@ -190,17 +190,17 @@ Vercel auto-deploys `main` branch. Required env vars in Vercel dashboard:
 
 After schema changes: run `npx prisma db push` locally with `PROD_DATABASE_URL` set in `.env.production.local`.
 
-### Acceptance environment (branch `staging`)
+### Acceptance environment (branch `dev`)
 
-Preview deployments cannot sign in, because the GitHub OAuth App only accepts the production callback. The branch `staging` is the one preview that can: Vercel serves it at a fixed address (`saaf-portal-git-staging-<team>.vercel.app`).
+Preview deployments cannot sign in, because the GitHub OAuth App only accepts the production callback. The branch `dev` is the one preview that can. In Vercel the domain `dev-saaf-portal.vercel.app` is assigned to that branch.
 
-Set these in the Vercel dashboard for the Preview environment, limited to the branch `staging`:
+Set these in the Vercel dashboard for the Preview environment, limited to the branch `dev`:
 
-- `GITHUB_ID` / `GITHUB_SECRET`: a second OAuth App whose callback is `https://<staging address>/api/auth/callback/github`
-- `NEXTAUTH_URL`: the staging address
+- `GITHUB_ID` / `GITHUB_SECRET`: a second OAuth App whose callback is `https://dev-saaf-portal.vercel.app/api/auth/callback/github`
+- `NEXTAUTH_URL`: `https://dev-saaf-portal.vercel.app`
 - `ALLOWED_LOGINS`: GitHub logins that may sign in there, comma-separated. Leave it unset in production.
 
-Merge a pull request branch into `staging` to try it with a signed-in session before it goes to `main`. If the Preview environment uses the production `DATABASE_URL`, everything written on staging is written to production: do not run schema changes from it.
+Merge a pull request branch into `dev` to try it with a signed-in session before it goes to `main`. If the Preview environment uses the production `DATABASE_URL`, everything written on `dev` is written to production: do not run schema changes from it.
 
 ---
 
