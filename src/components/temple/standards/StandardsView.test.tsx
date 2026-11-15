@@ -7,7 +7,7 @@ import { summarise, summaryNotes, summaryParts } from "./summary";
 import { keepOnFail } from "./useStandards";
 
 const all = (value: boolean | null): Checks => Object.fromEntries(STANDARDS.map((s) => [s.id, value]));
-const repo = (name: string, checks: Checks): RepoStandards => ({ name, url: `https://github.com/SAAF-Project/${name}`, private: false, pushed_at: "2026-11-17T10:00:00Z", checks });
+const repo = (name: string, checks: Checks): RepoStandards => ({ name, url: `https://github.com/SAAF-Project/${name}`, private: false, pushed_at: "2026-11-17T10:00:00Z", created_at: "2026-10-01T00:00:00Z", checks });
 
 // synthetic repos: one complete, one with two tiles, one whose file list could not be read
 const REPOS = [repo("example-agent", all(true)), repo("sample-service", { ...all(false), readme: true, licence: true }), repo("unread-agent", all(null))];

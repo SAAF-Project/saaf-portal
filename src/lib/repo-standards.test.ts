@@ -25,6 +25,7 @@ function fakeGitHub() {
     archived: false,
     size: 10,
     pushed_at: "2026-11-01T00:00:00Z",
+    created_at: "2026-10-01T00:00:00Z",
     ...extra,
   });
   const state = {
@@ -81,6 +82,7 @@ describe("loadRepoStandards", () => {
       url: "https://github.com/SAAF-Project/example-agent",
       private: false,
       pushed_at: "2026-11-01T00:00:00Z",
+      created_at: "2026-10-01T00:00:00Z",
       checks: all(true),
     });
     expect(p.repos?.[2]).toMatchObject({ private: true, checks: { ...all(false), readme: true, licence: true } });
