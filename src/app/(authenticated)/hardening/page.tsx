@@ -1,5 +1,6 @@
 import Link from "next/link";
 import StandardsChecklist from "@/components/temple/standards/StandardsChecklist";
+import ExternalReferences, { type ExternalReference } from "@/components/ExternalReferences";
 
 // The hardening day handout (Session 11, 17 November 2026) as a page. The nine standards come from
 // src/components/temple/standards/standards.ts, the same list the board at /standards checks.
@@ -47,11 +48,35 @@ const day = [
   { t: "09:30", v: "Adriaan Heijstek" },
   { t: "10:05", v: "Sjoerd de Vries" },
   { t: "11:00", v: "Faissal Assakkach, BDO" },
-  { t: "11:45", v: "Orq.ai" },
+  { t: "11:45", v: "Orq.ai workshop, Bauke Brenninkmeijer" },
   { t: "12:15", v: "Start hacking, then lunch" },
   { t: "16:15", v: "Last merge", accent: true },
   { t: "16:30", v: "Final score, prizes and guests" },
   { t: "17:00", v: "Drinks" },
+];
+
+// Tools our guests brought. Each one is an external site: the list shows a notice before it opens.
+const references: ExternalReference[] = [
+  {
+    name: "Orq.ai onboarding",
+    url: "https://saaf-project.orq.ai",
+    text: "Get your own project in the shared SAAF workspace on Orq.ai. The passcode is shared in the room.",
+  },
+  {
+    name: "Orq.ai guide",
+    url: "https://saaf-project.orq.ai/guide",
+    text: "Send traces from your agent to see what it does, use the framework integrations, and red team your agent.",
+  },
+  {
+    name: "evaluatorq",
+    url: "https://github.com/orq-ai/evaluatorq",
+    text: "The open-source package by Orq.ai for red teaming an agent.",
+  },
+  {
+    name: "Is It Dead Yet",
+    url: "https://isitdeadyet.dev/",
+    text: "Dependency health: which packages are abandoned or carry advisories. Built by Ellert van der Vecht.",
+  },
 ];
 
 function Rows({ rows, mono = false }: { rows: { k: string; v: React.ReactNode }[]; mono?: boolean }) {
@@ -116,6 +141,14 @@ export default function HardeningPage() {
           <p className="text-xs text-muted leading-relaxed mt-3">The board reads the default branch only.</p>
         </section>
       </div>
+
+      <section className="mb-10">
+        <h2 className="text-lg font-medium mb-3">Tools from our guests.</h2>
+        <ExternalReferences references={references} />
+        <p className="text-xs text-muted leading-relaxed mt-3">
+          Keep keys in environment variables, never in your repository. Use synthetic data when you try a tool.
+        </p>
+      </section>
 
       <section className="max-w-[560px]">
         <h2 className="text-lg font-medium mb-3">The day.</h2>
