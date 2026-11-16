@@ -18,8 +18,10 @@
   .std-note { margin: 24px 0 0; color: var(--muted); font-size: 15px; }
 
   /* above the wall: the summary line and the key */
-  .std-head { flex: none; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px 32px; padding-right: 76px; /* the Details tab of the closed side panel */ }
-  .std-sum { min-width: 0; }
+  /* The summary line never shrinks below its longest part and the key keeps its own width, so when both do not fit on
+     one row (the side panel is open, or the window is narrow) the key moves below the line instead of over it. */
+  .std-head { flex: none; display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 12px 32px; padding-right: 76px; /* the Details tab of the closed side panel */ }
+  .std-sum { flex: 1 1 auto; min-width: min-content; }
   .std-line { margin: 0; font-size: clamp(20px, 2vw, 36px); font-weight: 500; line-height: 1.15; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
   .std-part { white-space: nowrap; }
   .std-sep { color: var(--muted); }
