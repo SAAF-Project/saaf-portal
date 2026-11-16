@@ -25,7 +25,7 @@ describe("the three tracks", () => {
     expect(all.toLowerCase()).not.toContain("red team");
     expect(all).not.toContain("14:00");
     expect(all).not.toContain("a maintainer merges");
-    expect(SHORT_RULES.join(" ")).toContain("A teammate with write access reviews and merges");
+    expect(SHORT_RULES.join(" ").toLowerCase()).toContain("a teammate with write access reviews and merges");
   });
 });
 
