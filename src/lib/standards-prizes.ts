@@ -293,6 +293,13 @@ async function commitHistory(repo: RepoStandards, start: string, token: string, 
 // The history of a repo is kept until it is pushed again.
 const histories = new Map<string, { pushed_at: string | null; history: History }>();
 
+/** Take over the histories another server instance already read (the shared snapshot), so they cost no call here. */
+export function seedHistories(previous: Record<string, { pushed_at: string | null; history: History | null }>): void {
+  for (const [name, kept] of Object.entries(previous)) {
+    if (kept.history && !histories.has(name)) histories.set(name, { pushed_at: kept.pushed_at, history: kept.history });
+  }
+}
+
 /** The default branch from the start onwards. A repo nobody pushed to since the start costs no call. `null` = not readable. */
 export async function historyOf(repo: RepoStandards, start: string, token: string, fetchImpl: Fetch): Promise<History | null> {
   if (repo.pushed_at && repo.pushed_at <= start) {

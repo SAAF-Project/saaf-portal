@@ -253,7 +253,11 @@ export async function saveProposals(prisma: PrismaClient, rows: ProposalIn[]): P
       const id = `${p.repo}#${p.number}`;
       const url = `https://github.com/SAAF-Project/${p.repo}/pull/${p.number}`;
       const data = { repo: p.repo, number: p.number, title: p.title, author: p.author, url, kind: p.kind, score: p.score, verdict: p.verdict, feedback: p.feedback ?? null, flags: p.flags ?? [], gradedAt: now };
-      return prisma.proposalScore.upsert({ where: { id }, create: { id, ...data }, update: data });
+      // A new score keeps the time of the first one: a proposal scored before the freeze stays on the frozen list when
+      // the review runs again later.
+      const { gradedAt: _first, ...changed } = data;
+      void _first;
+      return prisma.proposalScore.upsert({ where: { id }, create: { id, ...data }, update: changed });
     }),
   );
   return rows.length;

@@ -153,14 +153,32 @@ async function refresh(fetchImpl: Fetch, token: string, now: () => number): Prom
   return lastGood;
 }
 
-/** The board's data. Never throws; asks GitHub at most once a minute, however many people have the board open. */
+/**
+ * Take over the answers another server instance already found (the shared snapshot in src/lib/shared-loaders.ts), so a
+ * fresh instance asks GitHub only about repos that were pushed since. Answers this instance has itself are kept.
+ */
+export function seedRepoStandards(previous: StandardsPayload): void {
+  for (const r of previous.repos ?? []) {
+    if (answers.has(r.name)) continue;
+    // The payload shows SECURITY.md as met when the organisation's policy covers it; the repo's own answer was "no file".
+    const checks: Checks = r.security_by_org ? { ...r.checks, security: false } : r.checks;
+    if (settled(checks)) answers.set(r.name, { pushed_at: r.pushed_at, checks, tree: r.tree_sha ?? null });
+  }
+  if (!lastGood && previous.repos) lastGood = previous;
+}
+
+/**
+ * The board's data. Never throws; asks GitHub at most once per `maxAgeMs` (a minute by default) on this instance,
+ * however many people have the board open. Pages use the shared snapshot instead, see src/lib/shared-loaders.ts.
+ */
 export async function loadRepoStandards(
   fetchImpl: Fetch = fetch,
   token: string | undefined = process.env.GITHUB_PAT,
   now: () => number = Date.now,
+  maxAgeMs: number = TTL_SECONDS * 1000,
 ): Promise<StandardsPayload> {
   if (!token) return NO_ANSWER;
-  if (memo && now() - memo.at < TTL_SECONDS * 1000) return memo.value;
+  if (memo && now() - memo.at < maxAgeMs) return memo.value;
   const entry = {
     at: now(),
     value: refresh(fetchImpl, token, now).catch(() => (lastGood ? { ...lastGood, stale: true } : NO_ANSWER)),
