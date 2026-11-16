@@ -121,6 +121,9 @@ describe("the day's leaderboard", () => {
     expect(day).toContain("1 check ");
     const reveal = text({ ...base, phase: "after", reveal: { step: 3, total: 11 }, checks: [check("?", 0, undefined, true), check("sample-service", 4, 2)], checks_total: 2 });
     expect(reveal).toContain("The reveal: step 3 of 11");
+    // During the prize-giving the block with the mentions is open: its first two steps happen there.
+    expect(html({ ...base, phase: "after", reveal: { step: 1, total: 11 } })).toContain("<details class=\"mt-8 group\" open");
+    expect(html(base)).not.toContain("<details class=\"mt-8 group\" open");
     expect(reveal).toContain("02 sample-service");
     const done = text({ ...base, phase: "after", reveal: { step: 11, total: 11 }, checks: [check("example-agent", 1, 1), check("sample-service", 4, 2)], checks_total: 2 });
     expect(done).toContain("01 example-agent");

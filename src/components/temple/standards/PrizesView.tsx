@@ -373,7 +373,8 @@ export default function PrizesView({ payload }: { payload: LeaderboardPayload | 
         </div>
       </div>
 
-      <details className="mt-8 group">
+      {/* Open during the prize-giving: its first two steps are the mentions in this block. */}
+      <details className="mt-8 group" open={payload.reveal ? true : undefined}>
         <summary className="cursor-pointer list-none text-sm font-medium mb-2">
           Also today, without a prize. <span className="font-mono text-xs text-muted group-open:hidden">show</span>
           <span className="font-mono text-xs text-muted hidden group-open:inline">hide</span>
