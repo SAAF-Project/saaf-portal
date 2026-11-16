@@ -1,7 +1,5 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "./auth";
 import { buildLeaderboard, DAY, frozenAt, isFrozen, pendingStates, type LeaderboardPayload } from "./leaderboard-day";
-import { getState, loadGrades, type BoardState, type Graded } from "./leaderboard-store";
+import { getState, loadGrades, loadProposals, type BoardState, type Graded, type Proposal } from "./leaderboard-store";
 import { getPrisma } from "./prisma";
 import { mapLimited } from "./repo-signals";
 import { loadRepoStandards, type StandardsPayload } from "./repo-standards";
@@ -9,18 +7,10 @@ import { historyOf, type History } from "./standards-prizes";
 
 // Server side of the day's leaderboard: gathers the board, the history of every repo (src/lib/standards-prizes.ts),
 // the grader's levels and the organisers' controls (src/lib/leaderboard-store.ts), and hands them to
-// buildLeaderboard (src/lib/leaderboard-day.ts). Also the two guards: the admin (MSACC) and the grader's token.
+// buildLeaderboard (src/lib/leaderboard-day.ts).
 
-const ADMIN_USERNAME = "MSACC";
 const CONCURRENCY = 6;
 const TTL_MS = 30_000;
-
-export async function isAdmin(): Promise<boolean> {
-  const session = await getServerSession(authOptions);
-  return (session?.user as { githubUsername?: string } | undefined)?.githubUsername === ADMIN_USERNAME;
-}
-
-export { isGrader } from "./grader-auth";
 
 async function histories(board: StandardsPayload): Promise<Map<string, History | null>> {
   const token = process.env.GITHUB_PAT;
@@ -30,14 +20,18 @@ async function histories(board: StandardsPayload): Promise<Map<string, History |
   return new Map(repos.map((r, i) => [r.name, hs[i]]));
 }
 
-async function grades(state: BoardState, now: string): Promise<{ frozen: Map<string, Graded>; all: Map<string, Graded> }> {
+async function grades(state: BoardState, now: string): Promise<{ frozen: Map<string, Graded>; all: Map<string, Graded>; proposals: Proposal[]; allProposals: Proposal[] }> {
   try {
     const prisma = getPrisma();
     const all = await loadGrades(prisma);
-    const frozen = isFrozen(now, state) ? await loadGrades(prisma, new Date(frozenAt(state))) : all;
-    return { frozen, all };
+    const allProposals = await loadProposals(prisma);
+    const until = frozenAt(state);
+    const frozenNow = isFrozen(now, state);
+    const frozen = frozenNow ? await loadGrades(prisma, new Date(until)) : all;
+    const proposals = frozenNow ? allProposals.filter((p) => p.gradedAt <= until) : allProposals;
+    return { frozen, all, proposals, allProposals };
   } catch {
-    return { frozen: new Map(), all: new Map() };
+    return { frozen: new Map(), all: new Map(), proposals: [], allProposals: [] };
   }
 }
 
@@ -60,7 +54,7 @@ export function loadLeaderboard(view: "public" | "admin", now: () => number = Da
     const board = await loadRepoStandards();
     const [hs, st] = await Promise.all([histories(board), state()]);
     const gs = await grades(st, nowIso);
-    return buildLeaderboard({ board, histories: hs, grades: gs.frozen, allGrades: gs.all, state: st, now: nowIso, view });
+    return buildLeaderboard({ board, histories: hs, grades: gs.frozen, allGrades: gs.all, proposals: gs.proposals, allProposals: gs.allProposals, state: st, now: nowIso, view });
   })();
   memo.set(view, { at: now(), value });
   value.catch(() => memo.delete(view));

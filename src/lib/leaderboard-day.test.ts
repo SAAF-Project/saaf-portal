@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { STANDARDS } from "../components/temple/standards/standards";
 import { buildLeaderboard, revealed, type DayInput } from "./leaderboard-day";
 import type { Levels } from "./leaderboard";
-import { isGrader } from "./grader-auth";
+import { hasAdminToken } from "./admin-auth";
 import { stateKey, validateGrades, type BoardState, type Graded } from "./leaderboard-store";
 import type { RepoStandards } from "./repo-standards";
 import type { History } from "./standards-prizes";
@@ -104,13 +104,13 @@ describe("the admin view", () => {
 });
 
 describe("guards", () => {
-  it("lets the grader in only with the exact, long token", () => {
+  it("accepts the admin token only when it is exact and long", () => {
     const secret = "x".repeat(40);
-    expect(isGrader(`Bearer ${secret}`, secret)).toBe(true);
-    expect(isGrader(`Bearer ${secret}y`, secret)).toBe(false);
-    expect(isGrader(null, secret)).toBe(false);
-    expect(isGrader("Bearer short", "short")).toBe(false); // a short token is never accepted
-    expect(isGrader(`Bearer ${secret}`, undefined)).toBe(false);
+    expect(hasAdminToken(`Bearer ${secret}`, secret)).toBe(true);
+    expect(hasAdminToken(`Bearer ${secret}y`, secret)).toBe(false);
+    expect(hasAdminToken(null, secret)).toBe(false);
+    expect(hasAdminToken("Bearer short", "short")).toBe(false); // a short token is never accepted
+    expect(hasAdminToken(`Bearer ${secret}`, undefined)).toBe(false);
   });
 
   it("refuses grades with unknown standards, levels out of range or odd names", () => {

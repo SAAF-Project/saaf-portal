@@ -1,5 +1,5 @@
 import type { FeedItem } from "../../../lib/leaderboard";
-import type { LeaderboardPayload, PersonRow, RepoRow } from "../../../lib/leaderboard-day";
+import type { LeaderboardPayload, PersonRow, ProposalRow, RepoRow } from "../../../lib/leaderboard-day";
 import { STANDARDS } from "./standards";
 import { clock } from "./StandardsView";
 
@@ -13,7 +13,7 @@ const SCORED = ["readme", "agent-yaml", "audit-criteria", "tests", "ci", "depend
 const MAX: Record<string, number> = { readme: 3, "agent-yaml": 3, "audit-criteria": 3, tests: 3, ci: 3, dependencies: 2, licence: 1, codeowners: 1 };
 
 export const RULES: string[] = [
-  "Improve an agent repo. A standard counts once it lands on the default branch between 09:00 and 16:15; a pull request opened before 16:15 still counts if it is merged by 16:45.",
+  "Improve an agent repo. A standard counts once it lands on the default branch between 09:00 and 16:15. Open your last pull request by 16:00, so it can be merged in time.",
   "A review agent scores the content of every standard at 13:30, 15:00 and 16:15. It must quote your files as evidence; a level without a real quote does not stand.",
   "Points rise with each level and the last step counts most: one README taken to level 3 beats four READMEs at level 1.",
   "You get the points you add: the rise of a level, by as much as it still stands at 16:15. Improving someone else's file counts for what you improved; removing a file and putting it back counts for nothing.",
@@ -21,7 +21,10 @@ export const RULES: string[] = [
   "Copied, empty or nonsense files score 0. Text that tries to steer the review agent disqualifies you.",
   "SECURITY.md is arranged by Stichting SAAF for every repo and counts for nobody.",
   "A merged pull request counts for its author, a direct push for whoever pushed. Bots do not count. Times are GitHub's own; a tie goes to whoever got there first.",
-  "From 15:15 the top places are hidden. The result is revealed at the prize-giving.",
+  "From 15:15 the top places are hidden. The result is revealed at the prize-giving, after the demos.",
+  "Better standards are a track of their own: open a pull request with the label standard-proposal on agent-template or on docs/conventions in SAAF-Project. Nothing is merged today; a review checks whether it adds real value without making things more complicated.",
+  "A new standard needs a strong case: why it does not fit in one of the nine, evidence from two repos, a rule the board can check, and which standard it replaces.",
+  "You merge in your own repos. For someone else's repo, ask the creator and request write access below the board.",
 ];
 
 function Avatar({ login, size = 28 }: { login: string; size?: number }) {
@@ -221,6 +224,34 @@ function Feed({ items, frozen }: { items: FeedItem[]; frozen: boolean }) {
   );
 }
 
+const KIND: Record<string, string> = { change: "change", new: "new standard", remove: "remove or merge" };
+
+function Proposals({ rows }: { rows: ProposalRow[] }) {
+  if (rows.length === 0) return <p className="text-sm text-muted py-3 border-t border-border">No proposals reviewed yet.</p>;
+  return (
+    <ol className="border-t border-border">
+      {rows.map((r, i) => (
+        <li key={`${r.url}-${i}`} className="grid grid-cols-[1.5rem_1fr_auto] gap-x-4 items-center py-3 border-b border-border">
+          <span className="font-mono text-xs text-muted">{String(i + 1).padStart(2, "0")}</span>
+          {r.masked ? (
+            <Hidden label="revealed at the prize-giving" />
+          ) : (
+            <span className="min-w-0 reveal-once">
+              <a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: "inherit" }} className="font-medium [overflow-wrap:anywhere]">
+                {r.title}
+              </a>
+              <span className="block text-xs font-mono text-muted">
+                @{r.author} · {r.repo} · {KIND[r.kind] ?? r.kind}
+              </span>
+            </span>
+          )}
+          <span className="text-right font-mono tabular-nums text-sm">{r.masked ? "" : `${r.score}/15`}</span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 function Rules() {
   return (
     <details className="mt-8 group" open>
@@ -304,6 +335,12 @@ export default function PrizesView({ payload }: { payload: LeaderboardPayload | 
           <p className="text-xs text-muted mb-3">Points added per person, over every repo. Open a name to see what.</p>
           <People rows={payload.top_contributor} />
         </div>
+      </div>
+
+      <div className="mt-8">
+        <h3 className="text-base font-medium mb-1">Best additions to the standards.</h3>
+        <p className="text-xs text-muted mb-3">Proposals on agent-template or docs/conventions, reviewed for real value and simplicity. Not merged today.</p>
+        <Proposals rows={payload.proposals} />
       </div>
 
       <div className="mt-8">

@@ -1,13 +1,13 @@
 import { readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { ADMIN_ITEM, NAV_GROUPS, activeGroupId, isActive, pageOf } from "./navGroups";
+import { ADMIN_ITEM, ARCHIVED_PAGES, NAV_GROUPS, activeGroupId, isActive, pageOf } from "./navGroups";
 
 const items = NAV_GROUPS.flatMap((g) => g.items);
 
 describe("navigation groups", () => {
-  it("has seven groups, each with at least one page", () => {
-    expect(NAV_GROUPS.map((g) => g.id)).toEqual(["work", "community", "hardening", "challenge", "visualised", "learn", "build"]);
+  it("has six groups, each with at least one page", () => {
+    expect(NAV_GROUPS.map((g) => g.id)).toEqual(["work", "community", "hardening", "visualised", "learn", "build"]);
     for (const g of NAV_GROUPS) expect(g.items.length).toBeGreaterThan(0);
   });
 
@@ -21,11 +21,11 @@ describe("navigation groups", () => {
     for (const item of [...items, ADMIN_ITEM]) expect(pages.has(pageOf(item.href)), item.href).toBe(true);
   });
 
-  it("covers every page except admin, so nothing drops out of the bar", () => {
+  it("covers every page except admin and earlier sessions, so nothing drops out of the bar by accident", () => {
     const pages = readdirSync(resolve(process.cwd(), "src/app/(authenticated)"), { withFileTypes: true })
       .filter((d) => d.isDirectory())
       .map((d) => `/${d.name}`)
-      .filter((p) => p !== ADMIN_ITEM.href);
+      .filter((p) => p !== ADMIN_ITEM.href && !ARCHIVED_PAGES.includes(p));
     expect([...new Set(items.map((i) => pageOf(i.href)))].sort()).toEqual(pages.sort());
   });
 
@@ -35,7 +35,8 @@ describe("navigation groups", () => {
     expect(activeGroupId("/e-learning")).toBe("learn");
     expect(activeGroupId("/hardening")).toBe("hardening");
     expect(activeGroupId("/standards")).toBe("hardening");
-    expect(activeGroupId("/demo")).toBe("challenge");
+    expect(activeGroupId("/demo")).toBe("hardening");
+    expect(activeGroupId("/sessions")).toBe("learn");
     expect(activeGroupId("/agent-library/some-agent")).toBe("build");
     expect(activeGroupId("/login")).toBeNull();
   });

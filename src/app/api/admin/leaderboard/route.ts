@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { forgetLeaderboard, isAdmin, loadLeaderboard } from "@/lib/leaderboard-load";
+import { isAdminRequest } from "@/lib/admin";
+import { forgetLeaderboard, loadLeaderboard } from "@/lib/leaderboard-load";
 import { getState, overrideGrade, setState } from "@/lib/leaderboard-store";
 import { getPrisma } from "@/lib/prisma";
 
 export const maxDuration = 60;
 
 // The organisers' view of the day's leaderboard: always the full, unfrozen standings, the grader's flags and the
-// controls (freeze, reveal, disqualify, override a level). MSACC only.
-export async function GET() {
-  if (!(await isAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+// controls (freeze, reveal, disqualify, override a level). MSACC or the portal's admin token.
+export async function GET(req: NextRequest) {
+  if (!(await isAdminRequest(req))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   return NextResponse.json(await loadLeaderboard("admin"));
 }
 
@@ -18,7 +19,7 @@ type Action =
   | { action: "override"; repo: string; tree: string; standard: string; level: number | null; note: string };
 
 export async function POST(req: NextRequest) {
-  if (!(await isAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!(await isAdminRequest(req))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const body = (await req.json().catch(() => null)) as Action | null;
   if (!body || typeof body.action !== "string") return NextResponse.json({ error: "Bad request" }, { status: 400 });
   const prisma = getPrisma();

@@ -35,6 +35,21 @@ const DDL = [
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "LeaderboardState_pkey" PRIMARY KEY ("id")
   )`,
+  `CREATE TABLE IF NOT EXISTS "ProposalScore" (
+    "id" TEXT NOT NULL,
+    "repo" TEXT NOT NULL,
+    "number" INTEGER NOT NULL,
+    "title" TEXT NOT NULL,
+    "author" TEXT NOT NULL,
+    "url" TEXT NOT NULL,
+    "kind" TEXT NOT NULL,
+    "score" INTEGER NOT NULL,
+    "verdict" TEXT NOT NULL,
+    "feedback" TEXT,
+    "flags" JSONB,
+    "gradedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "ProposalScore_pkey" PRIMARY KEY ("id")
+  )`,
 ];
 
 let ensured: Promise<void> | null = null;
@@ -175,4 +190,81 @@ export async function overrideGrade(prisma: PrismaClient, repo: string, tree: st
   await ensureTables(prisma);
   const r = await prisma.contentGrade.updateMany({ where: { repo, tree, standard }, data: { override: level, note: note.slice(0, 300) } });
   return r.count;
+}
+
+// ------------------------------------------------------------------------------------------------ standard proposals
+
+export const PROPOSAL_REPOS = ["agent-template", "SAAF-Project"] as const;
+export const PROPOSAL_KINDS = ["change", "new", "remove"] as const;
+export const VERDICTS = ["adopt", "adopt with changes", "add to an existing standard", "not now"] as const;
+/** Five points of 0-3 each in the standards review. */
+export const PROPOSAL_MAX = 15;
+
+export interface ProposalIn {
+  repo: string;
+  number: number;
+  title: string;
+  author: string;
+  kind: string;
+  score: number;
+  verdict: string;
+  feedback?: string | null;
+  flags?: string[];
+}
+
+export interface Proposal extends ProposalIn {
+  url: string;
+  gradedAt: string;
+}
+
+export function validateProposals(rows: unknown): { ok: ProposalIn[]; errors: string[] } {
+  const ok: ProposalIn[] = [];
+  const errors: string[] = [];
+  if (!Array.isArray(rows)) return { ok, errors: ["proposals must be an array"] };
+  rows.forEach((r, i) => {
+    const p = r as Partial<ProposalIn>;
+    if (!PROPOSAL_REPOS.includes(p.repo as (typeof PROPOSAL_REPOS)[number])) return void errors.push(`${i}: repo`);
+    if (!Number.isInteger(p.number) || (p.number as number) < 1) return void errors.push(`${i}: number`);
+    if (typeof p.title !== "string" || !p.title.trim()) return void errors.push(`${i}: title`);
+    if (typeof p.author !== "string" || !/^[\w-]{1,40}$/.test(p.author)) return void errors.push(`${i}: author`);
+    if (!PROPOSAL_KINDS.includes(p.kind as (typeof PROPOSAL_KINDS)[number])) return void errors.push(`${i}: kind`);
+    if (!Number.isInteger(p.score) || (p.score as number) < 0 || (p.score as number) > PROPOSAL_MAX) return void errors.push(`${i}: score`);
+    if (!VERDICTS.includes(p.verdict as (typeof VERDICTS)[number])) return void errors.push(`${i}: verdict`);
+    ok.push({
+      repo: p.repo!,
+      number: p.number!,
+      title: p.title.slice(0, 200),
+      author: p.author,
+      kind: p.kind!,
+      score: p.score!,
+      verdict: p.verdict!,
+      feedback: typeof p.feedback === "string" ? p.feedback.slice(0, 300) : null,
+      flags: Array.isArray(p.flags) ? p.flags.filter((f): f is string => typeof f === "string").slice(0, 10) : [],
+    });
+  });
+  return { ok, errors };
+}
+
+export async function saveProposals(prisma: PrismaClient, rows: ProposalIn[]): Promise<number> {
+  await ensureTables(prisma);
+  const now = new Date();
+  await prisma.$transaction(
+    rows.map((p) => {
+      const id = `${p.repo}#${p.number}`;
+      const url = `https://github.com/SAAF-Project/${p.repo}/pull/${p.number}`;
+      const data = { repo: p.repo, number: p.number, title: p.title, author: p.author, url, kind: p.kind, score: p.score, verdict: p.verdict, feedback: p.feedback ?? null, flags: p.flags ?? [], gradedAt: now };
+      return prisma.proposalScore.upsert({ where: { id }, create: { id, ...data }, update: data });
+    }),
+  );
+  return rows.length;
+}
+
+/** Every scored proposal; `until` leaves out scores given after that moment (the public board while frozen). */
+export async function loadProposals(prisma: PrismaClient, until?: Date): Promise<Proposal[]> {
+  await ensureTables(prisma);
+  const rows = await prisma.proposalScore.findMany({
+    where: until ? { gradedAt: { lte: until } } : undefined,
+    select: { repo: true, number: true, title: true, author: true, url: true, kind: true, score: true, verdict: true, feedback: true, flags: true, gradedAt: true },
+  });
+  return rows.map((r) => ({ ...r, flags: Array.isArray(r.flags) ? (r.flags as string[]) : [], gradedAt: r.gradedAt.toISOString() }));
 }

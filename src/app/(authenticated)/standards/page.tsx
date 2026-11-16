@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AccessRequest from "@/components/AccessRequest";
 import StandardsBoard from "@/components/temple/standards/StandardsBoard";
 
 // The standards board of the hardening day (Session 11, 17 November 2026): every repo of the organisation by the nine
@@ -18,6 +19,8 @@ export default function StandardsPage() {
       <h1 className="text-3xl font-medium leading-tight mb-6">The standards board.</h1>
 
       <StandardsBoard />
+
+      <AccessRequest />
 
       <p className="text-xs text-muted leading-relaxed mt-6 max-w-[680px]">
         The board reads the default branch of every repo in the SAAF-Project organisation that is not archived, once a

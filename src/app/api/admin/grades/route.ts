@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { forgetLeaderboard, isGrader } from "@/lib/leaderboard-load";
+import { isAdminRequest } from "@/lib/admin";
+import { forgetLeaderboard } from "@/lib/leaderboard-load";
 import { saveGrades, validateGrades } from "@/lib/leaderboard-store";
 import { getPrisma } from "@/lib/prisma";
 
-// One run of the private grader: levels per repo, tree SHA and standard. GRADER_TOKEN only. Rows that do not validate
+// One run of the private review agent: levels per repo, tree SHA and standard. Admin only (the skill uses the portal's
+// admin token). Rows that do not validate
 // are refused by name; the rest is saved.
 export async function POST(req: NextRequest) {
-  if (!isGrader(req.headers.get("authorization"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!(await isAdminRequest(req))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const body = (await req.json().catch(() => null)) as { runId?: unknown; grades?: unknown } | null;
   if (!body || typeof body.runId !== "string" || !/^[\w:.-]{1,60}$/.test(body.runId)) return NextResponse.json({ error: "runId" }, { status: 400 });
   const { ok, errors } = validateGrades(body.grades);

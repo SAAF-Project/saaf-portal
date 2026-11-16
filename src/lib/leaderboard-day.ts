@@ -1,6 +1,6 @@
 import { STANDARDS } from "../components/temple/standards/standards";
 import { MAX_POINTS, scoreDay, type DayStep, type FeedItem, type Levels, type PersonScore, type RepoDay, type RepoScore } from "./leaderboard";
-import type { Graded, BoardState } from "./leaderboard-store";
+import type { Graded, BoardState, Proposal } from "./leaderboard-store";
 import { stateKey } from "./leaderboard-store";
 import type { RepoStandards, StandardsPayload } from "./repo-standards";
 import type { History } from "./standards-prizes";
@@ -39,6 +39,18 @@ export interface PersonRow {
   masked?: boolean;
 }
 
+export interface ProposalRow {
+  title: string;
+  author: string;
+  url: string;
+  kind: string;
+  repo: string;
+  score: number;
+  verdict?: string;
+  feedback?: string | null;
+  masked?: boolean;
+}
+
 export interface LeaderboardPayload {
   phase: "before" | "during" | "after";
   view: "public" | "admin";
@@ -53,6 +65,8 @@ export interface LeaderboardPayload {
   best_agent: RepoRow[];
   most_improved: RepoRow[];
   top_contributor: PersonRow[];
+  /** Proposals to improve the standards, scored by the standards review (advice; nothing is merged on the day). */
+  proposals: ProposalRow[];
   feed: FeedItem[];
   /** Per repo: standards in place now that were not at the start. The board makes them glow. */
   fresh: Record<string, string[]>;
@@ -78,6 +92,9 @@ export interface DayInput {
   now: string;
   day?: Day;
   view: "public" | "admin";
+  /** Proposal scores up to the freeze (public) and all of them (admin, reveal). */
+  proposals?: Proposal[];
+  allProposals?: Proposal[];
 }
 
 const phaseAt = (now: string, d: Day): LeaderboardPayload["phase"] => (now < d.start ? "before" : now < d.end ? "during" : "after");
@@ -143,18 +160,25 @@ const maskRepo = (): RepoRow => ({ name: "?", url: "", made_today: false, before
 const maskPerson = (): PersonRow => ({ login: "?", points: 0, capped: 0, repos: [], contributions: [], masked: true });
 
 /**
- * The reveal goes place 5 to 1 for top contributor, then most improved, then best agent last.
- * Returns, per list, how many of its places (counted from the bottom) are revealed.
+ * The reveal goes place by place from the bottom: top contributor, most improved, the additions to the standards, and
+ * best agent last. Returns, per list, how many of its places (counted from the bottom) are revealed.
  */
-export function revealed(step: number, lengths: [number, number, number]): [number, number, number] {
-  const out: [number, number, number] = [0, 0, 0];
+export function revealed(step: number, lengths: number[]): number[] {
   let left = step;
-  for (let i = 0; i < 3; i++) {
-    out[i] = Math.min(left, lengths[i]);
-    left -= out[i];
-  }
-  return out;
+  return lengths.map((n) => {
+    const shown = Math.min(left, n);
+    left -= shown;
+    return shown;
+  });
 }
+
+const PROPOSALS_SHOWN = 3;
+const proposalRows = (ps: Proposal[], admin: boolean): ProposalRow[] =>
+  [...ps]
+    .sort((a, b) => b.score - a.score || a.gradedAt.localeCompare(b.gradedAt))
+    .slice(0, admin ? 50 : PROPOSALS_SHOWN)
+    .map((p) => ({ title: p.title, author: p.author, url: p.url, kind: p.kind, repo: p.repo, score: p.score, ...(admin ? { verdict: p.verdict, feedback: p.feedback } : {}) }));
+const maskProposal = (): ProposalRow => ({ title: "?", author: "?", url: "", kind: "", repo: "", score: 0, masked: true });
 
 /** Hide the places not yet revealed: with `shown` revealed from the bottom, the top `n - shown` stay hidden. */
 function hideTop<T>(rows: T[], hiddenFromTop: number, mask: (r: T) => T): T[] {
@@ -176,20 +200,23 @@ export function buildLeaderboard(input: DayInput): LeaderboardPayload {
   let best = score.best_agent.map(repoRow);
   let improved = score.most_improved.map(repoRow);
   let people = score.top_contributor.slice(0, 8).map(personRow);
+  let proposals = proposalRows((admin || revealing ? input.allProposals : input.proposals) ?? [], admin);
   let reveal: LeaderboardPayload["reveal"] = null;
 
   if (!admin && revealing) {
-    const lists: [number, number, number] = [Math.min(people.length, SHOWN), improved.length, best.length];
-    const total = lists[0] + lists[1] + lists[2];
-    const [p, m, b] = revealed(input.state.revealStep, lists);
+    const lists = [Math.min(people.length, SHOWN), improved.length, proposals.length, best.length];
+    const total = lists.reduce((n, x) => n + x, 0);
+    const [p, m, q, b] = revealed(input.state.revealStep, lists);
     people = hideTop(people.slice(0, SHOWN), lists[0] - p, maskPerson);
     improved = hideTop(improved, lists[1] - m, maskRepo);
-    best = hideTop(best, lists[2] - b, maskRepo);
+    proposals = hideTop(proposals, lists[2] - q, maskProposal);
+    best = hideTop(best, lists[3] - b, maskRepo);
     reveal = { step: Math.min(input.state.revealStep, total), total };
   } else if (frozen) {
     people = hideTop(people.slice(0, SHOWN), MASKED_TOP, maskPerson);
     improved = hideTop(improved, MASKED_TOP, maskRepo);
     best = hideTop(best, MASKED_TOP, maskRepo);
+    proposals = hideTop(proposals, 1, maskProposal);
   }
 
   const existing = score.repos.filter((r) => !r.made_today);
@@ -208,6 +235,7 @@ export function buildLeaderboard(input: DayInput): LeaderboardPayload {
     best_agent: best,
     most_improved: improved,
     top_contributor: people,
+    proposals,
     // While frozen the feed still says who landed what, without the levels the public may not see yet.
     feed: score.feed.slice(0, FEED),
     fresh: phase === "before" ? {} : fresh(input.board, input.histories, d),
