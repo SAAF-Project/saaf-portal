@@ -1,0 +1,68 @@
+/* The winners view: the big-screen page of the prize-giving (WinnersView.tsx). One screen, no scrolling at 1920 by
+   1080. A podium of three rounded blocks: second place left, first place centre and tallest, third place right. */
+
+.win-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 2vh, 24px);
+  padding: clamp(16px, 3.2vh, 40px) clamp(20px, 4vw, 80px) clamp(12px, 2vh, 24px);
+  background: var(--bg);
+  color: var(--text);
+  overflow: auto;
+}
+
+/* The ink lockup: white on the dark theme (the default), as it is on the light theme. */
+.win-logo { height: clamp(20px, 2.6vh, 30px); width: auto; filter: invert(1); }
+[data-theme="light"] .win-logo { filter: none; }
+
+.win-eyebrow { font-size: clamp(11px, 1.3vh, 15px); color: var(--muted); }
+.win-title { font-size: clamp(26px, 5.4vh, 60px); font-weight: 500; line-height: 1.08; }
+.win-sub { font-size: clamp(13px, 1.9vh, 20px); color: var(--muted); max-width: 60ch; margin-top: clamp(4px, 0.8vh, 10px); }
+
+.win-main { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; justify-content: flex-end; }
+/* The podium stands on the bottom of the screen; the mentions and the three winners together sit in the middle. */
+.win-main-middle { justify-content: center; }
+
+.win-podium { display: grid; grid-template-columns: 1fr 1.18fr 1fr; gap: clamp(10px, 1.6vw, 32px); align-items: end; }
+.win-col { display: flex; flex-direction: column; min-width: 0; grid-row: 1; }
+.win-col-1 { grid-column: 2; }
+.win-col-2 { grid-column: 1; }
+.win-col-3 { grid-column: 3; }
+.win-card { display: flex; flex-direction: column; justify-content: flex-end; min-height: clamp(110px, 25vh, 290px); padding: 0 clamp(4px, 0.6vw, 12px) clamp(10px, 1.8vh, 22px); }
+.win-name { font-size: clamp(18px, 3vh, 34px); font-weight: 500; line-height: 1.12; overflow-wrap: anywhere; }
+.win-col-1 .win-name { font-size: clamp(22px, 4.3vh, 50px); color: var(--accent); }
+.win-team { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: clamp(6px, 1vh, 12px); font-size: clamp(12px, 1.6vh, 17px); color: var(--muted); }
+.win-line { font-size: clamp(12px, 1.6vh, 17px); margin-top: clamp(4px, 0.7vh, 8px); overflow-wrap: anywhere; }
+.win-reason { font-size: clamp(13px, 1.9vh, 21px); line-height: 1.35; margin-top: clamp(6px, 1vh, 12px); max-width: 44ch; }
+.win-prize { font-size: clamp(13px, 1.9vh, 21px); font-weight: 500; margin-top: clamp(6px, 1vh, 12px); overflow-wrap: anywhere; }
+
+.win-step { border-radius: 18px; padding: clamp(10px, 1.8vh, 22px) clamp(12px, 1.4vw, 26px); background: var(--surface2); }
+.win-step-1 { height: clamp(120px, 31vh, 340px); background: var(--panel); color: var(--on-panel); }
+.win-step-2 { height: clamp(86px, 21vh, 232px); }
+.win-step-3 { height: clamp(60px, 14vh, 156px); }
+.win-numeral { font-size: clamp(26px, 6.2vh, 72px); font-weight: 500; line-height: 1; }
+.win-step-note { font-size: clamp(11px, 1.4vh, 15px); opacity: 0.75; margin-top: clamp(4px, 0.8vh, 10px); }
+
+.win-pair { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(16px, 3vw, 56px); align-items: start; }
+.win-list li { display: grid; grid-template-columns: 3.2rem 1fr auto; gap: 0 12px; align-items: baseline; padding: clamp(8px, 1.5vh, 16px) 0; border-bottom: 1px solid var(--border); font-size: clamp(15px, 2.4vh, 26px); }
+.win-list li:first-child { border-top: 1px solid var(--border); }
+
+.win-all { border-radius: 24px; padding: clamp(18px, 3.4vh, 44px) clamp(18px, 2.6vw, 48px); background: var(--panel); color: var(--on-panel); display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(16px, 2.4vw, 44px); }
+.win-all .win-name { font-size: clamp(20px, 3.6vh, 40px); color: inherit; }
+.win-all .win-team, .win-all .win-eyebrow { color: inherit; opacity: 0.78; }
+.win-also { font-size: clamp(12px, 1.7vh, 18px); color: var(--muted); margin-top: clamp(10px, 2vh, 22px); }
+
+.win-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; font-size: 12px; color: var(--muted); }
+.win-foot button, .win-foot a { padding: 4px 10px; border-radius: 8px; border: 1px solid var(--border); color: inherit; background: transparent; }
+.win-foot button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+
+@media (max-width: 760px) {
+  .win-podium { grid-template-columns: 1fr; }
+  .win-col { grid-row: auto; grid-column: 1; }
+  .win-card { min-height: 0; }
+  .win-step-1, .win-step-2, .win-step-3 { height: auto; }
+  .win-pair, .win-all { grid-template-columns: 1fr; }
+}

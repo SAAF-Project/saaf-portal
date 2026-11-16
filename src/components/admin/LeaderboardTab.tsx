@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import type { LeaderboardPayload } from "../../lib/leaderboard-day";
+import { juryPartsText, juryScoreText } from "../../lib/jury-result";
 import { STANDARDS } from "../temple/standards/standards";
 import { clock } from "../temple/standards/StandardsView";
+import { WINNERS_PATH } from "./Track3Tab";
 
 // The organisers' view of the day's leaderboard (Session 11): always the full, unfrozen standings per track, the review
-// agent's flags, and the controls for the freeze, the reveal, the jury's places for track 3, disqualifying a login and
-// overriding a level. MSACC only; the routes check that too.
+// agent's flags, and the controls for the freeze, the reveal, disqualifying a login and overriding a level. The jury's
+// result for track 3 is entered in its own tab (Track3Tab.tsx). MSACC only; the routes check that too.
 
 const LABEL: Record<string, string> = Object.fromEntries(STANDARDS.map((s) => [s.id, s.label]));
 const SCORED = ["readme", "agent-yaml", "audit-criteria", "tests", "ci", "dependencies", "licence", "codeowners"];
@@ -56,15 +58,6 @@ export default function LeaderboardTab() {
   // The admin keeps seeing a disqualified login, marked: on the public board it has no proposal and no place.
   const outSet = new Set(a.state.disqualified.map((l) => l.toLowerCase()));
   const tag = (l: string) => (outSet.has(l.toLowerCase()) ? `@${l} (disqualified)` : `@${l}`);
-  const place = async (repo: string, value: number | null) => {
-    setBusy(true);
-    const res = await fetch("/api/admin/checks", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ place: { repo, place: value } }) });
-    setBusy(false);
-    if (!res.ok) return setError(`Could not set the place (${res.status})`);
-    setError(null);
-    setTick((n) => n + 1);
-  };
-
   return (
     <div className="space-y-8">
       {error && <p className="text-sm text-saaf-red">{error}</p>}
@@ -85,7 +78,7 @@ export default function LeaderboardTab() {
           <p className="text-xs font-mono text-muted mb-2">Prize-giving</p>
           <p className="text-sm mb-3">
             First the two mentions (top contributor, {byRise ? "best agent" : "most improved"}), one step each. Then track 3, track 2 and track 1, each from
-            the third place up to the winner. Enter the jury&apos;s places for track 3 below before you start.
+            the third place up to the winner. Enter the jury&apos;s result in the Track 3 tab before you start.
           </p>
           <div className="flex flex-wrap gap-2">
             <button className={btn} disabled={busy} onClick={() => act({ action: "reveal-back" })}>
@@ -97,6 +90,9 @@ export default function LeaderboardTab() {
             <button className={btn} disabled={busy} onClick={() => act({ action: "reveal-reset" })}>
               Reset
             </button>
+            <a href={WINNERS_PATH} target="saaf-winners" className={btn}>
+              Open the winners view
+            </a>
           </div>
         </div>
         <div className="rounded-xl border border-border p-4">
@@ -124,34 +120,21 @@ export default function LeaderboardTab() {
       <section>
         <h3 className="text-base font-medium mb-2">Track 3 · LLM checks.</h3>
         <p className="text-xs text-muted mb-2">
-          The repos with an llm_checks.yaml, sent in by the facts script. The jury (Orq.ai and an auditor) picks the places at 16:15: click 1, 2 or 3. The public
-          sees places only in the reveal.
+          The repos with an llm_checks.yaml, sent in by the facts script, with the jury&apos;s places. Enter or change the result in the Track 3 tab. The
+          public sees places only in the reveal.
         </p>
         {p.checks.length === 0 ? (
           <p className="text-sm text-muted">No repo has been sent in yet.</p>
         ) : (
           <ol className="border-t border-border text-sm">
             {p.checks.map((c) => (
-              <li key={c.repo} className="grid grid-cols-[auto_1fr_auto] gap-x-3 items-center py-2 border-b border-border">
-                <span className="inline-flex gap-1">
-                  {[1, 2, 3].map((n) => (
-                    <button
-                      key={n}
-                      className={`w-7 h-7 text-xs font-mono rounded-md border ${c.place === n ? "border-accent text-accent" : "border-border text-muted hover:border-accent"}`}
-                      disabled={busy}
-                      onClick={() => place(c.repo, c.place === n ? null : n)}
-                      aria-label={`Place ${n} for ${c.repo}`}
-                      aria-pressed={c.place === n}
-                    >
-                      {n}
-                    </button>
-                  ))}
-                </span>
+              <li key={c.repo} className="grid grid-cols-[2.5rem_1fr_auto] gap-x-3 items-center py-2 border-b border-border">
+                <span className={`font-mono ${c.place ? "text-accent" : "text-muted"}`}>{c.place ? `P${c.place}` : "·"}</span>
                 <span className="min-w-0 [overflow-wrap:anywhere]">
                   <span className="font-medium">{c.repo}</span>
                   <span className="block text-xs text-muted">
                     {c.authors.map(tag).join(" ")}
-                    {c.feedback ? ` · ${c.feedback}` : ""}
+                    {c.jury ? ` · jury: ${[juryScoreText(c.jury), juryPartsText(c.jury.parts), c.jury.reason].filter(Boolean).join(" · ")}` : ""}
                     {c.flags && c.flags.length > 0 ? ` · ${c.flags.join("; ")}` : ""}
                   </span>
                 </span>

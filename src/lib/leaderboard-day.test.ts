@@ -125,6 +125,40 @@ describe("the public view", () => {
     expect(admin.admin?.reveal_total).toBe(1 + 1 + 1 + 0 + Math.min(admin.most_improved.length, 3));
   });
 
+  it("track 3: what the jury said shows only with a revealed place, and to the admin", () => {
+    const candidate = (repo: string, llm: number, login: string) => ({ repo, authors: [login], title: repo, llm, code: 1, score: 0, feedback: null, flags: [], firstAt: at("12:00") });
+    const said = (score: number, reason: string) => ({ score, parts: { criteria: 4, evals: score - 4 }, reason });
+    const checks = {
+      candidates: [candidate("example-agent", 3, "person-0"), candidate("sample-service", 5, "person-1"), candidate("quiet-agent", 9, "person-3")],
+      places: { "example-agent": 1, "sample-service": 2 },
+      updatedAt: at("15:20"),
+      jury: { names: ["Judge One, Example"], max: 16, results: { "example-agent": said(14, "Caught a real defect."), "sample-service": said(11, "Clear checks."), "quiet-agent": said(6, "Not placed.") }, enteredAt: at("15:20") },
+    };
+    const at_step = (revealStep: number) => buildLeaderboard(input({ now: at("15:40"), checks, state: { ...STATE, revealStep } }));
+
+    const before = buildLeaderboard(input({ checks })); // during the day: nothing of the jury
+    expect(JSON.stringify(before)).not.toMatch(/Caught a real defect|Judge One|jury/);
+    const mentions = at_step(2); // the reveal runs, track 3 has not started
+    expect(JSON.stringify(mentions)).not.toMatch(/Caught a real defect|Clear checks|Not placed|Judge One/);
+
+    const second = at_step(3); // second place revealed, the winner still hidden
+    expect(second.checks_jury).toEqual(["Judge One, Example"]);
+    expect(second.checks[1]).toMatchObject({ repo: "sample-service", place: 2, jury: { score: 11, max: 16, reason: "Clear checks." } });
+    expect(JSON.stringify(second)).not.toMatch(/Caught a real defect|Not placed/); // not the winner, not a repo without a place
+
+    const winner = at_step(4);
+    expect(winner.checks[0]).toMatchObject({ repo: "example-agent", place: 1, jury: { score: 14, parts: { criteria: 4, evals: 10 } } });
+    expect(winner.checks[2].jury).toBeUndefined();
+
+    const admin = buildLeaderboard(input({ checks, view: "admin" }));
+    expect(admin.checks_jury).toEqual(["Judge One, Example"]);
+    expect(admin.checks.find((c) => c.repo === "quiet-agent")?.jury?.reason).toBe("Not placed.");
+
+    // A disqualified author takes the repo, its place and what the jury said about it off the public view.
+    const out = buildLeaderboard(input({ now: at("15:40"), checks, state: { ...STATE, revealStep: 99, disqualified: ["Person-0"] } }));
+    expect(JSON.stringify(out.checks)).not.toMatch(/example-agent|Caught a real defect/);
+  });
+
   it("disqualified people are left out of the people list", () => {
     const p = buildLeaderboard(input({ state: { ...STATE, disqualified: ["person-2"] }, view: "admin" }));
     expect(p.top_contributor.map((r) => r.login)).not.toContain("person-2");
