@@ -149,6 +149,32 @@ export default function HardeningPage() {
         </section>
       </div>
 
+      <div className="grid gap-x-6 gap-y-10 md:grid-cols-2 mb-10">
+        <section className="min-w-0">
+          <h2 className="text-lg font-medium mb-3">Demo your lesson.</h2>
+          <p className="text-sm text-muted leading-relaxed">
+            Six demos from 16:30, five minutes each: one to connect, three to tell, one for questions. Show an improvement to a
+            standard, or how you made an agent better and what others can learn from it.
+          </p>
+          <Link href="/demo" className="inline-block mt-3 text-sm px-4 py-2 rounded-lg border border-border hover:border-accent">
+            Sign up by 16:00
+          </Link>
+        </section>
+
+        <section className="min-w-0">
+          <h2 className="text-lg font-medium mb-3">Improve a standard.</h2>
+          <p className="text-sm text-muted leading-relaxed">
+            Open a pull request with the form <code className="font-mono text-xs">standard-proposal</code> on{" "}
+            <code className="font-mono text-xs">agent-template</code> or <code className="font-mono text-xs">docs/conventions</code>{" "}
+            (add <code className="font-mono text-xs">?template=standard-proposal.md</code> to the address). Nothing is merged
+            today; the best proposals go into the next version of the standards.
+          </p>
+          <p className="text-xs text-muted leading-relaxed mt-3">
+            Judged on evidence, checkability, simplicity, fit and reach. Too complicated scores 0; a new standard replaces one.
+          </p>
+        </section>
+      </div>
+
       <section className="mb-10">
         <h2 className="text-lg font-medium mb-3">Tools from our guests.</h2>
         <p className="text-sm text-muted leading-relaxed mb-3">Select a tool to open it. Each one is an external site.</p>
