@@ -1,5 +1,6 @@
 import type { FeedItem } from "../../../lib/leaderboard";
 import type { CheckRow, LeaderboardPayload, PersonRow, ProposalRow, RepoRow } from "../../../lib/leaderboard-day";
+import { juryScoreText } from "../../../lib/jury-result";
 import { DATA_RULE, DAY_TRACKS, DEMO_LINE, PRIZE_EUR, PRIZE_LINE, PRIZE_SHORT, RULES, SHORT_RULES, prizeShare } from "../../../lib/day-tracks";
 import DayCountdown from "../../DayCountdown";
 import { STANDARDS } from "./standards";
@@ -17,7 +18,7 @@ const LABEL: Record<string, string> = Object.fromEntries(STANDARDS.map((s) => [s
 const HIDDEN = "revealed at 17:00";
 const hair = "border-[color-mix(in_srgb,var(--on-panel)_16%,transparent)]";
 
-function Avatar({ login, size = 28 }: { login: string; size?: number }) {
+export function Avatar({ login, size = 28 }: { login: string; size?: number }) {
   if (login === "?") return <span className="inline-block rounded-md bg-surface2 shrink-0" style={{ width: size, height: size }} />;
   return (
     // eslint-disable-next-line @next/next/no-img-element
@@ -296,6 +297,9 @@ function Checks({ rows }: { rows: CheckRow[] }) {
               </a>
               {r.authors.length > 0 && <span className="block text-xs font-mono text-muted [overflow-wrap:anywhere]">{r.authors.map((l) => `@${l}`).join(" · ")}</span>}
               {r.place === 1 && <Prize logins={r.authors} won />}
+              {r.place && r.jury && (r.jury.score !== null || r.jury.reason) && (
+                <span className="block text-xs text-muted mt-1 [overflow-wrap:anywhere]">Jury: {[juryScoreText(r.jury), r.jury.reason].filter(Boolean).join(" · ")}</span>
+              )}
             </span>
           )}
           <span className="text-right font-mono tabular-nums text-sm text-muted">{r.masked ? "" : `${r.llm} ${r.llm === 1 ? "check" : "checks"}`}</span>

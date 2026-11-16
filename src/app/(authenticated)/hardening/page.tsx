@@ -7,6 +7,7 @@ import ExternalReferences, { type ExternalReference } from "@/components/Externa
 import StandardsChecklist from "@/components/temple/standards/StandardsChecklist";
 import { sessionLogin } from "@/lib/admin";
 import { ASSIGNMENT_OPENS_CLOCK, previewing, seesAssignment } from "@/lib/day-gate";
+import { PASSCODE_IN_THE_ROOM, orqOnboardingText, orqPasscode } from "@/lib/orq-passcode";
 import { DATA_RULE, DAY_TRACKS, DEMO_LINE, PRIZE_LINE, SHORT_RULES, TRACKS_SUB } from "@/lib/day-tracks";
 
 // The hardening day (Session 11, 17 November 2026) on one screen: pick one of three tracks, start it with one copied
@@ -38,7 +39,8 @@ const references: ExternalReference[] = [
   {
     name: "Orq.ai onboarding",
     url: "https://saaf-project.orq.ai",
-    text: "Get your own project in the shared SAAF workspace on Orq.ai. Get started copies one prompt that installs the two skills. The passcode is shared in the room.",
+    // With ORQ_PASSCODE set on the server, the last sentence becomes the passcode (src/lib/orq-passcode.ts).
+    text: `Get your own project in the shared SAAF workspace on Orq.ai. Get started copies one prompt that installs the two skills. ${PASSCODE_IN_THE_ROOM}`,
   },
   {
     name: "Orq.ai guide",
@@ -238,7 +240,7 @@ export default async function HardeningPage({ searchParams }: { searchParams: Pr
         </Fold>
         <Fold title="Tools from our guests.">
           <p className="text-sm text-muted leading-relaxed mb-3">Select a tool to open it. Each one is an external site.</p>
-          <ExternalReferences references={references} />
+          <ExternalReferences references={references.map((r) => (r.url === "https://saaf-project.orq.ai" ? { ...r, text: orqOnboardingText(r.text, orqPasscode()) } : r))} />
           <p className="text-xs text-muted leading-relaxed mt-3">Keep keys in environment variables, never in your repository. Use synthetic data when you try a tool.</p>
         </Fold>
       </div>
