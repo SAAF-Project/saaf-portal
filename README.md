@@ -190,6 +190,18 @@ Vercel auto-deploys `main` branch. Required env vars in Vercel dashboard:
 
 After schema changes: run `npx prisma db push` locally with `PROD_DATABASE_URL` set in `.env.production.local`.
 
+### Acceptance environment (branch `dev`)
+
+Preview deployments cannot sign in, because the GitHub OAuth App only accepts the production callback. The branch `dev` is the one preview that can. Vercel serves it at a fixed address, `https://saaf-portal-git-dev-<team>.vercel.app`; a custom domain can be assigned to the branch later.
+
+Set these in the Vercel dashboard for the Preview environment, limited to the branch `dev`:
+
+- `GITHUB_ID` / `GITHUB_SECRET`: a second OAuth App ("SAAF Portal (dev)") whose callback is `https://<dev address>/api/auth/callback/github`
+- `NEXTAUTH_URL`: the dev address
+- `ALLOWED_LOGINS`: GitHub logins that may sign in there, comma-separated. Leave it unset in production.
+
+Merge a pull request branch into `dev` to try it with a signed-in session before it goes to `main`. If the Preview environment uses the production `DATABASE_URL`, everything written on `dev` is written to production: do not run schema changes from it.
+
 ---
 
 ## Project structure

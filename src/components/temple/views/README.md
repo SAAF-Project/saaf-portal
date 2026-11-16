@@ -1,6 +1,6 @@
 # Visualisations and the `visualization.yaml` contract
 
-Every visualisation (Temple, Islands, Agent dependencies, ...) has a folder here with two files:
+Every visualisation (Temple, Islands, Agent dependencies, Standards, ...) has a folder here with two files:
 
 ```
 views/<id>/
@@ -10,7 +10,8 @@ views/<id>/
 
 One shared engine (`../ProgressApp.tsx`) provides the data, the filters, the side panel, the tour, the chooser and the
 links. A visualisation is **frontend only**: it receives the data and the current focus, draws them and reports clicks. It
-never writes data.
+never writes data. A view may read one extra read-only source through its own hook (the Standards view reads
+`/api/standards`), and it still never writes.
 
 ## visualization.yaml
 

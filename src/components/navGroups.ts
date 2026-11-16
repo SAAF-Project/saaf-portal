@@ -15,6 +15,9 @@ export interface NavGroup {
   items: NavItem[];
 }
 
+/** Pages of earlier sessions: out of the bar, reached through /sessions ("Earlier sessions"). */
+export const ARCHIVED_PAGES = ["/challenge"];
+
 export const NAV_GROUPS: NavGroup[] = [
   {
     id: "work",
@@ -37,13 +40,13 @@ export const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    id: "challenge",
-    label: "Security Challenge",
-    hint: "10 November 2026",
+    id: "hardening",
+    label: "Hardening day",
+    hint: "17 November 2026",
     items: [
-      { href: "/challenge", label: "Handout", icon: "▤" },
+      { href: "/hardening", label: "Handout", icon: "▤" },
+      { href: "/standards", label: "Standards board", icon: "▥" },
       { href: "/demo", label: "Demo sign-up", icon: "▷" },
-      { href: "/quiz", label: "Quiz", icon: "?" },
     ],
   },
   {
@@ -56,6 +59,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: "/visualised#/?view=temple", label: "Temple", icon: "▲" },
       { href: "/visualised#/?view=islands", label: "Islands", icon: "◒" },
       { href: "/visualised#/?view=dependencies", label: "Agent dependencies", icon: "⇄" },
+      { href: "/visualised#/?view=standards", label: "Standards", icon: "▩" },
     ],
   },
   {
@@ -65,6 +69,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/about", label: "About SAAF", icon: "ℹ" },
       { href: "/e-learning", label: "E-Learning", icon: "▣" },
+      { href: "/sessions", label: "Earlier sessions", icon: "◷" },
     ],
   },
   {

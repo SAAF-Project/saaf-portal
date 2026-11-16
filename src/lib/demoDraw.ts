@@ -1,5 +1,5 @@
-// Fair demo schedule for the Security Challenge: every registered team gets the same share
-// of the demo window, at most five minutes, in an order drawn at random by the admin.
+// Demo schedules: a random draw that gives every registered team the same share of the window (at most five minutes),
+// or fixed slots for the teams the organisers selected (src/lib/demo-sessions.ts).
 
 export const WINDOW_START = "16:30";
 export const WINDOW_MINUTES = 30;
@@ -39,12 +39,16 @@ export interface Slot<T> {
   item: T;
 }
 
-/** Back-to-back slots from the window start, one per item in the given order. */
-export function schedule<T>(ordered: readonly T[]): { seconds: number; slots: Slot<T>[] } {
-  const seconds = secondsPerTeam(ordered.length);
+/**
+ * Back-to-back slots from the window start, one per item in the given order. By default the window is split evenly
+ * (the draw); with `seconds` every slot has that fixed length (the organisers' selection).
+ */
+export function schedule<T>(ordered: readonly T[], opts: { seconds?: number; start?: string } = {}): { seconds: number; slots: Slot<T>[] } {
+  const seconds = opts.seconds ?? secondsPerTeam(ordered.length);
+  const start = opts.start ?? WINDOW_START;
   return {
     seconds,
-    slots: ordered.map((item, i) => ({ start: clock(i * seconds), end: clock((i + 1) * seconds), item })),
+    slots: ordered.map((item, i) => ({ start: clock(i * seconds, start), end: clock((i + 1) * seconds, start), item })),
   };
 }
 

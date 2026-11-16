@@ -10,6 +10,7 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
   const isNotMember = error === "not-member";
+  const isNotAllowed = error === "not-allowed";
 
   const ghUsername = searchParams.get("username") || "";
   const [showSignup, setShowSignup] = useState(false);
@@ -86,7 +87,13 @@ function LoginForm() {
               </p>
             </div>
 
-            {error && !isNotMember && (
+            {isNotAllowed && (
+              <div className="mt-4 p-3 bg-saaf-red/10 border border-saaf-red/30 rounded-lg text-sm text-saaf-red">
+                This is a test environment. Only its maintainers can sign in here.
+              </div>
+            )}
+
+            {error && !isNotMember && !isNotAllowed && (
               <div className="mt-4 p-3 bg-saaf-red/10 border border-saaf-red/30 rounded-lg text-sm text-saaf-red">
                 Authentication failed. Please try again.
               </div>

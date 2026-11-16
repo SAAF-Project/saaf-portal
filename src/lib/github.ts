@@ -7,7 +7,7 @@ const ORG = "SAAF-Project";
 const REPO = "SAAF-Project/SAAF-Project";
 
 // Repos that aren't agents (meta repos)
-const META_REPOS = new Set(["saaf-portal", "SAAF-Project", "website"]);
+export const META_REPOS = new Set(["saaf-portal", "SAAF-Project", "website"]);
 
 export interface ReviewedAgent {
   category: string;
@@ -525,6 +525,24 @@ export async function fetchUserOrgRepos(username: string): Promise<OrgRepo[]> {
     }
   }
 
+  // The pull requests this user opened anywhere in the organisation, in one search call (up to three pages). It used
+  // to be one search call per repo and per user, which runs into GitHub's limit of thirty searches a minute as soon as
+  // a few members open My Repos at the same time.
+  const pullRequests = new Map<string, number>();
+  for (let p = 1; p <= 3; p++) {
+    const prRes = await githubFetch(
+      `${API}/search/issues?q=org:${ORG}+author:${encodeURIComponent(username)}+type:pr&per_page=100&page=${p}`,
+      { revalidate: CACHE_TTL.SEARCH }
+    );
+    const prData = await safeJson(prRes);
+    const items = prData && typeof prData === "object" && Array.isArray((prData as { items?: unknown }).items) ? (prData as { items: { repository_url?: string }[] }).items : [];
+    for (const item of items) {
+      const name = item.repository_url?.split("/").pop();
+      if (name) pullRequests.set(name, (pullRequests.get(name) ?? 0) + 1);
+    }
+    if (items.length < 100) break;
+  }
+
   while (true) {
     const res = await githubFetch(
       `${API}/orgs/${ORG}/repos?per_page=100&page=${page}&sort=updated`,
@@ -550,17 +568,10 @@ export async function fetchUserOrgRepos(username: string): Promise<OrgRepo[]> {
       }
 
       if (!contributed) {
-        const prRes = await githubFetch(
-          `${API}/search/issues?q=repo:${ORG}/${repo.name}+author:${username}+type:pr&per_page=1`,
-          { revalidate: CACHE_TTL.SEARCH }
-        );
-        const prData = await safeJson(prRes);
-        if (prData && typeof prData === "object" && "total_count" in prData) {
-          const tc = (prData as { total_count: number }).total_count;
-          if (tc > 0) {
-            contributed = true;
-            prCount = tc;
-          }
+        const opened = pullRequests.get(repo.name) ?? 0;
+        if (opened > 0) {
+          contributed = true;
+          prCount = opened;
         }
       }
 

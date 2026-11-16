@@ -1,18 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { isAdminRequest } from "@/lib/admin";
 import { getPrisma } from "@/lib/prisma";
 
-const ADMIN_USERNAME = "MSACC";
-
-async function checkAdmin() {
-  const session = await getServerSession(authOptions);
-  const username = (session?.user as { githubUsername?: string })?.githubUsername;
-  return username === ADMIN_USERNAME;
-}
-
-export async function GET() {
-  if (!(await checkAdmin())) {
+export async function GET(request: NextRequest) {
+  if (!(await isAdminRequest(request))) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -27,7 +18,7 @@ export async function GET() {
 }
 
 export async function PATCH(request: NextRequest) {
-  if (!(await checkAdmin())) {
+  if (!(await isAdminRequest(request))) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

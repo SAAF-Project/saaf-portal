@@ -1,0 +1,118 @@
+/* The Standards view of SAAF Visualised: a wall of faces, one per repo; a face is a 3x3 grid of tiles, one per standard.
+   Everything is nested under .temple-app .std-view, like temple.css, so nothing leaks into the host page and the
+   engine's own button and link rules do not win. Colours are the host's tokens (--bg, --text, --muted, --accent ...). */
+.temple-app .std-view {
+  --face: 88px; /* one face; a tile is a third of it */
+  --std-on: var(--accent);
+  --std-line: color-mix(in srgb, var(--text) 30%, transparent); /* a missing tile: a hairline */
+  --std-dash: color-mix(in srgb, var(--text) 55%, transparent); /* a tile that could not be checked: dashed */
+  --std-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  position: absolute;
+  inset: 0;
+  z-index: 4; /* above the engine's paper grain (3), which this view has no switch for; below its bars and panels (49 and up) */
+  background: var(--bg);
+  color: var(--text);
+
+  /* the box between the engine's top bar and its legend; next to the side panel when that is open */
+  .std-body { position: absolute; top: calc(var(--head) + 60px); left: 16px; right: 16px; bottom: calc(var(--std-legend, 56px) + 8px); display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+  .std-note { margin: 24px 0 0; color: var(--muted); font-size: 15px; }
+
+  /* above the wall: the summary line and the key */
+  .std-head { flex: none; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px 32px; padding-right: 76px; /* the Details tab of the closed side panel */ }
+  .std-sum { min-width: 0; }
+  .std-line { margin: 0; font-size: clamp(20px, 2vw, 36px); font-weight: 500; line-height: 1.15; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+  .std-part { white-space: nowrap; }
+  .std-sep { color: var(--muted); }
+  .std-notes { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+
+  .std-key { flex: none; color: var(--muted); font-size: 11.5px; line-height: 1.3; }
+  .std-key-wide { display: flex; align-items: flex-start; gap: 20px; }
+  .std-key-narrow { display: none; }
+  .std-key-narrow > summary { cursor: pointer; padding: 2px 0; }
+  .std-states { list-style: none; margin: 0; padding: 0; display: grid; grid-auto-flow: column; grid-template-rows: repeat(3, auto); gap: 6px 20px; padding-top: 3px; }
+  .std-states li { display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+  .std-states .std-tile, .std-states .std-ringkey { width: 11px; height: 11px; flex: none; }
+  .std-ringkey { box-sizing: border-box; border: 2px solid var(--std-on); border-radius: 4px; }
+  .std-keyface { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 136px)); gap: 4px; }
+  .std-keyface li { display: flex; align-items: center; min-height: 22px; padding: 2px 7px; border: 1px solid var(--std-line); border-radius: 5px; color: var(--text); overflow-wrap: anywhere; }
+
+  /* the wall */
+  .std-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; margin: 0 -4px; padding: 4px; }
+  .std-wall { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 6px; align-items: start; }
+  .std-cell { min-width: 0; }
+  .std-pick { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; padding: 5px; background: none; border: 1px solid transparent; border-radius: 12px; text-align: left; transition: background-color 0.25s, border-color 0.25s; }
+  .std-pick:hover { background: var(--hover); }
+  .std-pick.on { background: var(--hover); border-color: var(--text); }
+
+  .std-face { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; width: min(100%, var(--face)); aspect-ratio: 1; margin-bottom: 5px; border-radius: 7px; }
+  .std-cell[data-complete] .std-face { outline: 2px solid var(--std-on); outline-offset: 3px; } /* the ring of a complete face */
+  .std-tile { display: block; box-sizing: border-box; border: 1px solid var(--std-line); border-radius: 5px; transition: background-color 0.3s, border-color 0.3s; }
+  .std-tile[data-state="in place"] { background: var(--std-on); border-color: var(--std-on); }
+  .std-tile[data-state="not checked"] { border-style: dashed; border-color: var(--std-dash); }
+
+  .std-name { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-width: 100%; font-size: 11.5px; line-height: 1.22; overflow-wrap: anywhere; }
+  .std-count { display: flex; align-items: center; gap: 5px; color: var(--muted); font-family: var(--std-mono); font-size: 11.5px; line-height: 1.3; font-variant-numeric: tabular-nums; }
+  .std-cell[data-complete] .std-count { color: var(--text); font-weight: 600; }
+  /* a linked plan's stage: the same rounded square as the swatches in the legend */
+  .std-stage { display: inline-block; flex: none; width: 9px; height: 9px; border-radius: 2px; }
+  .std-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+  /* the nine standards of the selected repo, by name, docked under the wall */
+  .std-detail { flex: none; display: flex; gap: 10px 28px; align-items: flex-start; padding: 12px 14px; background: var(--glass); border: 1px solid var(--border); border-radius: 14px; }
+  .std-detail-head { position: relative; box-sizing: border-box; flex: 0 1 300px; min-width: 0; padding-right: 34px; }
+  .std-detail h2 { margin: 0; font-size: 16px; font-weight: 500; line-height: 1.25; overflow-wrap: anywhere; }
+  .std-detail a:hover { text-decoration: underline; }
+  .std-facts, .std-plan { margin: 3px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.35; }
+  .std-plan .std-stage { margin-right: 6px; }
+  .std-close { position: absolute; top: -2px; right: 0; background: none; border: 1px solid var(--border); border-radius: 8px; padding: 1px 8px; color: var(--muted); }
+  .std-close:hover { background: var(--hover); color: var(--text); }
+  .std-checks { flex: 1 1 auto; min-width: 0; list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 20px; }
+  .std-checks li { display: grid; grid-template-columns: 13px minmax(0, 1fr) auto; align-items: center; column-gap: 8px; min-width: 0; padding: 4px 0; border-top: 1px solid var(--border); font-size: 12.5px; line-height: 1.3; }
+  .std-checks li:nth-child(-n + 3) { border-top: 0; }
+  .std-checks .std-tile { width: 13px; height: 13px; border-radius: 3px; }
+  .std-check-name { min-width: 0; overflow-wrap: anywhere; }
+  .std-check-state { color: var(--muted); font-size: 11.5px; white-space: nowrap; }
+  .std-checks li[data-state="in place"] .std-check-state { color: var(--text); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .std-pick, .std-tile { transition: none; }
+  }
+
+  /* wide screens: the side panel sits to the right of the wall */
+  @media (min-width: 801px) {
+    &.panel-open .std-body { right: 392px; }
+    &.panel-open .std-head { padding-right: 0; }
+  }
+  /* not enough room for the key next to the summary line: it goes under it */
+  @media (max-width: 1280px) {
+    .std-head { flex-wrap: wrap; }
+  }
+
+  /* Phones and narrow windows: the key folds away and the side panel is a sheet at the bottom, so the selected repo
+     goes above the wall, clear of the sheet and of the Details button. */
+  @media (max-width: 800px) {
+    .std-body { top: calc(var(--head) + 52px); left: 12px; right: 12px; gap: 8px; }
+    &.panel-open .std-body { bottom: calc(42vh + 64px); }
+    &.panel-open .std-notes, &.panel-open .std-key { display: none; }
+    .std-head { flex-direction: column; flex-wrap: nowrap; gap: 6px; padding-right: 0; }
+    .std-notes { font-size: 12px; margin-top: 4px; }
+    .std-key-wide { display: none; }
+    .std-key-narrow { display: block; }
+    .std-key-narrow .std-states { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 6px 0 8px; padding-top: 0; }
+    .std-keyface { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .std-keyface li { font-size: 10.5px; padding: 2px 5px; }
+    .std-wall { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
+    .std-scroll { padding-bottom: 44px; /* the last row scrolls clear of the Details button */ }
+    .std-detail { order: -1; flex-direction: column; gap: 6px; padding: 10px 12px; max-height: 50%; overflow-y: auto; }
+    .std-head { order: -2; }
+    .std-detail-head { flex: none; width: 100%; }
+    .std-checks { width: 100%; gap: 0 10px; }
+    .std-checks li { grid-template-columns: 11px minmax(0, 1fr); column-gap: 6px; align-items: start; padding: 3px 0; font-size: 11.5px; line-height: 1.25; }
+    .std-checks .std-tile { width: 11px; height: 11px; margin-top: 2px; }
+    .std-check-state { grid-column: 2; font-size: 10.5px; }
+  }
+  /* a phone: three faces per row */
+  @media (max-width: 480px) {
+    .std-wall { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+}
