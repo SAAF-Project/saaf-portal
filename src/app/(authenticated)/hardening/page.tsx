@@ -13,10 +13,10 @@ import { DATA_RULE, DAY_TRACKS, DEMO_LINE, PRIZE_LINE, SHORT_RULES, TRACKS_SUB }
 const HANDOUT_PDF: string | null = "/hardening/saaf-hardening-day-handout.pdf";
 
 const day = [
-  { t: "09:00", v: "Welcome and the three tracks" },
-  { t: "09:30", v: "Guests from BDO: Adriaan Heijstek, Faissal Assakkach (10:00), Sjoerd de Vries and Thijs Modderman (11:00)" },
+  { t: "09:00", v: "Welcome: Eduward van de Kamp on quality, Mathijs Schouten on the nine standards" },
+  { t: "09:30", v: "Guests from BDO: Adriaan Heijstek, Faissal Assakkach (10:00), Sjoerd de Vries and Thijs Modderman (11:00). Coffee at 10:45" },
   { t: "11:45", v: "Bauke Brenninkmeijer, Orq.ai: observe and evaluate your agents" },
-  { t: "12:15", v: "Start hacking, then lunch. In the afternoon: Gülnur Orpak, ABN AMRO, a 15-minute talk" },
+  { t: "12:15", v: "The assignment: three tracks. Lunch at 12:30, then build. In the afternoon: Gülnur Orpak, ABN AMRO, a 15-minute talk" },
   { t: "15:15", v: "The leaderboard freezes" },
   { t: "16:00", v: "Last pull request opened; demo sign-up closes" },
   { t: "16:15", v: "Last merge, final review", accent: true },
