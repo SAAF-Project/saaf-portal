@@ -68,6 +68,8 @@ export interface CheckRow {
   score?: number;
   feedback?: string | null;
   flags?: string[];
+  /** What the jury said: only on a place that is revealed, and for the admin. */
+  jury?: { score: number | null; max: number; parts: Record<string, number>; reason: string };
   masked?: boolean;
 }
 
@@ -95,6 +97,8 @@ export interface LeaderboardPayload {
   checks: CheckRow[];
   /** How many repos have LLM checks. */
   checks_total: number;
+  /** Who judged track 3: once a place of that track is revealed, and for the admin. */
+  checks_jury?: string[];
   /** How many participants the organisers disqualified. The public sees the number, never the names. */
   disqualified: number;
   feed: FeedItem[];
@@ -225,6 +229,10 @@ const maskCheck = (): CheckRow => ({ repo: "?", url: "", authors: [], llm: 0, co
  * admin the jury's places come first.
  */
 function checkRows(doc: ChecksDoc, mode: "public" | "reveal" | "admin"): CheckRow[] {
+  const said = (repo: string) => {
+    const j = doc.jury?.results[repo];
+    return j && doc.jury ? { jury: { score: j.score, max: doc.jury.max, parts: j.parts, reason: j.reason } } : {};
+  };
   const rows: CheckRow[] = doc.candidates
     .filter((c) => c.llm > 0 || mode === "admin")
     .map((c) => ({
@@ -235,6 +243,8 @@ function checkRows(doc: ChecksDoc, mode: "public" | "reveal" | "admin"): CheckRo
       code: c.code,
       ...(mode === "public" ? {} : { place: doc.places[c.repo] ?? null }),
       ...(mode === "admin" ? { score: c.score, feedback: c.feedback, flags: c.flags } : {}),
+      // A hidden place is masked afterwards (hideTop), so what the jury said shows only with a revealed place.
+      ...(mode === "admin" || (mode === "reveal" && doc.places[c.repo]) ? said(c.repo) : {}),
     }));
   rows.sort((a, b) => (a.place ?? 9) - (b.place ?? 9) || b.llm - a.llm || a.repo.localeCompare(b.repo));
   return mode === "admin" ? rows : rows.slice(0, CHECKS_SHOWN);
@@ -285,9 +295,11 @@ export function buildLeaderboard(input: DayInput): LeaderboardPayload {
   const steps = revealSteps(people.length, (prize === "most_improved" ? best : improved).length, placed, proposals.length, (prize === "most_improved" ? improved : best).length);
   const revealTotal = steps.reduce((n, x) => n + x, 0);
   let reveal: LeaderboardPayload["reveal"] = null;
+  let jury: string[] | null = admin && rawChecks.jury ? rawChecks.jury.names : null;
 
   if (!admin && revealing) {
     const [p, o, c, q, w] = revealed(input.state.revealStep, steps);
+    if (c > 0 && rawChecks.jury) jury = rawChecks.jury.names;
     const mention = (rows: RepoRow[]) => (o ? rows : hideTop(rows, MASKED_TOP, maskRepo));
     const winner = (rows: RepoRow[]) => hideTop(rows, steps[4] - w, maskRepo);
     people = p ? people.slice(0, SHOWN) : hideTop(people.slice(0, SHOWN), MASKED_TOP, maskPerson);
@@ -323,6 +335,7 @@ export function buildLeaderboard(input: DayInput): LeaderboardPayload {
     proposals,
     checks,
     checks_total: checksDoc.candidates.filter((c) => c.llm > 0).length,
+    ...(jury ? { checks_jury: jury } : {}),
     disqualified: input.state.disqualified.length,
     // While frozen the feed still says who landed what, without the levels the public may not see yet.
     feed: score.feed.slice(0, FEED),

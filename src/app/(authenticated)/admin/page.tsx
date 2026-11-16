@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import AccessTab from "@/components/admin/AccessTab";
 import DemosTab from "@/components/admin/DemosTab";
 import LeaderboardTab from "@/components/admin/LeaderboardTab";
+import Track3Tab from "@/components/admin/Track3Tab";
 
 interface SignupRequest {
   id: string;
@@ -44,7 +45,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 export default function AdminPage() {
   const { data: session } = useSession();
   const router = useRouter();
-  const [tab, setTab] = useState<"signups" | "feedback" | "demos" | "access" | "leaderboard">("signups");
+  const [tab, setTab] = useState<"signups" | "feedback" | "demos" | "access" | "leaderboard" | "track3">("signups");
   const [requests, setRequests] = useState<SignupRequest[]>([]);
   const [feedback, setFeedback] = useState<FeedbackItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -144,11 +145,20 @@ export default function AdminPage() {
         >
           Leaderboard
         </button>
+        <button
+          onClick={() => setTab("track3")}
+          className={`px-4 py-2 text-sm font-semibold cursor-pointer transition-colors border-b-2 ${
+            tab === "track3" ? "text-accent border-accent" : "text-muted border-transparent hover:text-text"
+          }`}
+        >
+          Track 3
+        </button>
       </div>
 
       {tab === "demos" && <DemosTab />}
       {tab === "access" && <AccessTab />}
       {tab === "leaderboard" && <LeaderboardTab />}
+      {tab === "track3" && <Track3Tab />}
 
       {tab === "signups" && (
         <SignupsTab requests={requests} pendingCount={pendingSignups.length} />
