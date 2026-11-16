@@ -15,6 +15,10 @@ import { DATA_RULE, DAY_TRACKS, DEMO_LINE, PRIZE_LINE, SHORT_RULES, TRACKS_SUB }
 // folded away. Keep the text in step with the handout PDF.
 
 const HANDOUT_PDF: string | null = "/hardening/saaf-hardening-day-handout.pdf";
+// The handout of the Orq.ai talk at 11:45 (source: SAAF-Project docs/handouts/session-11/01-orq-observe-and-evaluate.md).
+const ORQ_HANDOUT_PDF = "/hardening/orq-observe-and-evaluate.pdf";
+// Gates saaf-project.orq.ai, where each member claims their own Orq.ai project.
+const ORQ_PASSCODE = "saaf-amsterdam";
 
 const day = [
   { t: "09:00", v: "Opening by Eduward van de Kamp and Mathijs Schouten: why quality, and the nine standards" },
@@ -38,7 +42,7 @@ const references: ExternalReference[] = [
   {
     name: "Orq.ai onboarding",
     url: "https://saaf-project.orq.ai",
-    text: "Get your own project in the shared SAAF workspace on Orq.ai. Get started copies one prompt that installs the two skills. The passcode is shared in the room.",
+    text: `Get your own project in the shared SAAF workspace on Orq.ai. Get started copies one prompt that installs the two skills. Passcode: ${ORQ_PASSCODE}.`,
   },
   {
     name: "Orq.ai guide",
@@ -131,11 +135,16 @@ export default async function HardeningPage({ searchParams }: { searchParams: Pr
       <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/brand/saaf-lockup-ink.png" alt="SAAF, Shared Audit Agents Framework" className="h-6 w-auto dark:invert" />
-        {HANDOUT_PDF && (
-          <a href={HANDOUT_PDF} download className="text-sm px-4 py-2 rounded-lg border border-border hover:border-accent">
-            Download the handout (PDF)
+        <div className="flex flex-wrap gap-2">
+          {HANDOUT_PDF && (
+            <a href={HANDOUT_PDF} download className="text-sm px-4 py-2 rounded-lg border border-border hover:border-accent">
+              Download the handout (PDF)
+            </a>
+          )}
+          <a href={ORQ_HANDOUT_PDF} download className="text-sm px-4 py-2 rounded-lg border border-border hover:border-accent">
+            Orq.ai handout (PDF)
           </a>
-        )}
+        </div>
       </div>
 
       <p className="text-xs font-mono text-muted mb-1">Session #11 · Hackathon #10 · 17 November 2026 · TAG, The Stack, Amsterdam</p>
