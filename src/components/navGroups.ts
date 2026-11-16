@@ -15,6 +15,9 @@ export interface NavGroup {
   items: NavItem[];
 }
 
+/** Pages of earlier sessions: out of the bar, reached through /sessions ("Earlier sessions"). */
+export const ARCHIVED_PAGES = ["/challenge"];
+
 export const NAV_GROUPS: NavGroup[] = [
   {
     id: "work",
@@ -43,17 +46,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/hardening", label: "Handout", icon: "▤" },
       { href: "/standards", label: "Standards board", icon: "▥" },
-    ],
-  },
-  {
-    id: "challenge",
-    // Short on purpose: with seven groups the full "Security Challenge" no longer fits the bar at 1024 px.
-    label: "Challenge",
-    hint: "10 November 2026",
-    items: [
-      { href: "/challenge", label: "Handout", icon: "▤" },
       { href: "/demo", label: "Demo sign-up", icon: "▷" },
-      { href: "/quiz", label: "Quiz", icon: "?" },
     ],
   },
   {
@@ -76,6 +69,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/about", label: "About SAAF", icon: "ℹ" },
       { href: "/e-learning", label: "E-Learning", icon: "▣" },
+      { href: "/sessions", label: "Earlier sessions", icon: "◷" },
     ],
   },
   {

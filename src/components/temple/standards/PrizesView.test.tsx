@@ -15,6 +15,7 @@ const base: LeaderboardPayload = {
   best_agent: [],
   most_improved: [],
   top_contributor: [],
+  proposals: [],
   feed: [],
   fresh: {},
   totals: { start: 100, now: 130, max: 500 },
@@ -52,7 +53,8 @@ describe("the day's leaderboard", () => {
     const t = text({ ...base, phase: "before", totals: null });
     expect(t).toContain("best agent, most improved and top contributor");
     expect(t).toContain("How you get on the leaderboard.");
-    expect(RULES).toHaveLength(9);
+    expect(RULES).toHaveLength(12);
+    expect(RULES.join(" ")).not.toContain("16:45");
   });
 
   it("during the day: best agent large, most improved, people with what they added, and the feed", () => {
@@ -84,6 +86,14 @@ describe("the day's leaderboard", () => {
     expect(t).toContain("Revealed at the prize-giving.");
     expect(t).toContain("Landed. Judged at the reveal.");
     expect(t).toContain("@bob");
+  });
+
+  it("lists the best additions to the standards with their score", () => {
+    const t = text({ ...base, proposals: [{ title: "Name the data residency in the README", author: "alice", url: "https://github.com/SAAF-Project/agent-template/pull/3", kind: "change", repo: "agent-template", score: 12 }] });
+    expect(t).toContain("Best additions to the standards.");
+    expect(t).toContain("Name the data residency in the README");
+    expect(t).toContain("@alice · agent-template · change");
+    expect(t).toContain("12/15");
   });
 
   it("the reveal: says how far it is", () => {

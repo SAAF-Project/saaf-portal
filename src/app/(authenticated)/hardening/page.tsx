@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AccessRequest from "@/components/AccessRequest";
 import StandardsChecklist from "@/components/temple/standards/StandardsChecklist";
 import ExternalReferences, { type ExternalReference } from "@/components/ExternalReferences";
 
@@ -50,9 +51,12 @@ const day = [
   { t: "11:00", v: "Faissal Assakkach, BDO" },
   { t: "11:45", v: "Orq.ai workshop, Bauke Brenninkmeijer" },
   { t: "12:15", v: "Start hacking, then lunch" },
-  { t: "16:15", v: "Last merge", accent: true },
-  { t: "16:30", v: "Final score, prizes and guests" },
-  { t: "17:00", v: "Drinks" },
+  { t: "15:15", v: "The leaderboard freezes" },
+  { t: "16:00", v: "Last pull request opened; demo sign-up closes" },
+  { t: "16:15", v: "Last merge, final review", accent: true },
+  { t: "16:30", v: "Six demos of five minutes: lessons learned and better standards" },
+  { t: "17:00", v: "The reveal and the prizes" },
+  { t: "17:10", v: "Drinks" },
 ];
 
 // Tools our guests brought. Each one is an external site: the list shows a notice before it opens.
@@ -123,6 +127,8 @@ export default function HardeningPage() {
           </div>
         ))}
       </div>
+
+      <AccessRequest />
 
       <section className="mb-10">
         <h2 className="text-lg font-medium mb-3">The nine standards.</h2>

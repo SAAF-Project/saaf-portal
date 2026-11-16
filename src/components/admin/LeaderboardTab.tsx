@@ -51,7 +51,7 @@ export default function LeaderboardTab() {
 
   if (!p) return <p className="text-muted">{error ?? "Loading the leaderboard."}</p>;
   const a = p.admin!;
-  const total = Math.min(p.top_contributor.length, 5) + p.most_improved.length + p.best_agent.length;
+  const total = Math.min(p.top_contributor.length, 5) + p.most_improved.length + Math.min(p.proposals.length, 3) + p.best_agent.length;
 
   return (
     <div className="space-y-8">
@@ -71,7 +71,7 @@ export default function LeaderboardTab() {
         </div>
         <div className="rounded-xl border border-border p-4">
           <p className="text-xs font-mono text-muted mb-2">Prize-giving</p>
-          <p className="text-sm mb-3">Places 5 to 1: top contributor, most improved, then best agent.</p>
+          <p className="text-sm mb-3">From the bottom: top contributor, most improved, additions to the standards, then best agent.</p>
           <div className="flex flex-wrap gap-2">
             <button className={btn} disabled={busy} onClick={() => act({ action: "reveal-back" })}>
               Back
@@ -98,6 +98,12 @@ export default function LeaderboardTab() {
         <List title="Best agent" rows={p.best_agent.map((r) => [r.name, `${r.after} pts (+${r.gain})`, r.by.join(", ")])} />
         <List title="Most improved" rows={p.most_improved.map((r) => [r.name, `+${r.gain} (${r.before} → ${r.after})`, r.by.join(", ")])} />
         <List title="Top contributor" rows={p.top_contributor.slice(0, 10).map((x) => [`@${x.login}`, `${x.points} pts`, `${x.repos.length} repos${x.capped ? `, ${x.capped} capped` : ""}`])} />
+      </section>
+
+      <section>
+        <h3 className="text-base font-medium mb-2">Additions to the standards.</h3>
+        <p className="text-xs text-muted mb-2">Advice from the standards review. Nothing is merged today; the sweep comes after.</p>
+        <List title="" rows={p.proposals.map((x) => [x.title, `${x.score}/15`, `@${x.author} · ${x.repo} · ${x.kind} · ${x.verdict ?? ""}${x.feedback ? ` · ${x.feedback}` : ""}`])} />
       </section>
 
       <section>
@@ -173,7 +179,7 @@ export default function LeaderboardTab() {
 function List({ title, rows }: { title: string; rows: [string, string, string][] }) {
   return (
     <div>
-      <h3 className="text-base font-medium mb-2">{title}.</h3>
+      {title && <h3 className="text-base font-medium mb-2">{title}.</h3>}
       {rows.length === 0 ? (
         <p className="text-sm text-muted">Nobody yet.</p>
       ) : (

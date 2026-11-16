@@ -1,6 +1,5 @@
 import Link from "next/link";
 import FindingRules from "@/components/FindingRules";
-import PizzaToggle from "@/components/PizzaToggle";
 
 // The Security Challenge handout (10 November 2026) as a page, with the printable PDF next to it.
 // Keep the text in step with public/challenge/saaf-security-challenge-handout.pdf.
@@ -25,7 +24,7 @@ const afternoon = [
   { t: "14:05", v: "What the hackers found: guest hackers show their findings, five minutes each." },
   { t: "14:45", v: "The assignment, the rules and the quiz. Then form teams of three to five, each with at least one hacker or developer: people you click with." },
   { t: "15:00", v: "Build in teams. Mail your CSV whenever you have one." },
-  { t: "by 16:15", v: <>Sign up your team at <Link href="/demo" className="text-accent hover:underline">Demo sign-up</Link>: team name, guard name, what you built, why you should win, your SAAF repo.</> },
+  { t: "by 16:15", v: "Teams signed up for a demo: team name, guard name, what they built, why they should win, their SAAF repo." },
   { t: "16:30", v: "Demos: click-through, offline on your own laptop. No live cloud fixes. Order drawn at random; the half hour is split evenly, five minutes at most.", accent: true },
   { t: "17:00", v: "The jury deliberates for ten minutes. Grab a drink." },
   { t: "17:10", v: "Prizes, and the quiz winner." },
@@ -56,6 +55,12 @@ export default function ChallengePage() {
         </a>
       </div>
 
+      <p className="text-xs mb-4">
+        <Link href="/sessions" className="text-accent hover:underline">
+          Earlier sessions
+        </Link>{" "}
+        <span className="text-muted">· this is the handout as it was on the day</span>
+      </p>
       <p className="text-xs font-mono text-muted mb-2">Security Challenge · Session #10 · Mollie Amsterdam · 10 November 2026</p>
       <h1 className="text-3xl font-medium leading-tight mb-3">
         Build one guard that <span className="text-accent">stops a bad actor.</span>
@@ -123,26 +128,6 @@ export default function ChallengePage() {
           </p>
         </section>
 
-        <section className="bg-surface border border-border rounded-2xl p-5 min-w-0">
-          <h2 className="text-xs font-mono text-muted mb-3">The quiz</h2>
-          <p className="text-lg font-medium mb-2">Guess the total at 17:00.</p>
-          <p className="text-sm text-muted leading-relaxed mb-4">
-            127 findings before today, plus every new one the teams hand in. One guess each, change it until 17:00.
-            Closest guess wins.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/quiz" className="text-sm px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium">
-              Make your guess
-            </Link>
-            <Link href="/demo" className="text-sm px-4 py-2 rounded-lg border border-border hover:border-accent">
-              Sign up for a demo
-            </Link>
-          </div>
-        </section>
-      </div>
-
-      <div className="mt-10">
-        <PizzaToggle />
       </div>
     </div>
   );

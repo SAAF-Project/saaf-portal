@@ -310,7 +310,7 @@ describe("simulation: 100 kinds of participant", () => {
     expect(careful).toBeGreaterThanOrEqual(0.8);
     expect(generic).toBeLessThanOrEqual(0.15);
     expect(cheats).toBe(0);
-    for (const k of ["injector", "bot", "organiser", "late-push"]) expect(report.average_points[k] ?? 0).toBe(0);
+    for (const k of ["injector", "bot", "organiser", "late-pr", "late-push"]) expect(report.average_points[k] ?? 0).toBe(0);
     // a thief gains nothing from stealing; at most a stray point when the grader is one level off (3% of the time)
     expect(report.average_points["thief"] ?? 0).toBeLessThanOrEqual(0.5);
     // depth and breadth of real work both have a fair chance

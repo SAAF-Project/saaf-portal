@@ -19,7 +19,7 @@ export const config = {
     "/admin/:path*",
     "/participants/:path*",
     "/about/:path*",
-    "/quiz/:path*",
+    "/sessions/:path*",
     "/demo/:path*",
     "/challenge/:path*",
     "/hardening/:path*",

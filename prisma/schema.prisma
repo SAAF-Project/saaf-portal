@@ -124,3 +124,20 @@ model LeaderboardState {
   disqualified Json?
   updatedAt    DateTime  @default(now())
 }
+
+// Hardening day: the standards review's score for one proposal to improve the standards (a pull request on
+// agent-template or on docs/conventions in SAAF-Project). Created by the portal itself, like ContentGrade.
+model ProposalScore {
+  id       String   @id
+  repo     String
+  number   Int
+  title    String
+  author   String
+  url      String
+  kind     String
+  score    Int
+  verdict  String
+  feedback String?
+  flags    Json?
+  gradedAt DateTime @default(now())
+}

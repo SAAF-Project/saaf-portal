@@ -73,12 +73,11 @@ describe("credit", () => {
 });
 
 describe("time", () => {
-  it("a merge at 15:14:59 counts, one at 15:15:01 does not, unless its pull request was opened in time and merged in the grace period", () => {
+  it("a merge at 15:15:00 counts, one at 15:15:01 does not, whenever its pull request was opened", () => {
     const w = { end: at("15:15"), until: at("16:00") };
-    expect(counts({ sha: "a", at: "2026-11-17T15:14:59Z", login: "x", levels: {} }, w)).toBe(true);
+    expect(counts({ sha: "a", at: "2026-11-17T15:15:00Z", login: "x", levels: {} }, w)).toBe(true);
     expect(counts({ sha: "b", at: "2026-11-17T15:15:01Z", login: "x", levels: {} }, w)).toBe(false);
-    expect(counts({ sha: "c", at: "2026-11-17T15:30:00Z", login: "x", levels: {}, opened_at: at("15:10") }, w)).toBe(true);
-    expect(counts({ sha: "d", at: "2026-11-17T15:50:00Z", login: "x", levels: {}, opened_at: at("15:10") }, w)).toBe(false);
+    expect(counts({ sha: "c", at: "2026-11-17T15:20:00Z", login: "x", levels: {}, opened_at: at("15:00") }, w)).toBe(false);
   });
 
   it("a state the grader has not seen yet waits; it counts once graded", () => {

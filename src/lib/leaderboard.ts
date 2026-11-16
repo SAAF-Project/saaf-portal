@@ -15,7 +15,7 @@ import { STANDARDS } from "../components/temple/standards/standards";
 // - Quick standards (licence, dependencies, CODEOWNERS, CI) count for at most QUICK_CAP points per person, so copying
 //   a licence and a workflow into twenty repos does not win.
 // - A repo made during the day starts at its first state: what a template brings in is nobody's work.
-// - A pull request opened before the close and merged within the grace period still counts.
+// - Only what lands on the default branch by the close counts (16:15): after it come the last review and the demos.
 // - Whoever tries to steer the grader (prompt injection, flagged by the grader and confirmed by an organiser) is
 //   disqualified: their credits go to nobody.
 
@@ -53,7 +53,6 @@ export const QUICK = new Set(["licence", "dependencies", "codeowners", "ci"]);
 export const QUICK_CAP = 6;
 /** A repo must gain at least this many points today to compete for best agent. */
 export const BEST_MIN_GAIN = 4;
-export const GRACE_MINUTES = 30;
 export const MAX_POINTS = Object.values(POINTS).reduce((n, row) => n + row[row.length - 1], 0);
 
 /** Points for one standard at one level. */
@@ -75,7 +74,7 @@ export interface DayStep {
   sha: string;
   at: string;
   login: string | null;
-  /** For a merged pull request: when it was opened. Decides the grace period. */
+  /** For a merged pull request: when it was opened. */
   opened_at?: string | null;
   url?: string | null;
   levels: Levels | null;
@@ -154,14 +153,11 @@ export interface Window {
   until: string;
 }
 
-const addMinutes = (iso: string, m: number) => new Date(Date.parse(iso) + m * 60_000).toISOString();
 const byTime = (a: string | null, b: string | null): number => (a === b ? 0 : a === null ? 1 : b === null ? -1 : a < b ? -1 : 1);
 
-/** Does this step count: before the close, or a pull request opened before the close and merged in the grace period. */
+/** Does this step count: it landed by the close and by the moment of counting. */
 export function counts(step: DayStep, w: Window): boolean {
-  if (step.at <= w.until && step.at <= w.end) return true;
-  if (w.until <= w.end) return false;
-  return !!step.opened_at && step.opened_at <= w.end && step.at <= addMinutes(w.end, GRACE_MINUTES) && step.at <= w.until;
+  return step.at <= w.until && step.at <= w.end;
 }
 
 /** Score the day. */
