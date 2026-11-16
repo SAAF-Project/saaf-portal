@@ -42,6 +42,12 @@ export const sharedInputs = (): Promise<DayInputs> => day.get();
 /** The standards board. Never throws. */
 export const sharedBoard = async (): Promise<StandardsPayload> => (await day.get()).board;
 
+/** For a response header: where this instance's last answer came from ("shared", "built", "not-mine", ...) and its age. */
+export const sharedInfo = (): string => {
+  const { source, ageMs } = day.info();
+  return ageMs === null ? source : `${source};age=${Math.round(ageMs / 1000)}`;
+};
+
 /** The histories as the leaderboard code wants them. */
 export const historyMap = (inputs: DayInputs): Map<string, History | null> =>
   new Map(Object.entries(inputs.histories).map(([name, kept]) => [name, kept.history]));

@@ -1,31 +1,20 @@
 import type { FeedItem } from "../../../lib/leaderboard";
-import type { LeaderboardPayload, PersonRow, ProposalRow, RepoRow } from "../../../lib/leaderboard-day";
+import type { CheckRow, LeaderboardPayload, PersonRow, ProposalRow, RepoRow } from "../../../lib/leaderboard-day";
+import { DATA_RULE, DAY_TRACKS, DEMO_LINE, PRIZE_LINE, RULES, SHORT_RULES } from "../../../lib/day-tracks";
 import { STANDARDS } from "./standards";
 import { clock } from "./StandardsView";
 
-// The day's leaderboard above the standards board: best agent large, then most improved, top contributor (who added
-// what, per person) and the live feed, with the rules. Pure: it draws the payload it is given (StandardsBoard.tsx
-// fetches it), so it can be rendered in a test. The scores come from a review agent that grades the content of every
-// standard (src/lib/leaderboard.ts); from 15:15 the top places are hidden until the organisers reveal them.
+// The day's leaderboard above the standards board. On top the three tracks of the day (src/lib/day-tracks.ts) with how
+// you win each and who leads; below one list per track; then, folded away, the lists without a prize, the live feed
+// and the rules. Pure: it draws the payload it is given (StandardsBoard.tsx fetches it), so it can be rendered in a
+// test. Track 1 is scored by a review agent that grades the content of every standard (src/lib/leaderboard.ts); from
+// 15:15 the top places are hidden until the organisers reveal them.
+
+export { RULES, SHORT_RULES };
 
 const LABEL: Record<string, string> = Object.fromEntries(STANDARDS.map((s) => [s.id, s.label]));
-const SCORED = ["readme", "agent-yaml", "audit-criteria", "tests", "ci", "dependencies", "licence", "codeowners"];
-const MAX: Record<string, number> = { readme: 3, "agent-yaml": 3, "audit-criteria": 3, tests: 3, ci: 3, dependencies: 2, licence: 1, codeowners: 1 };
-
-export const RULES: string[] = [
-  "Improve an agent repo. A standard counts once it lands on the default branch between 09:00 and 16:15. Open your last pull request by 16:00, so it can be merged in time.",
-  "A review agent scores the content of every standard at 13:30, 15:00 and 16:15. It must quote your files as evidence; a level without a real quote does not stand.",
-  "Points rise with each level and the last step counts most: one README taken to level 3 beats four READMEs at level 1.",
-  "You get the points you add: the rise of a level, by as much as it still stands at 16:15. Improving someone else's file counts for what you improved; removing a file and putting it back counts for nothing.",
-  "Licence, dependencies, CODEOWNERS and CI count for at most 6 points per person, so copying them into many repos does not win.",
-  "Copied, empty or nonsense files score 0. Text that tries to steer the review agent disqualifies you.",
-  "SECURITY.md is arranged by Stichting SAAF for every repo and counts for nobody.",
-  "A merged pull request counts for its author, a direct push for whoever pushed. Bots do not count. Times are GitHub's own; a tie goes to whoever got there first.",
-  "From 15:15 the top places are hidden. The result is revealed at the prize-giving, after the demos.",
-  "Better standards are a track of their own: open a pull request with the label standard-proposal on agent-template or on docs/conventions in SAAF-Project. Nothing is merged today; a review checks whether it adds real value without making things more complicated.",
-  "A new standard needs a strong case: why it does not fit in one of the nine, evidence from two repos, a rule the board can check, and which standard it replaces.",
-  "You merge in your own repos. For someone else's repo, ask the creator and request write access below the board.",
-];
+const HIDDEN = "revealed at 17:00";
+const hair = "border-[color-mix(in_srgb,var(--on-panel)_16%,transparent)]";
 
 function Avatar({ login, size = 28 }: { login: string; size?: number }) {
   if (login === "?") return <span className="inline-block rounded-md bg-surface2 shrink-0" style={{ width: size, height: size }} />;
@@ -35,83 +24,77 @@ function Avatar({ login, size = 28 }: { login: string; size?: number }) {
   );
 }
 
-/** The eight scored standards of a repo as small bars: how far each one is. */
-function Levels({ levels, onPanel = false }: { levels: Record<string, number | undefined>; onPanel?: boolean }) {
-  return (
-    <ul className="grid grid-cols-4 gap-1.5 w-[184px] shrink-0" aria-label="Levels per standard">
-      {SCORED.map((id) => {
-        const lv = levels[id] ?? 0;
-        return (
-          <li key={id} title={`${LABEL[id] ?? id}: ${lv} of ${MAX[id]}`} className="flex gap-[2px] h-3">
-            {Array.from({ length: MAX[id] }, (_, i) => (
-              <span
-                key={i}
-                className={`flex-1 rounded-[2px] ${i < lv ? "std-glow" : onPanel ? "bg-[color-mix(in_srgb,var(--on-panel)_18%,transparent)]" : "bg-border"}`}
-              />
-            ))}
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
-
-function Hidden({ label }: { label: string }) {
+function Hidden({ label = HIDDEN }: { label?: string }) {
   return <span className="font-mono text-muted">? · {label}</span>;
 }
 
-function BestAgent({ p }: { p: LeaderboardPayload }) {
-  const [lead, ...rest] = p.best_agent;
-  const final = p.phase === "after" && (!p.reveal || p.reveal.step >= p.reveal.total) && !p.frozen;
+/** Who leads a track, as one short block inside the tracks panel. */
+function Leader({ lead, sub, empty }: { lead: string | null; sub?: string; empty: string }) {
+  if (lead === null) return <p className="text-sm opacity-70">{empty}</p>;
+  if (lead === "?") {
+    return (
+      <>
+        <p className="text-3xl font-medium leading-none">?</p>
+        <p className="text-xs font-mono opacity-70 mt-2">Revealed at 17:00.</p>
+      </>
+    );
+  }
   return (
-    <div className="rounded-2xl p-6 sm:p-8 mb-8" style={{ background: "var(--panel)", color: "var(--on-panel)" }}>
-      <div className="grid gap-6 md:grid-cols-[1fr_auto] items-center">
-        <div className="min-w-0">
-          <p className="font-mono text-xs opacity-70 mb-3">Best agent · highest score at 16:15{final ? " · winner" : ""}</p>
-          {!lead ? (
-            <p className="text-3xl sm:text-4xl font-medium leading-tight">No agent has gained enough yet.</p>
-          ) : lead.masked ? (
-            <>
-              <p className="text-5xl sm:text-6xl font-medium leading-none">?</p>
-              <p className="mt-3 text-base opacity-80">Revealed at the prize-giving.</p>
-            </>
-          ) : (
-            <div key={lead.name} className="reveal-once">
-              <a href={lead.url} target="_blank" rel="noopener noreferrer" style={{ color: "inherit" }} className="block text-4xl sm:text-5xl font-medium leading-[1.05] [overflow-wrap:anywhere]">
-                {lead.name}
-              </a>
-              <p className="mt-3 text-base opacity-80">
-                <span className="font-mono">{lead.after}</span> points · +{lead.gain} today
-              </p>
-              {lead.by.length > 0 && (
-                <ul className="flex flex-wrap gap-x-4 gap-y-2 mt-4">
-                  {lead.by.map((l) => (
-                    <li key={l} className="flex items-center gap-2 text-sm font-mono">
-                      <Avatar login={l} />@{l}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          )}
-        </div>
-        {lead && !lead.masked && <Levels levels={lead.levels} onPanel />}
-      </div>
-      {rest.length > 0 && (
-        <ol className="mt-6 border-t border-[color-mix(in_srgb,var(--on-panel)_16%,transparent)]">
-          {rest.map((r, i) => (
-            <li key={`${r.name}-${i}`} className="flex items-baseline gap-4 py-2 border-b border-[color-mix(in_srgb,var(--on-panel)_16%,transparent)] text-sm">
-              <span className="font-mono text-xs opacity-60">{String(i + 2).padStart(2, "0")}</span>
-              <span className="font-medium flex-1 min-w-0 [overflow-wrap:anywhere]">{r.masked ? "?" : r.name}</span>
-              <span className="font-mono tabular-nums opacity-80">{r.masked ? "" : `${r.after} pts`}</span>
-            </li>
-          ))}
-        </ol>
-      )}
+    <div key={lead} className="reveal-once">
+      <p className="text-xl font-medium leading-tight [overflow-wrap:anywhere]">{lead}</p>
+      {sub && <p className="text-xs font-mono opacity-70 mt-1 [overflow-wrap:anywhere]">{sub}</p>}
     </div>
   );
 }
 
+/** The repo list that carries the prize of track 1, and the one that does not. */
+function track1(p: LeaderboardPayload): { prize: RepoRow[]; mention: RepoRow[] } {
+  return p.prize === "most_improved" ? { prize: p.most_improved, mention: p.best_agent } : { prize: p.best_agent, mention: p.most_improved };
+}
+
+const names = (logins: string[]): string => logins.map((l) => `@${l}`).join(" ");
+
+/** The three tracks on one panel: how you win each and, once the day runs, who leads. */
+export function TracksPanel({ p }: { p: LeaderboardPayload | null }) {
+  const running = !!p && p.phase !== "before";
+  const lead = p ? track1(p).prize[0] : undefined;
+  const proposal = p?.proposals[0];
+  const check = p?.checks[0];
+  const agentSub = lead && !lead.masked ? `${p!.prize === "most_improved" ? `+${lead.gain} points today` : `${lead.after} points, +${lead.gain} today`}${lead.by.length ? ` · ${names(lead.by)}` : ""}` : undefined;
+  const leaders = [
+    <Leader key="agent" lead={!lead ? null : lead.masked ? "?" : lead.name} sub={agentSub} empty="No agent has gained points yet." />,
+    <Leader key="standard" lead={!proposal ? null : proposal.masked ? "?" : proposal.title} sub={proposal && !proposal.masked ? `@${proposal.author} · ${proposal.score}/15` : undefined} empty="No proposal reviewed yet." />,
+    p?.reveal ? (
+      <Leader key="checks" lead={check?.masked ? "?" : check?.place ? check.repo : null} sub={check?.place ? names(check.authors) : undefined} empty="The jury has not chosen yet." />
+    ) : (
+      <Leader
+        key="checks"
+        lead={p && p.checks_total > 0 ? `${p.checks_total} ${p.checks_total === 1 ? "repo has" : "repos have"} LLM checks` : null}
+        sub="The jury picks the winner at 16:15."
+        empty="No repo has LLM checks yet."
+      />
+    ),
+  ];
+  return (
+    <div className="rounded-2xl p-6 sm:p-8 mb-6" style={{ background: "var(--panel)", color: "var(--on-panel)" }}>
+      <ul className="grid md:grid-cols-3">
+        {DAY_TRACKS.map((t, i) => (
+          <li key={t.id} className={`py-4 md:py-0 md:px-6 first:pt-0 md:first:pl-0 last:pb-0 md:last:pr-0 border-b md:border-b-0 md:border-l first:border-l-0 last:border-b-0 ${hair}`}>
+            <p className="font-mono text-xs opacity-70 mb-2">Track {t.number}</p>
+            <h3 className="text-2xl font-medium leading-tight mb-2">{t.name}</h3>
+            <p className="text-sm opacity-80 leading-relaxed">{t.win}</p>
+            {running && <div className={`mt-4 pt-4 border-t ${hair}`}>{leaders[i]}</div>}
+          </li>
+        ))}
+      </ul>
+      <p className={`mt-6 pt-4 border-t ${hair} text-xs font-mono opacity-70`}>
+        {PRIZE_LINE} {DEMO_LINE}
+      </p>
+    </div>
+  );
+}
+
+/** Track 1 when the prize is for the rise: the gain large, from where to where, and who did it. */
 function Improved({ rows }: { rows: RepoRow[] }) {
   if (rows.length === 0) return <p className="text-sm text-muted py-3 border-t border-border">No repo has gained points yet.</p>;
   return (
@@ -120,7 +103,7 @@ function Improved({ rows }: { rows: RepoRow[] }) {
         <li key={`${r.name}-${i}`} className="grid grid-cols-[1.5rem_1fr_auto] gap-x-4 items-center py-3 border-b border-border">
           <span className="font-mono text-xs text-muted">{String(i + 1).padStart(2, "0")}</span>
           {r.masked ? (
-            <Hidden label="revealed at the prize-giving" />
+            <Hidden />
           ) : (
             <span className="min-w-0 reveal-once">
               <a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: "inherit" }} className="font-medium [overflow-wrap:anywhere]">
@@ -145,6 +128,22 @@ function Improved({ rows }: { rows: RepoRow[] }) {
   );
 }
 
+/** The repos with the highest score at the close. */
+function Agents({ rows }: { rows: RepoRow[] }) {
+  if (rows.length === 0) return <p className="text-sm text-muted py-3 border-t border-border">No agent has gained enough yet.</p>;
+  return (
+    <ol className="border-t border-border">
+      {rows.map((r, i) => (
+        <li key={`${r.name}-${i}`} className="grid grid-cols-[1.5rem_1fr_auto] gap-x-4 items-baseline py-2 border-b border-border text-sm">
+          <span className="font-mono text-xs text-muted">{String(i + 1).padStart(2, "0")}</span>
+          {r.masked ? <Hidden /> : <span className="font-medium min-w-0 [overflow-wrap:anywhere] reveal-once">{r.name}</span>}
+          <span className="font-mono tabular-nums text-muted">{r.masked ? "" : `${r.after} points · +${r.gain} today`}</span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 function People({ rows }: { rows: PersonRow[] }) {
   if (rows.length === 0) return <p className="text-sm text-muted py-3 border-t border-border">Nobody has added points yet.</p>;
   return (
@@ -154,7 +153,7 @@ function People({ rows }: { rows: PersonRow[] }) {
           <li key={`masked-${i}`} className="grid grid-cols-[1.5rem_auto_1fr] gap-x-3 items-center py-3 border-b border-border">
             <span className="font-mono text-xs text-muted">{String(i + 1).padStart(2, "0")}</span>
             <Avatar login="?" size={32} />
-            <Hidden label="revealed at the prize-giving" />
+            <Hidden />
           </li>
         ) : (
           <li key={p.login} className="border-b border-border reveal-once">
@@ -234,7 +233,7 @@ function Proposals({ rows }: { rows: ProposalRow[] }) {
         <li key={`${r.url}-${i}`} className="grid grid-cols-[1.5rem_1fr_auto] gap-x-4 items-center py-3 border-b border-border">
           <span className="font-mono text-xs text-muted">{String(i + 1).padStart(2, "0")}</span>
           {r.masked ? (
-            <Hidden label="revealed at the prize-giving" />
+            <Hidden />
           ) : (
             <span className="min-w-0 reveal-once">
               <a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: "inherit" }} className="font-medium [overflow-wrap:anywhere]">
@@ -252,30 +251,62 @@ function Proposals({ rows }: { rows: ProposalRow[] }) {
   );
 }
 
+/** Track 3: the repos with LLM checks. A place shows only once the organisers reveal it. */
+function Checks({ rows }: { rows: CheckRow[] }) {
+  if (rows.length === 0) return <p className="text-sm text-muted py-3 border-t border-border">No repo has LLM checks yet.</p>;
+  return (
+    <ol className="border-t border-border">
+      {rows.map((r, i) => (
+        <li key={`${r.repo}-${i}`} className="grid grid-cols-[1.5rem_1fr_auto] gap-x-4 items-center py-3 border-b border-border">
+          <span className="font-mono text-xs text-muted">{r.place ? String(r.place).padStart(2, "0") : r.masked ? String(i + 1).padStart(2, "0") : "·"}</span>
+          {r.masked ? (
+            <Hidden />
+          ) : (
+            <span className="min-w-0 reveal-once">
+              <a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: "inherit" }} className="font-medium [overflow-wrap:anywhere]">
+                {r.repo}
+              </a>
+              {r.authors.length > 0 && <span className="block text-xs font-mono text-muted [overflow-wrap:anywhere]">{r.authors.map((l) => `@${l}`).join(" · ")}</span>}
+            </span>
+          )}
+          <span className="text-right font-mono tabular-nums text-sm text-muted">{r.masked ? "" : `${r.llm} ${r.llm === 1 ? "check" : "checks"}`}</span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+/** Five rules everyone needs, and all of them one click further. Closed by default: the handout has them too. */
 function Rules() {
   return (
-    <details className="mt-8 group" open>
+    <details className="mt-8 group" id="rules">
       <summary className="cursor-pointer list-none text-sm font-medium mb-2">
-        How you get on the leaderboard. <span className="font-mono text-xs text-muted group-open:hidden">show</span>
+        The rules. <span className="font-mono text-xs text-muted group-open:hidden">show</span>
+        <span className="font-mono text-xs text-muted hidden group-open:inline">hide</span>
       </summary>
       <ol className="border-t border-border max-w-[820px]">
-        {RULES.map((r, i) => (
+        {SHORT_RULES.map((r, i) => (
           <li key={i} className="grid grid-cols-[1.5rem_1fr] gap-x-3 py-2 border-b border-border text-sm text-muted leading-relaxed">
             <span className="font-mono text-xs pt-0.5">{i + 1}</span>
             <span>{r}</span>
           </li>
         ))}
       </ol>
+      <p className="text-sm text-muted mt-2 max-w-[820px]">{DATA_RULE}</p>
+      <details className="mt-4 group/all">
+        <summary className="cursor-pointer list-none text-xs font-mono text-muted mb-2">
+          All rules <span className="group-open/all:hidden">· show</span>
+        </summary>
+        <ol className="border-t border-border max-w-[820px]">
+          {RULES.map((r, i) => (
+            <li key={i} className="grid grid-cols-[1.5rem_1fr] gap-x-3 py-2 border-b border-border text-sm text-muted leading-relaxed">
+              <span className="font-mono text-xs pt-0.5">{i + 1}</span>
+              <span>{r}</span>
+            </li>
+          ))}
+        </ol>
+      </details>
     </details>
-  );
-}
-
-function Stat({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="py-3 sm:px-6 first:pl-0 border-b sm:border-b-0 sm:border-l first:border-l-0 border-border">
-      <p className="text-4xl sm:text-5xl font-medium tabular-nums leading-none">{value}</p>
-      <p className="text-xs font-mono text-muted mt-2">{label}</p>
-    </div>
   );
 }
 
@@ -287,67 +318,84 @@ export default function PrizesView({ payload }: { payload: LeaderboardPayload | 
   if (payload.phase === "before") {
     return (
       <section aria-labelledby="prizes-title" className="mb-10">
-        <h2 id="prizes-title" className="text-2xl font-medium mb-2">The day&apos;s leaderboard.</h2>
-        <p className="text-sm text-muted leading-relaxed max-w-[720px]">
-          Three prizes: best agent, most improved and top contributor. Counting starts at {startsAt} on 17 November and closes
-          at {endsAt}. A review agent scores the quality of every standard, not only whether the file is there. Standards that come
-          in during the day glow on the board below.
-        </p>
+        <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 mb-4">
+          <h2 id="prizes-title" className="text-2xl font-medium">Three tracks, three winners.</h2>
+          <p className="text-xs font-mono text-muted">
+            Counting starts at {startsAt} on 17 November and closes at {endsAt}
+          </p>
+        </div>
+        <TracksPanel p={payload} />
         <Rules />
       </section>
     );
   }
 
   const status: string[] = [];
-  if (payload.reveal) status.push(`The reveal: ${payload.reveal.step} of ${payload.reveal.total} places`);
-  else if (payload.frozen) status.push(`Frozen at ${clock(payload.freeze)}, the result is revealed at the prize-giving`);
+  if (payload.reveal) status.push(`The reveal: step ${payload.reveal.step} of ${payload.reveal.total}`);
+  else if (payload.frozen) status.push(`Frozen at ${clock(payload.freeze)}, the winners are revealed at 17:00`);
   else if (payload.phase === "after") status.push(`Closed at ${endsAt}`);
   else status.push(`Live since ${startsAt}, closes at ${endsAt}`);
+  if (payload.totals && !payload.frozen) {
+    const gained = payload.totals.now - payload.totals.start;
+    status.push(`${gained >= 0 ? "+" : ""}${gained} points since ${startsAt}`);
+  }
   if (payload.graded.last_at && !payload.frozen) status.push(`last review ${clock(payload.graded.last_at)}`);
   if (payload.unread > 0) status.push(`${payload.unread} ${payload.unread === 1 ? "repo" : "repos"} not read yet`);
-  const gained = payload.totals ? payload.totals.now - payload.totals.start : 0;
+  const { prize, mention } = track1(payload);
+  const byRise = payload.prize === "most_improved";
 
   return (
     <section aria-labelledby="prizes-title" className="mb-10">
       <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 mb-4">
-        <h2 id="prizes-title" className="text-2xl font-medium">The day&apos;s leaderboard.</h2>
+        <h2 id="prizes-title" className="text-2xl font-medium">Three tracks, three winners.</h2>
         <p className="text-xs font-mono text-muted">{status.join(" · ")}</p>
       </div>
 
-      {payload.totals && (
-        <div className="grid sm:grid-cols-3 mb-8 border-y border-border">
-          <Stat value={`${gained >= 0 ? "+" : ""}${gained}`} label={`points added since ${startsAt}`} />
-          <Stat value={String(payload.totals.now)} label={`of ${payload.totals.max} points in place`} />
-          <Stat value={payload.graded.last_at ? clock(payload.graded.last_at) : "–"} label="last review (13:30, 15:00, 16:15)" />
-        </div>
-      )}
+      <TracksPanel p={payload} />
 
-      <BestAgent p={payload} />
-
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="grid gap-8 lg:grid-cols-3">
         <div>
-          <h3 className="text-base font-medium mb-1">Most improved.</h3>
-          <p className="text-xs text-muted mb-3">Points gained since {startsAt} by a repo that existed then.</p>
-          <Improved rows={payload.most_improved} />
+          <h3 className="text-base font-medium mb-1">Track 1 · {byRise ? "Most quality added." : "Best agent."}</h3>
+          <p className="text-xs text-muted mb-3">
+            {byRise ? `Points gained since ${startsAt} by an agent that existed then, and the team that added them.` : `The highest score at ${endsAt}, with at least 4 points gained today.`}
+          </p>
+          {byRise ? <Improved rows={prize} /> : <Agents rows={prize} />}
         </div>
         <div>
-          <h3 className="text-base font-medium mb-1">Top contributor.</h3>
-          <p className="text-xs text-muted mb-3">Points added per person, over every repo. Open a name to see what.</p>
-          <People rows={payload.top_contributor} />
+          <h3 className="text-base font-medium mb-1">Track 2 · Best additions to the standards.</h3>
+          <p className="text-xs text-muted mb-3">Proposals on agent-template or docs/conventions, reviewed for real value and simplicity. Not merged today.</p>
+          <Proposals rows={payload.proposals} />
+        </div>
+        <div>
+          <h3 className="text-base font-medium mb-1">Track 3 · LLM checks.</h3>
+          <p className="text-xs text-muted mb-3">Repos with an llm_checks.yaml on the default branch. Orq.ai and an auditor pick the winner at 16:15.</p>
+          <Checks rows={payload.checks} />
         </div>
       </div>
 
-      <div className="mt-8">
-        <h3 className="text-base font-medium mb-1">Best additions to the standards.</h3>
-        <p className="text-xs text-muted mb-3">Proposals on agent-template or docs/conventions, reviewed for real value and simplicity. Not merged today.</p>
-        <Proposals rows={payload.proposals} />
-      </div>
-
-      <div className="mt-8">
-        <h3 className="text-base font-medium mb-1">Just landed.</h3>
-        <p className="text-xs text-muted mb-3">Every merge and push on a default branch today, with the levels from the last review.</p>
-        <Feed items={payload.feed} frozen={payload.frozen} />
-      </div>
+      <details className="mt-8 group">
+        <summary className="cursor-pointer list-none text-sm font-medium mb-2">
+          Also today, without a prize. <span className="font-mono text-xs text-muted group-open:hidden">show</span>
+          <span className="font-mono text-xs text-muted hidden group-open:inline">hide</span>
+        </summary>
+        <div className="grid gap-8 lg:grid-cols-2 mt-4">
+          <div>
+            <h3 className="text-base font-medium mb-1">{byRise ? "Best agent." : "Most improved."}</h3>
+            <p className="text-xs text-muted mb-3">{byRise ? `The highest score at ${endsAt}, with at least 4 points gained today.` : `Points gained since ${startsAt} by a repo that existed then.`}</p>
+            {byRise ? <Agents rows={mention} /> : <Improved rows={mention} />}
+          </div>
+          <div>
+            <h3 className="text-base font-medium mb-1">Top contributor.</h3>
+            <p className="text-xs text-muted mb-3">Points added per person, over every repo. Open a name to see what.</p>
+            <People rows={payload.top_contributor} />
+          </div>
+        </div>
+        <div className="mt-8">
+          <h3 className="text-base font-medium mb-1">Just landed.</h3>
+          <p className="text-xs text-muted mb-3">Every merge and push on a default branch today, with the levels from the last review.</p>
+          <Feed items={payload.feed} frozen={payload.frozen} />
+        </div>
+      </details>
 
       <Rules />
     </section>

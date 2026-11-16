@@ -1,7 +1,8 @@
 import { randomInt } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { isAdminRequest, sessionLogin } from "@/lib/admin";
-import { demoSession, normaliseLink, type DemoKind, type DemoSession } from "@/lib/demo-sessions";
+import { trackOfKind } from "@/lib/day-tracks";
+import { demoSession, isDemoKind, normaliseLink, overKind, type DemoKind, type DemoSession } from "@/lib/demo-sessions";
 import { normaliseRepo, schedule, secondsPerTeam, shuffle } from "@/lib/demoDraw";
 import { getPrisma } from "@/lib/prisma";
 
@@ -25,7 +26,7 @@ function parseEntry(text: string): Entry | null {
     const v = JSON.parse(text);
     if (typeof v.team === "string" && typeof v.title === "string") {
       const str = (x: unknown) => (typeof x === "string" ? x : "");
-      const kind = v.kind === "standard" || v.kind === "journey" ? v.kind : "";
+      const kind = isDemoKind(v.kind) ? v.kind : "";
       return { team: v.team, title: v.title, what: str(v.what), why: str(v.why), repo: str(v.repo), kind, link: str(v.link) };
     }
   } catch {
@@ -140,7 +141,7 @@ export async function GET(request: NextRequest) {
   const plan = ordered ? schedule(ordered, { seconds: s.mode === "select" ? s.slotSeconds : undefined, start: s.windowStart }) : null;
 
   return NextResponse.json({
-    session: { id: s.id, label: s.label, mode: s.mode, kinds: s.kinds, lockAt: s.lockAt, windowStart: s.windowStart, maxSlots: s.maxSlots, slotSeconds: s.slotSeconds },
+    session: { id: s.id, label: s.label, mode: s.mode, kinds: s.kinds, lockAt: s.lockAt, windowStart: s.windowStart, maxSlots: s.maxSlots, maxPerKind: s.maxPerKind ?? null, slotSeconds: s.slotSeconds },
     locked: locked(s, order),
     drawn: order !== null,
     drawnAt: orderedAt,
@@ -176,6 +177,12 @@ export async function POST(request: NextRequest) {
       ids = [...new Set(ids)];
       if (ids.length === 0) return NextResponse.json({ error: "Select at least one team" }, { status: 400 });
       if (ids.length > s.maxSlots) return NextResponse.json({ error: `At most ${s.maxSlots} teams` }, { status: 400 });
+      // Two per track, unless the organisers say the split may be uneven (a track with one sign-up leaves a slot free).
+      const over = body.uneven === true ? [] : overKind(ids.map((id) => teams.find((t) => t.id === id)?.entry.kind ?? ""), s.maxPerKind);
+      if (over.length > 0) {
+        const names = over.map((k) => trackOfKind(k)?.demo.label ?? k).join(", ");
+        return NextResponse.json({ error: `At most ${s.maxPerKind} demos per track. Too many of: ${names}. Tick "uneven split" to allow it.` }, { status: 400 });
+      }
     }
     await prisma.feedback.deleteMany({ where: { category: s.orderCategory } });
     await prisma.feedback.create({ data: { userId: owner.id, category: s.orderCategory, text: JSON.stringify({ order: ids }), status: "reviewed" } });
@@ -194,7 +201,7 @@ export async function POST(request: NextRequest) {
   const why = clean(body.why, 400);
   const repo = normaliseRepo(body.repo);
   const link = normaliseLink(body.link);
-  const kind: DemoKind | "" = body.kind === "standard" || body.kind === "journey" ? body.kind : "";
+  const kind: DemoKind | "" = isDemoKind(body.kind) ? body.kind : "";
   if (team.length < 2 || title.length < 3) return NextResponse.json({ error: "Enter your team or name and a title" }, { status: 400 });
   if (s.kinds && !kind) return NextResponse.json({ error: "Choose what you want to demo" }, { status: 400 });
   if (what.length < 20) return NextResponse.json({ error: "Describe in a sentence or two what you will show" }, { status: 400 });
@@ -202,6 +209,7 @@ export async function POST(request: NextRequest) {
   if (repo === null) return NextResponse.json({ error: "The repository must be in the SAAF-Project org, e.g. SAAF-Project/my-agent" }, { status: 400 });
   if (link === null) return NextResponse.json({ error: "The link must be a pull request or repo in the SAAF-Project org" }, { status: 400 });
   if (kind === "standard" && !link) return NextResponse.json({ error: "Link the pull request with your proposal" }, { status: 400 });
+  if (kind === "checks" && !repo) return NextResponse.json({ error: "Name the repository that holds your llm_checks.yaml" }, { status: 400 });
   const taken = teams.find((t) => sameTeam(t.entry.team, team) && t.userId !== user.id);
   if (taken) {
     return NextResponse.json({ error: `${taken.entry.team} is already signed up by @${taken.user.githubUsername}. One sign-up per team.` }, { status: 409 });

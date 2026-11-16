@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DEMO_SESSIONS, CURRENT_DEMO_SESSION } from "../../lib/demo-sessions";
+import { DAY_TRACKS, trackOfKind } from "../../lib/day-tracks";
+import { DEMO_SESSIONS, CURRENT_DEMO_SESSION, overKind, type DemoKind } from "../../lib/demo-sessions";
 
 // The organisers' view of the demo sign-up, per session. A draw session (10 November) shuffles the order; a select
 // session (17 November) lets the organisers pick at most a few teams, in order, for fixed slots. The pitch check skill
@@ -11,7 +12,7 @@ interface Row {
   id: string;
   team: string;
   title: string;
-  kind?: "standard" | "journey" | "";
+  kind?: DemoKind | "";
   link?: string;
   what?: string;
   why?: string;
@@ -24,7 +25,7 @@ interface Row {
 }
 
 interface State {
-  session: { id: string; label: string; mode: "draw" | "select"; maxSlots: number; slotSeconds: number; windowStart: string };
+  session: { id: string; label: string; mode: "draw" | "select"; maxSlots: number; maxPerKind?: number | null; slotSeconds: number; windowStart: string };
   drawn: boolean;
   locked: boolean;
   secondsPerTeam: number;
@@ -32,7 +33,10 @@ interface State {
   schedule: Row[] | null;
 }
 
-const KIND = { standard: "Standard", journey: "Journey", "": "" } as const;
+const kindLabel = (kind: DemoKind | "" | undefined): string => {
+  const track = trackOfKind(kind ?? "");
+  return track ? `Track ${track.number} · ${track.demo.label}` : "";
+};
 const btn = "text-xs px-3 py-2 rounded-lg border border-border hover:border-accent cursor-pointer disabled:opacity-50";
 
 export default function DemosTab() {
@@ -40,6 +44,7 @@ export default function DemosTab() {
   const [state, setState] = useState<State | null>(null);
   const [picked, setPicked] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [uneven, setUneven] = useState(false);
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
@@ -87,6 +92,9 @@ export default function DemosTab() {
   const select = state.session.mode === "select";
   const rows = state.schedule ?? state.teams;
   const max = state.session.maxSlots;
+  const perKind = state.session.maxPerKind ?? undefined;
+  const pickedKinds = picked.map((id) => state.teams.find((t) => t.id === id)?.kind ?? "");
+  const over = uneven ? [] : overKind(pickedKinds, perKind);
 
   return (
     <>
@@ -116,9 +124,20 @@ export default function DemosTab() {
           JSON
         </a>
         {select ? (
-          <button onClick={() => post({ action: "select", ids: picked })} disabled={picked.length === 0 || picked.length > max} className={`${btn} border-accent text-accent`}>
-            Publish {picked.length} of {max}
-          </button>
+          <>
+            {perKind ? (
+              <label className="text-xs text-muted inline-flex items-center gap-1">
+                <input type="checkbox" checked={uneven} onChange={(e) => setUneven(e.target.checked)} /> uneven split
+              </label>
+            ) : null}
+            <button
+              onClick={() => post({ action: "select", ids: picked, uneven })}
+              disabled={picked.length === 0 || picked.length > max || over.length > 0}
+              className={`${btn} border-accent text-accent`}
+            >
+              Publish {picked.length} of {max}
+            </button>
+          </>
         ) : (
           <button onClick={() => post({ action: "draw" })} disabled={state.teams.length === 0} className={`${btn} border-accent text-accent`}>
             {state.drawn ? "Draw again" : "Draw order at random"}
@@ -130,6 +149,16 @@ export default function DemosTab() {
           </button>
         )}
       </div>
+      {select && perKind && !state.drawn ? (
+        <p className="text-xs font-mono text-muted mb-4">
+          {DAY_TRACKS.map((t) => {
+            const n = pickedKinds.filter((k) => k === t.demo.kind).length;
+            const signed = state.teams.filter((r) => r.kind === t.demo.kind).length;
+            return `Track ${t.number}: ${n} of ${perKind} picked (${signed} signed up)`;
+          }).join(" · ")}
+          {over.length > 0 ? " · more than two in one track: untick one, or tick uneven split" : ""}
+        </p>
+      ) : null}
       {error && <p className="text-sm text-saaf-red mb-4">{error}</p>}
       <div className="bg-surface border border-border rounded-xl overflow-x-auto">
         <table className="w-full text-sm">
@@ -173,7 +202,7 @@ export default function DemosTab() {
                   <td className="px-4 py-3">
                     <div className="font-semibold">{t.team}</div>
                     <div className="text-muted text-xs">{t.title}</div>
-                    {t.kind && <div className="text-xs font-mono text-accent mt-1">{KIND[t.kind]}</div>}
+                    {t.kind && <div className="text-xs font-mono text-accent mt-1">{kindLabel(t.kind)}</div>}
                   </td>
                   <td className="px-4 py-3 text-xs max-w-[420px]">
                     <div>{t.what}</div>

@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { DAY_TRACKS, trackOfKind } from "@/lib/day-tracks";
+import type { DemoKind } from "@/lib/demo-sessions";
 
-// Demo sign-up for the current session (src/lib/demo-sessions.ts). On the hardening day: an improvement to the standards
-// or the journey and lessons learned of improving an agent. The organisers choose six on the pitch; each gets five
-// minutes (one to connect, three to tell, one for questions).
+// Demo sign-up for the current session (src/lib/demo-sessions.ts). On the hardening day a demo belongs to one of the
+// three tracks (src/lib/day-tracks.ts). The organisers choose six on the pitch, two per track; each gets five minutes
+// (one to connect, three to tell, one for questions).
 
-type Entry = { team: string; title: string; repo: string; kind: "standard" | "journey" | ""; link: string; mine: boolean; what?: string; why?: string };
+type Entry = { team: string; title: string; repo: string; kind: DemoKind | ""; link: string; mine: boolean; what?: string; why?: string };
 type Slot = Entry & { start: string; end: string };
 type DemoState = {
   session: { id: string; label: string; mode: "draw" | "select"; kinds: boolean; lockAt: string; windowStart: string; maxSlots: number; slotSeconds: number };
@@ -17,12 +19,15 @@ type DemoState = {
   schedule: Slot[] | null;
 };
 
-const KIND_LABEL = { standard: "Improving a standard", journey: "Journey and lessons learned", "": "" } as const;
+const kindLabel = (kind: DemoKind | ""): string => {
+  const track = trackOfKind(kind);
+  return track ? `Track ${track.number} · ${track.demo.label}` : "";
+};
 const field = "bg-bg border border-border rounded-lg px-3 py-2 text-sm";
 
 export default function DemoPage() {
   const [state, setState] = useState<DemoState | null>(null);
-  const [kind, setKind] = useState<"standard" | "journey" | "">("");
+  const [kind, setKind] = useState<DemoKind | "">("");
   const [team, setTeam] = useState("");
   const [title, setTitle] = useState("");
   const [what, setWhat] = useState("");
@@ -74,7 +79,7 @@ export default function DemoPage() {
     });
     const data = await res.json().catch(() => ({}));
     setBusy(false);
-    setMessage(res.ok ? `${data.team} is signed up. The organisers choose six demos at 16:15.` : data.error || "Something went wrong. Try again.");
+    setMessage(res.ok ? `${data.team} is signed up. The organisers choose six demos at 16:15, two per track.` : data.error || "Something went wrong. Try again.");
     reload();
   }
 
@@ -103,9 +108,9 @@ export default function DemoPage() {
       <p className="text-xs font-mono text-muted mb-2">{state?.session.label ?? "Hardening day · 17 November 2026"}</p>
       <h1 className="text-2xl font-medium mb-3">Demo your lesson.</h1>
       <p className="text-sm text-muted leading-relaxed mb-6">
-        Six demos from 16:30, five minutes each: one to connect your laptop, three to tell, one for questions. Show an improvement
-        to the standards, or the journey of making an agent better and what others can learn from it. Sign up by {closes}; the
-        organisers choose six on the pitch and post the order here.
+        Six demos from 16:30, two per track, five minutes each: one to connect your laptop, three to tell, one for questions.
+        Sign up by {closes}; the organisers choose six on the pitch and post the order here. A demo slot is not a prize: the
+        winners are revealed at 17:00.
       </p>
 
       {state?.schedule ? (
@@ -119,27 +124,25 @@ export default function DemoPage() {
                 </span>
                 <span className="flex-1 text-sm">
                   <span className="font-medium">{s.team}</span> <span className="text-muted">· {s.title}</span>
-                  {s.kind && <span className="block text-xs font-mono text-muted">{KIND_LABEL[s.kind]}</span>}
+                  {s.kind && <span className="block text-xs font-mono text-muted">{kindLabel(s.kind)}</span>}
                 </span>
                 {s.mine && <span className="text-xs font-mono text-accent">you</span>}
               </div>
             ))}
           </div>
-          {mine && !state.schedule.some((s) => s.mine) && <p className="text-sm text-muted">Thank you for signing up. Your lesson is not among the six this time; share it in the WhatsApp group.</p>}
+          {mine && !state.schedule.some((s) => s.mine) && <p className="text-sm text-muted">Thank you for signing up. Your demo is not among the six this time; share it in the WhatsApp group.</p>}
         </>
       ) : (
         <>
           <form onSubmit={register} className="bg-surface border border-border rounded-xl p-5 mb-4 grid gap-3">
             <fieldset className="grid gap-2" disabled={state?.locked}>
               <legend className="text-sm font-medium mb-1">What do you want to demo?</legend>
-              {(["journey", "standard"] as const).map((k) => (
-                <label key={k} className="flex items-start gap-2 text-sm">
-                  <input type="radio" name="kind" value={k} checked={kind === k} onChange={() => setKind(k)} required className="mt-1" />
+              {DAY_TRACKS.map((t) => (
+                <label key={t.demo.kind} className="flex items-start gap-2 text-sm">
+                  <input type="radio" name="kind" value={t.demo.kind} checked={kind === t.demo.kind} onChange={() => setKind(t.demo.kind)} required className="mt-1" />
                   <span>
-                    <span className="font-medium">{KIND_LABEL[k]}</span>
-                    <span className="block text-xs text-muted">
-                      {k === "journey" ? "How you made an agent better today, and what others should copy or avoid." : "A pull request that improves a standard, on agent-template or in docs/conventions."}
-                    </span>
+                    <span className="font-medium">{t.demo.label}</span> <span className="text-xs font-mono text-muted">track {t.number}</span>
+                    <span className="block text-xs text-muted">{t.demo.hint}</span>
                   </span>
                 </label>
               ))}
@@ -154,9 +157,10 @@ export default function DemoPage() {
             <label className="text-sm font-medium" htmlFor="why">Why others should hear it</label>
             <textarea id="why" value={why} onChange={(e) => setWhy(e.target.value)} maxLength={400} required rows={2} className={field} disabled={state?.locked} />
             <label className="text-sm font-medium" htmlFor="repo">
-              Repository in SAAF-Project <span className="text-muted font-normal">(the agent you improved)</span>
+              Repository in SAAF-Project{" "}
+              <span className="text-muted font-normal">{kind === "checks" ? "(the agent with your llm_checks.yaml, required)" : "(the agent you improved)"}</span>
             </label>
-            <input id="repo" value={repo} onChange={(e) => setRepo(e.target.value)} maxLength={200} placeholder="SAAF-Project/my-agent" className={`${field} font-mono`} disabled={state?.locked} />
+            <input id="repo" value={repo} onChange={(e) => setRepo(e.target.value)} maxLength={200} required={kind === "checks"} placeholder="SAAF-Project/my-agent" className={`${field} font-mono`} disabled={state?.locked} />
             <label className="text-sm font-medium" htmlFor="link">
               Pull request <span className="text-muted font-normal">{kind === "standard" ? "(your proposal, required)" : "(optional)"}</span>
             </label>
@@ -180,7 +184,7 @@ export default function DemoPage() {
           {state && state.teams.length > 0 && (
             <>
               <h2 className="text-xs font-mono text-muted mb-2">
-                {state.teams.length} signed up · six are chosen
+                {state.teams.length} signed up · six are chosen, two per track
               </h2>
               <div className="bg-surface border border-border rounded-xl overflow-hidden mb-4">
                 {state.teams.map((t, i) => (

@@ -1,3 +1,5 @@
+import { EMPTY_CHECKS, type ChecksDoc } from "./day-checks";
+import { loadChecks } from "./day-checks-db";
 import { buildLeaderboard, frozenAt, isFrozen, pendingStates, type LeaderboardPayload } from "./leaderboard-day";
 import { getState, loadGrades, loadProposals, type BoardState, type Graded, type Proposal } from "./leaderboard-store";
 import { getPrisma } from "./prisma";
@@ -30,6 +32,15 @@ async function grades(state: BoardState, now: string): Promise<{ frozen: Map<str
   }
 }
 
+/** Track 3: the repos with LLM checks and the jury's places. Empty when the database does not answer. */
+async function checksDoc(): Promise<ChecksDoc> {
+  try {
+    return await loadChecks();
+  } catch {
+    return EMPTY_CHECKS;
+  }
+}
+
 let stateMemo: { at: number; value: Promise<BoardState> } | null = null;
 
 function currentState(now: () => number): Promise<BoardState> {
@@ -57,8 +68,8 @@ export async function loadLeaderboard(view: "public" | "admin", now: () => numbe
   const value = (async () => {
     const nowIso = new Date(now()).toISOString();
     const inputs = await sharedInputs();
-    const gs = await grades(st, nowIso);
-    return buildLeaderboard({ board: inputs.board, histories: historyMap(inputs), grades: gs.frozen, allGrades: gs.all, proposals: gs.proposals, allProposals: gs.allProposals, state: st, now: nowIso, view });
+    const [gs, checks] = await Promise.all([grades(st, nowIso), checksDoc()]);
+    return buildLeaderboard({ board: inputs.board, histories: historyMap(inputs), grades: gs.frozen, allGrades: gs.all, proposals: gs.proposals, allProposals: gs.allProposals, checks, state: st, now: nowIso, view });
   })();
   memo.set(key, { at: now(), value });
   value.catch(() => memo.delete(key));
