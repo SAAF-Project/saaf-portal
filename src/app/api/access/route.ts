@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { sessionLogin } from "@/lib/admin";
 import { ACCESS_CATEGORY, listRequests, validateRequest } from "@/lib/access";
 import { getPrisma } from "@/lib/prisma";
-import { loadRepoStandards } from "@/lib/repo-standards";
+import { sharedBoard } from "@/lib/shared-loaders";
 
 // A member asks for write access to a repo that is not theirs (to revive it, merge it or help). Mathijs approves in
 // the admin; then it is granted from his Mac. The member sees the status here.
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
   const prisma = getPrisma();
   const user = await prisma.user.findUnique({ where: { githubUsername: login } });
   if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
-  const board = await loadRepoStandards();
+  const board = await sharedBoard();
   const checked = validateRequest(await request.json().catch(() => null), (board.repos ?? []).map((r) => r.name));
   if ("error" in checked) return NextResponse.json({ error: checked.error }, { status: 400 });
   const open = (await listRequests(prisma, login)).find((r) => r.repo === checked.ok.repo && (r.status === "waiting" || r.status === "approved"));

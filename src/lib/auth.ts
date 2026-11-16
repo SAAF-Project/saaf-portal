@@ -74,15 +74,10 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session.user && token.githubUsername) {
+        // No database call here: this runs on every request of every signed-in member. Routes that need the user row
+        // look it up by githubUsername themselves.
         (session.user as { githubUsername?: string }).githubUsername =
           token.githubUsername as string;
-
-        const dbUser = await getPrisma().user.findUnique({
-          where: { githubUsername: token.githubUsername as string },
-        });
-        if (dbUser) {
-          (session.user as { dbId?: string }).dbId = dbUser.id;
-        }
       }
       return session;
     },
