@@ -47,10 +47,11 @@ const tile = [
 const day = [
   { t: "09:00", v: "Welcome and the assignment" },
   { t: "09:30", v: "Adriaan Heijstek, BDO" },
-  { t: "10:05", v: "Sjoerd de Vries, BDO" },
-  { t: "11:00", v: "Faissal Assakkach, BDO" },
+  { t: "10:00", v: "Faissal Assakkach, BDO" },
+  { t: "11:00", v: "Sjoerd de Vries and Thijs Modderman, BDO" },
   { t: "11:45", v: "Orq.ai workshop, Bauke Brenninkmeijer" },
   { t: "12:15", v: "Start hacking, then lunch" },
+  { t: "14:00", v: "Gülnur Orpak, ABN AMRO: a 15-minute talk" },
   { t: "15:15", v: "The leaderboard freezes" },
   { t: "16:00", v: "Last pull request opened; demo sign-up closes" },
   { t: "16:15", v: "Last merge, final review", accent: true },
