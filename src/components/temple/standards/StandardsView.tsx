@@ -15,7 +15,7 @@ const stateOf = (value: boolean | null | undefined, isFresh = false): State =>
 const MARK: Record<State, string> = {
   "added today": "std-glow",
   "in place": "bg-accent border-accent",
-  "arranged by SAAF": "border-accent border-dotted bg-accent/15",
+  "arranged by SAAF": "std-saaf",
   missing: "border-muted",
   "not checked": "border-dashed border-muted",
 };

@@ -1,6 +1,7 @@
 import type { FeedItem } from "../../../lib/leaderboard";
 import type { CheckRow, LeaderboardPayload, PersonRow, ProposalRow, RepoRow } from "../../../lib/leaderboard-day";
-import { DATA_RULE, DAY_TRACKS, DEMO_LINE, PRIZE_LINE, RULES, SHORT_RULES } from "../../../lib/day-tracks";
+import { DATA_RULE, DAY_TRACKS, DEMO_LINE, PRIZE_EUR, PRIZE_LINE, PRIZE_SHORT, RULES, SHORT_RULES, prizeShare } from "../../../lib/day-tracks";
+import DayCountdown from "../../DayCountdown";
 import { STANDARDS } from "./standards";
 import { clock } from "./StandardsView";
 
@@ -54,18 +55,42 @@ function track1(p: LeaderboardPayload): { prize: RepoRow[]; mention: RepoRow[] }
 
 const names = (logins: string[]): string => logins.map((l) => `@${l}`).join(" ");
 
+/** The prize in words: the amount, what each of the team gets, and who shares it when more names stand on the entry. */
+export function prizeText(logins: string[]): string | null {
+  const share = prizeShare(logins);
+  if (!share) return null;
+  const each = share.team.length > 1 ? ` · EUR ${share.each} each` : "";
+  const who = logins.length > share.team.length ? ` for ${names(share.team)}` : "";
+  return `EUR ${PRIZE_EUR}${each}${who}`;
+}
+
+/** Under the leader of a list: what the prize is worth to this team, now or once it is won. */
+function Prize({ logins, won }: { logins: string[]; won: boolean }) {
+  const text = prizeText(logins);
+  if (!text) return null;
+  return (
+    <span className="block text-xs font-mono mt-1 [overflow-wrap:anywhere]">
+      {won ? "Wins" : "Leads for"} {text}
+    </span>
+  );
+}
+
 /** The three tracks on one panel: how you win each and, once the day runs, who leads. */
 export function TracksPanel({ p }: { p: LeaderboardPayload | null }) {
   const running = !!p && p.phase !== "before";
   const lead = p ? track1(p).prize[0] : undefined;
   const proposal = p?.proposals[0];
   const check = p?.checks[0];
-  const agentSub = lead && !lead.masked ? `${p!.prize === "most_improved" ? `+${lead.gain} points today` : `${lead.after} points, +${lead.gain} today`}${lead.by.length ? ` · ${names(lead.by)}` : ""}` : undefined;
+  const share = (logins: string[]): string => {
+    const text = prizeText(logins);
+    return text ? ` · ${text}` : "";
+  };
+  const agentSub = lead && !lead.masked ? `${p!.prize === "most_improved" ? `+${lead.gain} points today` : `${lead.after} points, +${lead.gain} today`}${lead.by.length ? ` · ${names(lead.by)}` : ""}${share(lead.by)}` : undefined;
   const leaders = [
     <Leader key="agent" lead={!lead ? null : lead.masked ? "?" : lead.name} sub={agentSub} empty="No agent has gained points yet." />,
-    <Leader key="standard" lead={!proposal ? null : proposal.masked ? "?" : proposal.title} sub={proposal && !proposal.masked ? `@${proposal.author} · ${proposal.score}/15` : undefined} empty="No proposal reviewed yet." />,
+    <Leader key="standard" lead={!proposal ? null : proposal.masked ? "?" : proposal.title} sub={proposal && !proposal.masked ? `@${proposal.author} · ${proposal.score}/15${share([proposal.author])}` : undefined} empty="No proposal reviewed yet." />,
     p?.reveal ? (
-      <Leader key="checks" lead={check?.masked ? "?" : check?.place ? check.repo : null} sub={check?.place ? names(check.authors) : undefined} empty="The jury has not chosen yet." />
+      <Leader key="checks" lead={check?.masked ? "?" : check?.place ? check.repo : null} sub={check?.place ? `${names(check.authors)}${check.place === 1 ? share(check.authors) : ""}` : undefined} empty="The jury has not chosen yet." />
     ) : (
       <Leader
         key="checks"
@@ -83,6 +108,7 @@ export function TracksPanel({ p }: { p: LeaderboardPayload | null }) {
             <p className="font-mono text-xs opacity-70 mb-2">Track {t.number}</p>
             <h3 className="text-2xl font-medium leading-tight mb-2">{t.name}</h3>
             <p className="text-sm opacity-80 leading-relaxed">{t.win}</p>
+            <p className="font-mono text-xs opacity-70 mt-2">{PRIZE_SHORT}</p>
             {running && <div className={`mt-4 pt-4 border-t ${hair}`}>{leaders[i]}</div>}
           </li>
         ))}
@@ -95,7 +121,7 @@ export function TracksPanel({ p }: { p: LeaderboardPayload | null }) {
 }
 
 /** Track 1 when the prize is for the rise: the gain large, from where to where, and who did it. */
-function Improved({ rows }: { rows: RepoRow[] }) {
+function Improved({ rows, won }: { rows: RepoRow[]; /** null: this list carries no prize. */ won: boolean | null }) {
   if (rows.length === 0) return <p className="text-sm text-muted py-3 border-t border-border">No repo has gained points yet.</p>;
   return (
     <ol className="border-t border-border">
@@ -110,6 +136,7 @@ function Improved({ rows }: { rows: RepoRow[] }) {
                 {r.name}
               </a>
               {r.by.length > 0 && <span className="block text-xs font-mono text-muted [overflow-wrap:anywhere]">{r.by.map((l) => `@${l}`).join(" · ")}</span>}
+              {i === 0 && won !== null && <Prize logins={r.by} won={won} />}
             </span>
           )}
           <span className="text-right">
@@ -225,7 +252,7 @@ function Feed({ items, frozen }: { items: FeedItem[]; frozen: boolean }) {
 
 const KIND: Record<string, string> = { change: "change", new: "new standard", remove: "remove or merge" };
 
-function Proposals({ rows }: { rows: ProposalRow[] }) {
+function Proposals({ rows, won }: { rows: ProposalRow[]; won: boolean }) {
   if (rows.length === 0) return <p className="text-sm text-muted py-3 border-t border-border">No proposals reviewed yet.</p>;
   return (
     <ol className="border-t border-border">
@@ -242,6 +269,7 @@ function Proposals({ rows }: { rows: ProposalRow[] }) {
               <span className="block text-xs font-mono text-muted">
                 @{r.author} · {r.repo} · {KIND[r.kind] ?? r.kind}
               </span>
+              {i === 0 && <Prize logins={[r.author]} won={won} />}
             </span>
           )}
           <span className="text-right font-mono tabular-nums text-sm">{r.masked ? "" : `${r.score}/15`}</span>
@@ -267,6 +295,7 @@ function Checks({ rows }: { rows: CheckRow[] }) {
                 {r.repo}
               </a>
               {r.authors.length > 0 && <span className="block text-xs font-mono text-muted [overflow-wrap:anywhere]">{r.authors.map((l) => `@${l}`).join(" · ")}</span>}
+              {r.place === 1 && <Prize logins={r.authors} won />}
             </span>
           )}
           <span className="text-right font-mono tabular-nums text-sm text-muted">{r.masked ? "" : `${r.llm} ${r.llm === 1 ? "check" : "checks"}`}</span>
@@ -310,7 +339,7 @@ function Rules() {
   );
 }
 
-export default function PrizesView({ payload }: { payload: LeaderboardPayload | null }) {
+export default function PrizesView({ payload, clockNow }: { payload: LeaderboardPayload | null; /** A fixed moment for the countdown, for previews and tests. */ clockNow?: string }) {
   if (!payload) return null;
   const startsAt = clock(payload.start);
   const endsAt = clock(payload.end);
@@ -324,6 +353,7 @@ export default function PrizesView({ payload }: { payload: LeaderboardPayload | 
             Counting starts at {startsAt} on 17 November and closes at {endsAt}
           </p>
         </div>
+        <DayCountdown fixedNow={clockNow} />
         <TracksPanel p={payload} />
         <Rules />
       </section>
@@ -343,6 +373,8 @@ export default function PrizesView({ payload }: { payload: LeaderboardPayload | 
   if (payload.unread > 0) status.push(`${payload.unread} ${payload.unread === 1 ? "repo" : "repos"} not read yet`);
   const { prize, mention } = track1(payload);
   const byRise = payload.prize === "most_improved";
+  // The first row of a list has won once the prize-giving shows it, or after the close when nothing is hidden.
+  const won = !!payload.reveal || (payload.phase === "after" && !payload.frozen);
 
   return (
     <section aria-labelledby="prizes-title" className="mb-10">
@@ -351,6 +383,7 @@ export default function PrizesView({ payload }: { payload: LeaderboardPayload | 
         <p className="text-xs font-mono text-muted">{status.join(" · ")}</p>
       </div>
 
+      <DayCountdown fixedNow={clockNow} />
       <TracksPanel p={payload} />
 
       <div className="grid gap-8 lg:grid-cols-3">
@@ -359,12 +392,12 @@ export default function PrizesView({ payload }: { payload: LeaderboardPayload | 
           <p className="text-xs text-muted mb-3">
             {byRise ? `Points gained since ${startsAt} by an agent that existed then, and the team that added them.` : `The highest score at ${endsAt}, with at least 4 points gained today.`}
           </p>
-          {byRise ? <Improved rows={prize} /> : <Agents rows={prize} />}
+          {byRise ? <Improved rows={prize} won={won} /> : <Agents rows={prize} />}
         </div>
         <div>
           <h3 className="text-base font-medium mb-1">Track 2 · Best additions to the standards.</h3>
           <p className="text-xs text-muted mb-3">Proposals on agent-template or docs/conventions, reviewed for real value and simplicity. Not merged today.</p>
-          <Proposals rows={payload.proposals} />
+          <Proposals rows={payload.proposals} won={won} />
         </div>
         <div>
           <h3 className="text-base font-medium mb-1">Track 3 · LLM checks.</h3>
@@ -383,7 +416,7 @@ export default function PrizesView({ payload }: { payload: LeaderboardPayload | 
           <div>
             <h3 className="text-base font-medium mb-1">{byRise ? "Best agent." : "Most improved."}</h3>
             <p className="text-xs text-muted mb-3">{byRise ? `The highest score at ${endsAt}, with at least 4 points gained today.` : `Points gained since ${startsAt} by a repo that existed then.`}</p>
-            {byRise ? <Agents rows={mention} /> : <Improved rows={mention} />}
+            {byRise ? <Agents rows={mention} /> : <Improved rows={mention} won={null} />}
           </div>
           <div>
             <h3 className="text-base font-medium mb-1">Top contributor.</h3>

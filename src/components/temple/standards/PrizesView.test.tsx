@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type { LeaderboardPayload, PersonRow, RepoRow } from "../../../lib/leaderboard-day";
-import PrizesView, { RULES, SHORT_RULES } from "./PrizesView";
+import PrizesView, { RULES, SHORT_RULES, prizeText } from "./PrizesView";
 
 const base: LeaderboardPayload = {
   phase: "during",
@@ -56,7 +56,9 @@ describe("the day's leaderboard", () => {
     const t = text({ ...base, phase: "before", totals: null });
     expect(t).toContain("Three tracks, three winners.");
     for (const name of ["Harden an agent.", "Improve a standard.", "Write LLM checks."]) expect(t).toContain(name);
-    expect(t).toContain("EUR 200 in Orq.ai credits each");
+    expect(t).toContain("EUR 200 in Orq.ai credits for the team");
+    expect(t).toContain("at least EUR 50");
+    expect(t).toContain("Counting starts");
     expect(t).toContain("The rules.");
     expect(html({ ...base, phase: "before", totals: null })).not.toContain("<details open");
     expect(SHORT_RULES).toHaveLength(5);
@@ -127,5 +129,33 @@ describe("the day's leaderboard", () => {
     expect(reveal).toContain("02 sample-service");
     const done = text({ ...base, phase: "after", reveal: { step: 11, total: 11 }, checks: [check("example-agent", 1, 1), check("sample-service", 4, 2)], checks_total: 2 });
     expect(done).toContain("01 example-agent");
+  });
+
+  it("shows what the prize is worth to the leading team, and that it is won once the prize-giving shows it", () => {
+    const four = repo("sample-service", 10, 30, ["ana", "ben", "cas", "dee"]);
+    const live = text({ ...base, most_improved: [four, repo("example-agent", 5, 9, ["eve"])] });
+    expect(live).toContain("Leads for EUR 200 · EUR 50 each");
+    expect(live).not.toContain("Wins EUR");
+    const done = text({ ...base, phase: "after", reveal: { step: 11, total: 11 }, most_improved: [four] });
+    expect(done).toContain("Wins EUR 200 · EUR 50 each");
+    // hidden top places show no names and no amounts
+    expect(text({ ...base, frozen: true, most_improved: [repo("?", 0, 0, [], true)] })).not.toContain("Leads for");
+  });
+
+  it("shares a prize between at most four people, in whole euros", () => {
+    expect(prizeText(["ana"])).toBe("EUR 200");
+    expect(prizeText(["ana", "ben"])).toBe("EUR 200 · EUR 100 each");
+    expect(prizeText(["ana", "ben", "cas"])).toBe("EUR 200 · EUR 66 each");
+    expect(prizeText(["ana", "ben", "cas", "dee", "eve", "fay"])).toBe("EUR 200 · EUR 50 each for @ana @ben @cas @dee");
+    expect(prizeText([])).toBeNull();
+  });
+
+  it("puts the countdown of the day on top, with every deadline", () => {
+    const t = renderToStaticMarkup(<PrizesView payload={base} clockNow="2026-11-17T14:00:00Z" />).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+    expect(t).toContain("Next deadline · 15:15");
+    expect(t).toContain("The board freezes.");
+    expect(t).toContain("15:00"); // a quarter of an hour left
+    for (const label of ["Last pull request", "Demo sign-up closes", "Last merge", "Demos", "The reveal"]) expect(t).toContain(label);
+    expect(t).toContain("passed"); // counting started at 09:00
   });
 });

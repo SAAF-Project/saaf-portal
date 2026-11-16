@@ -27,7 +27,34 @@ export const TRACK1_PRIZE: "most_improved" | "best_agent" = "most_improved";
 
 export const TRACKS_TITLE = "Pick one track.";
 export const TRACKS_SUB = "Three tracks, one winner each: EUR 200 in Orq.ai credits. Pick one and do it well.";
-export const PRIZE_LINE = "One winner per track. EUR 200 in Orq.ai credits each, sponsored by Orq.ai.";
+/** The prize of a track, in euros of Orq.ai credits, and how many people share it at most. */
+export const PRIZE_EUR = 200;
+export const TEAM_MAX = 4;
+export const PRIZE_LINE = `One winner per track: EUR ${PRIZE_EUR} in Orq.ai credits for the team, sponsored by Orq.ai. A team is at most ${TEAM_MAX === 4 ? "four" : TEAM_MAX} people, so every winner gets at least EUR ${PRIZE_EUR / TEAM_MAX}.`;
+export const PRIZE_SHORT = `EUR ${PRIZE_EUR} for the team · at least EUR ${PRIZE_EUR / TEAM_MAX} each`;
+
+/**
+ * Who shares the prize of a winning entry and what each gets, in whole euros. The names come in the order of the board
+ * (who added the most first); with more than four, the first four share it.
+ */
+export function prizeShare(logins: string[]): { team: string[]; each: number } | null {
+  const team = [...new Set(logins.filter(Boolean))].slice(0, TEAM_MAX);
+  return team.length ? { team, each: Math.floor(PRIZE_EUR / team.length) } : null;
+}
+
+/**
+ * The moments of the day everyone works towards, for the countdown. Instants in UTC (Amsterdam is UTC+1 on the day);
+ * `clock` is what the room reads. The start, the freeze and the close are the same instants as DAY in leaderboard-day.ts.
+ */
+export const DAY_DEADLINES: { at: string; clock: string; label: string }[] = [
+  { at: "2026-11-17T08:00:00Z", clock: "09:00", label: "Counting starts" },
+  { at: "2026-11-17T14:15:00Z", clock: "15:15", label: "The board freezes" },
+  { at: "2026-11-17T15:00:00Z", clock: "16:00", label: "Last pull request" },
+  { at: "2026-11-17T15:00:00Z", clock: "16:00", label: "Demo sign-up closes" },
+  { at: "2026-11-17T15:15:00Z", clock: "16:15", label: "Last merge" },
+  { at: "2026-11-17T15:30:00Z", clock: "16:30", label: "Demos" },
+  { at: "2026-11-17T16:00:00Z", clock: "17:00", label: "The reveal" },
+];
 export const DEMO_LINE = "Six demos at 16:30, two per track, five minutes each. Sign up by 16:00.";
 
 const SKILL = "gh api repos/SAAF-Project/SAAF-Project/contents/.claude/skills/harden-agent-repo/SKILL.md --jq .content | base64 -d";
@@ -123,5 +150,5 @@ export const RULES: string[] = [
   "Track 2. Open a pull request with the form standard-proposal on agent-template or on docs/conventions in SAAF-Project, by 16:00; you may work from a fork. Nothing is merged today; a review checks whether it adds real value without making the standards more complicated. A new standard needs evidence from two repos, a rule the board can check, and the standard it replaces.",
   "Track 3. Number the criteria in AUDIT-CRITERIA.md and give each one that needs reading a check in llm_checks.yaml, on the default branch by 16:15. Orq.ai and an experienced auditor pick the winner.",
   "A teammate with write access reviews and merges; you do not merge your own pull request. For someone else's repo, ask the creator and request write access on this page.",
-  "One prize per team.",
+  "One prize per team. A team is at most four people and shares the EUR 200 of its track, so every winner gets at least EUR 50. With more names on a winning entry, the first four on the board share it.",
 ];

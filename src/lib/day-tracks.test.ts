@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { EMPTY_CHECKS, mergeChecks, setPlace, toChecksDoc, validateChecks } from "./day-checks";
-import { DAY_TRACKS, RULES, SHORT_RULES, TRACK1_PRIZE, trackOfKind } from "./day-tracks";
+import { DAY_DEADLINES, DAY_TRACKS, PRIZE_EUR, PRIZE_LINE, RULES, SHORT_RULES, TEAM_MAX, TRACK1_PRIZE, prizeShare, trackOfKind } from "./day-tracks";
+import { DAY } from "./leaderboard-day";
 import { DEMO_KINDS, demoSession, isDemoKind, overKind } from "./demo-sessions";
 
 // The three tracks of the hardening day and what hangs on them: the demo kinds and the store of track 3.
@@ -90,3 +91,24 @@ describe("track 3: the repos with LLM checks and the jury's places", () => {
     expect(toChecksDoc({ candidates: [], places: {}, updatedAt: 5 })).toEqual({ candidates: [], places: {}, updatedAt: null });
   });
 });
+
+describe("the prize and the deadlines", () => {
+  it("gives every winner at least EUR 50: a team of four shares EUR 200", () => {
+    expect(PRIZE_EUR / TEAM_MAX).toBe(50);
+    expect(prizeShare(["a", "b", "c", "d", "e"])).toEqual({ team: ["a", "b", "c", "d"], each: 50 });
+    expect(prizeShare(["a", "a", "b"])).toEqual({ team: ["a", "b"], each: 100 });
+    expect(prizeShare([])).toBeNull();
+    expect(PRIZE_LINE).toContain("at least EUR 50");
+    expect(RULES.join(" ")).toContain("at most four people");
+  });
+
+  it("counts down to the same start, freeze and close as the leaderboard", () => {
+    const at = (label: string) => DAY_DEADLINES.find((d) => d.label === label)?.at;
+    expect(Date.parse(at("Counting starts")!)).toBe(Date.parse(DAY.start));
+    expect(Date.parse(at("The board freezes")!)).toBe(Date.parse(DAY.freeze));
+    expect(Date.parse(at("Last merge")!)).toBe(Date.parse(DAY.end));
+    const times = DAY_DEADLINES.map((d) => Date.parse(d.at));
+    expect([...times].sort((a, b) => a - b)).toEqual(times);
+  });
+});
+
