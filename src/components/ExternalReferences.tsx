@@ -64,6 +64,7 @@ export function LeavingNotice({ reference, onClose }: { reference: ExternalRefer
             href={reference.url}
             target="_blank"
             rel="noopener noreferrer"
+            data-leaving-ok=""
             onClick={onClose}
             className="text-sm px-4 py-2 rounded-lg border border-accent hover:underline"
           >

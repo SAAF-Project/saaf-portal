@@ -1,6 +1,7 @@
 import Link from "next/link";
 import AccessRequest from "@/components/AccessRequest";
 import CopyPrompt from "@/components/CopyPrompt";
+import DayCountdown from "@/components/DayCountdown";
 import ExternalReferences, { type ExternalReference } from "@/components/ExternalReferences";
 import StandardsChecklist from "@/components/temple/standards/StandardsChecklist";
 import { DATA_RULE, DAY_TRACKS, DEMO_LINE, PRIZE_LINE, SHORT_RULES, TRACKS_SUB } from "@/lib/day-tracks";
@@ -13,8 +14,8 @@ import { DATA_RULE, DAY_TRACKS, DEMO_LINE, PRIZE_LINE, SHORT_RULES, TRACKS_SUB }
 const HANDOUT_PDF: string | null = "/hardening/saaf-hardening-day-handout.pdf";
 
 const day = [
-  { t: "09:00", v: "Welcome: Eduward van de Kamp on quality, Mathijs Schouten on the nine standards" },
-  { t: "09:30", v: "Guests from BDO: Adriaan Heijstek, Faissal Assakkach (10:00), Sjoerd de Vries and Thijs Modderman (11:00). Coffee at 10:45" },
+  { t: "09:00", v: "Opening by Eduward van de Kamp and Mathijs Schouten: why quality, and the nine standards" },
+  { t: "09:45", v: "Guests from BDO: Adriaan Heijstek, Faissal Assakkach (10:15), Sjoerd de Vries and Thijs Modderman (11:00). Coffee at 10:45" },
   { t: "11:45", v: "Bauke Brenninkmeijer, Orq.ai: observe and evaluate your agents" },
   { t: "12:15", v: "The assignment: three tracks. Lunch at 12:30, then build. In the afternoon: Gülnur Orpak, ABN AMRO, a 15-minute talk" },
   { t: "15:15", v: "The leaderboard freezes" },
@@ -122,7 +123,9 @@ export default function HardeningPage() {
         </div>
       </div>
 
-      <div className="grid gap-x-10 gap-y-10 md:grid-cols-2 mb-10">
+      <DayCountdown />
+
+      <div className="grid gap-x-10 gap-y-10 md:grid-cols-2 mb-10 mt-4">
         <section className="min-w-0">
           <h2 className="text-lg font-medium mb-3">Five rules.</h2>
           <ol className="border-t border-border">
