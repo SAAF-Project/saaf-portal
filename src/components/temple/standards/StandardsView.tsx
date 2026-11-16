@@ -4,18 +4,24 @@ import { summarise, summaryNotes, summaryParts } from "./summary";
 
 // The live part of the standards board: the summary line and the table of repos by the nine standards.
 // Pure: it draws the payload it is given (StandardsBoard.tsx fetches it), so it can be rendered in a test.
+// On the hardening day a standard that came in since 09:00 glows (`fresh`, from the leaderboard); the ones that were
+// already there step back a little, so the day's work is what the eye finds first.
 
-type State = "in place" | "missing" | "not checked";
+type State = "added today" | "in place" | "arranged by SAAF" | "missing" | "not checked";
 
-const stateOf = (value: boolean | null | undefined): State => (value === true ? "in place" : value === false ? "missing" : "not checked");
+const stateOf = (value: boolean | null | undefined, isFresh = false): State =>
+  value === true ? (isFresh ? "added today" : "in place") : value === false ? "missing" : "not checked";
 
 const MARK: Record<State, string> = {
+  "added today": "std-glow",
   "in place": "bg-accent border-accent",
+  "arranged by SAAF": "border-accent border-dotted bg-accent/15",
   missing: "border-muted",
   "not checked": "border-dashed border-muted",
 };
+const CALM = "bg-accent/40 border-transparent";
 
-function Mark({ state, label }: { state: State; label?: string }) {
+function Mark({ state, label, calm = false }: { state: State; label?: string; calm?: boolean }) {
   const text = label ? `${label}: ${state}` : state;
   return (
     <span
@@ -23,7 +29,7 @@ function Mark({ state, label }: { state: State; label?: string }) {
       aria-label={text}
       title={text}
       data-state={state}
-      className={`inline-block align-middle w-3.5 h-3.5 sm:w-5 sm:h-5 rounded-[3px] border-2 ${MARK[state]}`}
+      className={`inline-block align-middle w-3.5 h-3.5 sm:w-5 sm:h-5 rounded-[3px] border-2 ${calm && state === "in place" ? CALM : MARK[state]}`}
     />
   );
 }
@@ -31,7 +37,16 @@ function Mark({ state, label }: { state: State; label?: string }) {
 /** The time of day of an ISO timestamp, in the viewer's own time zone: "14:32". */
 export const clock = (iso: string): string => new Date(iso).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 
-export default function StandardsView({ payload, loaded }: { payload: StandardsPayload | null; loaded: boolean }) {
+export default function StandardsView({
+  payload,
+  loaded,
+  fresh = {},
+}: {
+  payload: StandardsPayload | null;
+  loaded: boolean;
+  /** Per repo: the standards that came in since the start of the hardening day. */
+  fresh?: Record<string, string[]>;
+}) {
   if (!loaded) return <p className="text-muted">Checking the repos.</p>;
   if (!payload || !payload.repos) {
     return <p className="text-muted">The board has no answer from GitHub right now. It tries again every minute.</p>;
@@ -42,6 +57,10 @@ export default function StandardsView({ payload, loaded }: { payload: StandardsP
   const parts = summaryParts(summary, payload.checked_at ? clock(payload.checked_at) : null);
   const notes = summaryNotes(summary, payload.archived);
   if (payload.stale) notes.push("GitHub did not answer the last check, so this may be behind");
+  const glowing = Object.values(fresh).reduce((n, ids) => n + ids.length, 0);
+  const calm = glowing > 0;
+  const byOrg = repos.some((r) => r.security_by_org);
+  const key: State[] = [...(calm ? (["added today"] as State[]) : []), "in place", ...(byOrg ? (["arranged by SAAF"] as State[]) : []), "missing", "not checked"];
 
   return (
     <>
@@ -59,9 +78,9 @@ export default function StandardsView({ payload, loaded }: { payload: StandardsP
       <p className="text-sm text-muted mb-6">{notes.join(" · ")}</p>
 
       <ul className="flex flex-wrap gap-x-5 gap-y-1 text-xs font-mono text-muted mb-2" aria-label="Key">
-        {(["in place", "missing", "not checked"] as State[]).map((state) => (
+        {key.map((state) => (
           <li key={state} className="flex items-center gap-2">
-            <Mark state={state} /> {state}
+            <Mark state={state} calm={calm} /> {state === "added today" ? `added today (${glowing})` : state}
           </li>
         ))}
       </ul>
@@ -109,7 +128,11 @@ export default function StandardsView({ payload, loaded }: { payload: StandardsP
                 </th>
                 {STANDARDS.map((s) => (
                   <td key={s.id} className="text-center py-2">
-                    <Mark state={stateOf(r.checks[s.id])} label={s.label} />
+                    <Mark
+                      state={s.id === "security" && r.security_by_org ? "arranged by SAAF" : stateOf(r.checks[s.id], fresh[r.name]?.includes(s.id))}
+                      label={s.label}
+                      calm={calm}
+                    />
                   </td>
                 ))}
                 <td className="hidden sm:table-cell text-right font-mono tabular-nums text-muted py-2">

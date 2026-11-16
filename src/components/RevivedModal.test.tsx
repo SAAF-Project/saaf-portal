@@ -11,14 +11,14 @@ describe("the message for a revived agent", () => {
     const out = html(["sample-quiet-agent"]);
     expect(out).toContain("You revived an agent.");
     expect(out).toContain("sample-quiet-agent");
-    expect(out).toContain("It is on the standards board with all nine tiles, and your name is on it.");
+    expect(out).toContain("It is on the standards board with all nine standards met, and your name is on it.");
   });
 
   it("says it in the plural for more agents and names every repo", () => {
     const out = html(["sample-quiet-agent", "sample-quiet-service"]);
     expect(out).toContain("You revived 2 agents.");
     expect(out).toContain("sample-quiet-agent and sample-quiet-service");
-    expect(out).toContain("They are on the standards board with all nine tiles, and your name is on them.");
+    expect(out).toContain("They are on the standards board with all nine standards met, and your name is on them.");
     expect(html(["a-agent", "b-agent", "c-agent"])).toContain("You revived 3 agents.");
     expect(html(["a-agent", "b-agent", "c-agent"])).toContain("a-agent, b-agent and c-agent");
   });

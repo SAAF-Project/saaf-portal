@@ -71,8 +71,8 @@ describe("standards wall", () => {
 
   it("sums the tiles in one line above the wall, with the time of the check", () => {
     const head = text(html.split('<div class="std-scroll"')[0]);
-    expect(head).toMatch(/11 of 27 tiles in place · 1 repo complete · checked \d\d:\d\d/);
-    expect(head).toContain("3 repos on the board · 9 tiles not checked");
+    expect(head).toMatch(/11 of 27 standards met · 1 repo complete · checked \d\d:\d\d/);
+    expect(head).toContain("3 repos on the board · 9 standards not checked");
     expect(head).not.toContain("may be behind");
     expect(text(render(payload({ stale: true, archived: 2 })))).toContain("2 archived repos left out · GitHub did not answer the last check, so this may be behind");
   });
@@ -89,7 +89,7 @@ describe("standards wall", () => {
       expect(text(none)).toContain("The standards have no answer from GitHub right now. The picture tries again every minute.");
       expect(none).not.toContain("std-cell");
       expect(none).not.toContain("std-tile");
-      expect(text(none)).not.toContain("tiles in place");
+      expect(text(none)).not.toContain("standards met");
     }
     const waiting = render(null, { loaded: false });
     expect(text(waiting)).toContain("Checking the repos.");

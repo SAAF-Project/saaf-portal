@@ -37,7 +37,7 @@ const tile = [
     v: (
       <>
         After a maintainer merges it to the default branch (for example main or master), the board at{" "}
-        <Link href="/standards" className="text-accent hover:underline">/standards</Link> turns the tile on within two minutes.
+        <Link href="/standards" className="text-accent hover:underline">/standards</Link> marks the standard as met within two minutes, and it glows for the rest of the day.
       </>
     ),
   },
@@ -137,7 +137,7 @@ export default function HardeningPage() {
         </section>
 
         <section className="min-w-0">
-          <h2 className="text-lg font-medium mb-3">How your tile turns on.</h2>
+          <h2 className="text-lg font-medium mb-3">How a standard gets on the board.</h2>
           <Rows rows={tile} mono />
           <p className="text-xs text-muted leading-relaxed mt-3">The board reads the default branch only.</p>
         </section>

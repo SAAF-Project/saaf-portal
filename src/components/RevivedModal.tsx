@@ -63,8 +63,8 @@ export function RevivedDialog({ repos, onClose }: { repos: string[]; onClose: ()
           <p className="font-mono text-sm mt-3 break-words">{listNames(repos)}</p>
           <p className="text-muted text-sm mt-2">
             {one
-              ? "It is on the standards board with all nine tiles, and your name is on it."
-              : "They are on the standards board with all nine tiles, and your name is on them."}
+              ? "It is on the standards board with all nine standards met, and your name is on it."
+              : "They are on the standards board with all nine standards met, and your name is on them."}
           </p>
         </div>
         <div className="flex items-center gap-2 p-4 border-t border-border">
