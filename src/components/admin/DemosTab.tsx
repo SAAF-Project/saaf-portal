@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { DAY_TRACKS, trackOfKind } from "../../lib/day-tracks";
-import { DEMO_SESSIONS, CURRENT_DEMO_SESSION, overKind, type DemoKind } from "../../lib/demo-sessions";
+import { DEMO_SESSIONS, CURRENT_DEMO_SESSION, linksOf, overKind, type DemoKind } from "../../lib/demo-sessions";
 
 // The organisers' view of the demo sign-up, per session. A draw session (10 November) shuffles the order; a select
 // session (17 November) lets the organisers pick at most a few teams, in order, for fixed slots. The pitch check skill
@@ -214,11 +214,11 @@ export default function DemosTab() {
                         {t.repo.replace("SAAF-Project/", "")}
                       </a>
                     ) : null}
-                    {t.link ? (
-                      <a href={t.link} target="_blank" rel="noopener noreferrer" className="block hover:text-accent">
-                        {t.link.replace("https://github.com/SAAF-Project/", "")}
+                    {linksOf(t.link).map((link) => (
+                      <a key={link} href={link} target="_blank" rel="noopener noreferrer" className="block hover:text-accent">
+                        {link.replace("https://github.com/SAAF-Project/", "")}
                       </a>
-                    ) : null}
+                    ))}
                   </td>
                   <td className="px-4 py-3 text-muted text-xs">{`${t.name || t.githubUsername} @${t.githubUsername}${t.organisation ? " · " + t.organisation : ""}`}</td>
                   <td className="px-4 py-3 text-right">

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { nextStatus, validateRequest } from "./access";
-import { demoSession, normaliseLink } from "./demo-sessions";
+import { demoSession, linksOf, normaliseLink, normaliseLinks } from "./demo-sessions";
 import { schedule } from "./demoDraw";
 
 describe("access requests", () => {
@@ -35,6 +35,13 @@ describe("demo sessions", () => {
     expect(normaliseLink("")).toBe("");
     expect(normaliseLink("https://github.com/someone/else/pull/1")).toBeNull();
     expect(normaliseLink("javascript:alert(1)")).toBeNull();
+    // several pull requests on one sign-up: one per line, at most five, no doubles
+    const two = "https://github.com/SAAF-Project/agent-template/pull/12\nhttps://github.com/SAAF-Project/sample-service/pull/3";
+    expect(normaliseLinks(two + "\n" + two.split("\n")[0] + "/")).toBe(two);
+    expect(linksOf(normaliseLinks("https://github.com/SAAF-Project/a/pull/1, https://github.com/SAAF-Project/b/pull/2"))).toHaveLength(2);
+    expect(normaliseLinks("")).toBe("");
+    expect(normaliseLinks(two + "\nhttps://github.com/someone/else/pull/1")).toBeNull();
+    expect(normaliseLinks(Array.from({ length: 6 }, (_, i) => `https://github.com/SAAF-Project/a/pull/${i + 1}`).join("\n"))).toBeNull();
   });
 
   it("gives six selected teams five minutes each from 16:30", () => {

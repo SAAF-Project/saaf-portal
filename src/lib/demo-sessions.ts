@@ -79,3 +79,24 @@ export function normaliseLink(value: unknown): string | null {
   const m = raw.match(/^https:\/\/github\.com\/SAAF-Project\/[\w.-]+(\/pull\/\d+)?\/?$/i);
   return m ? raw.replace(/\/$/, "") : null;
 }
+
+/** How many links a demo sign-up may carry. */
+export const LINKS_MAX = 5;
+
+/**
+ * Several links, one per line (spaces and commas separate too): pull requests or repos in the SAAF-Project org. Returns
+ * them one per line without doubles, "" when empty, and null when one points elsewhere or there are more than five.
+ */
+export function normaliseLinks(value: unknown): string | null {
+  const parts = String(value ?? "").split(/[\s,]+/).filter(Boolean);
+  const links: string[] = [];
+  for (const part of parts) {
+    const link = normaliseLink(part);
+    if (!link) return null;
+    if (!links.includes(link)) links.push(link);
+  }
+  return links.length > LINKS_MAX ? null : links.join("\n");
+}
+
+/** The links of a stored sign-up, as a list. */
+export const linksOf = (link: string | null | undefined): string[] => String(link ?? "").split(/\s+/).filter(Boolean);

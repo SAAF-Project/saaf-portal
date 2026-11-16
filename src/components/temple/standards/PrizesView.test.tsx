@@ -19,6 +19,7 @@ const base: LeaderboardPayload = {
   proposals: [],
   checks: [],
   checks_total: 0,
+  disqualified: 0,
   feed: [],
   fresh: {},
   totals: { start: 100, now: 130, max: 500 },
@@ -157,5 +158,10 @@ describe("the day's leaderboard", () => {
     expect(t).toContain("15:00"); // a quarter of an hour left
     for (const label of ["Last pull request", "Demo sign-up closes", "Last merge", "Demos", "The reveal"]) expect(t).toContain(label);
     expect(t).toContain("passed"); // counting started at 09:00
+  });
+
+  it("says how many participants were disqualified, never who", () => {
+    expect(text({ ...base, disqualified: 1 })).toContain("1 participant disqualified");
+    expect(text(base)).not.toContain("disqualified");
   });
 });

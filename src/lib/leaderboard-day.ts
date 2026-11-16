@@ -95,6 +95,8 @@ export interface LeaderboardPayload {
   checks: CheckRow[];
   /** How many repos have LLM checks. */
   checks_total: number;
+  /** How many participants the organisers disqualified. The public sees the number, never the names. */
+  disqualified: number;
   feed: FeedItem[];
   /** Per repo: standards in place now that were not at the start. The board makes them glow. */
   fresh: Record<string, string[]>;
@@ -264,11 +266,22 @@ export function buildLeaderboard(input: DayInput): LeaderboardPayload {
   let best = score.best_agent.map(repoRow);
   let improved = score.most_improved.map(repoRow);
   let people = score.top_contributor.slice(0, 8).map(personRow);
-  let proposals = proposalRows((admin || revealing ? input.allProposals : input.proposals) ?? [], admin);
-  const checksDoc = input.checks ?? EMPTY_CHECKS;
+  // A disqualified participant wins nothing: no credit in track 1 (scoreDay), no proposal in track 2 and no place in
+  // track 3. The admin keeps seeing everything.
+  const out = new Set(input.state.disqualified.map((login) => login.toLowerCase()));
+  const isOut = (login: string) => out.has(login.toLowerCase());
+  const allowed = <T extends { author: string }>(ps: T[]): T[] => (admin ? ps : ps.filter((p) => !isOut(p.author)));
+  let proposals = proposalRows(allowed((admin || revealing ? input.allProposals : input.proposals) ?? []), admin);
+  const rawChecks = input.checks ?? EMPTY_CHECKS;
+  const keptChecks = rawChecks.candidates
+    .map((c) => ({ ...c, authors: c.authors.filter((a) => !isOut(a)) }))
+    .filter((c, i) => c.authors.length > 0 || rawChecks.candidates[i].authors.length === 0);
+  const checksDoc: ChecksDoc = admin
+    ? rawChecks
+    : { ...rawChecks, candidates: keptChecks, places: Object.fromEntries(Object.entries(rawChecks.places).filter(([repo]) => keptChecks.some((c) => c.repo === repo))) };
   let checks = checkRows(checksDoc, admin ? "admin" : revealing ? "reveal" : "public");
   const prize: Track1Prize = input.prize ?? TRACK1_PRIZE;
-  const placed = Object.keys(checksDoc.places).filter((repo) => checksDoc.candidates.some((c) => c.repo === repo)).length;
+  const placed = Object.keys(rawChecks.places).filter((repo) => keptChecks.some((c) => c.repo === repo)).length;
   const steps = revealSteps(people.length, (prize === "most_improved" ? best : improved).length, placed, proposals.length, (prize === "most_improved" ? improved : best).length);
   const revealTotal = steps.reduce((n, x) => n + x, 0);
   let reveal: LeaderboardPayload["reveal"] = null;
@@ -310,6 +323,7 @@ export function buildLeaderboard(input: DayInput): LeaderboardPayload {
     proposals,
     checks,
     checks_total: checksDoc.candidates.filter((c) => c.llm > 0).length,
+    disqualified: input.state.disqualified.length,
     // While frozen the feed still says who landed what, without the levels the public may not see yet.
     feed: score.feed.slice(0, FEED),
     fresh: phase === "before" ? {} : fresh(input.board, input.histories, d),

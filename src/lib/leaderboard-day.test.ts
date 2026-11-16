@@ -129,6 +129,26 @@ describe("the public view", () => {
     const p = buildLeaderboard(input({ state: { ...STATE, disqualified: ["person-2"] }, view: "admin" }));
     expect(p.top_contributor.map((r) => r.login)).not.toContain("person-2");
   });
+
+  it("a disqualified participant wins nothing in any track, whatever the capitals in the login", () => {
+    const proposal = (author: string, score: number) => ({ repo: "agent-template", number: score, title: `By ${author}`, author, url: `https://github.com/SAAF-Project/agent-template/pull/${score}`, kind: "change", score, verdict: "adopt", feedback: null, flags: [], gradedAt: at("12:00") });
+    const candidate = (repo: string, authors: string[]) => ({ repo, authors, title: repo, llm: 3, code: 0, score: 0, feedback: null, flags: [], firstAt: at("12:00") });
+    const proposals = [proposal("person-2", 14), proposal("person-3", 9)];
+    const checks = { candidates: [candidate("example-agent", ["person-2"]), candidate("sample-service", ["person-2", "person-3"])], places: { "example-agent": 1, "sample-service": 2 }, updatedAt: at("13:00") };
+    const state = { ...STATE, disqualified: ["Person-2"] };
+    const pub = buildLeaderboard(input({ state, proposals, allProposals: proposals, checks }));
+    expect(pub.disqualified).toBe(1);
+    expect(pub.top_contributor.map((r) => r.login)).not.toContain("person-2");
+    expect(pub.proposals.map((r) => r.author)).toEqual(["person-3"]);
+    expect(pub.checks.map((c) => [c.repo, c.authors])).toEqual([["sample-service", ["person-3"]]]);
+    expect(JSON.stringify(pub)).not.toContain("Person-2");
+    // the organisers keep seeing everything, and the prize-giving has no step for the place that fell away
+    const admin = buildLeaderboard(input({ state, proposals, allProposals: proposals, checks, view: "admin" }));
+    expect(admin.proposals.map((r) => r.author)).toContain("person-2");
+    expect(admin.checks.map((c) => c.repo)).toContain("example-agent");
+    const clean = buildLeaderboard(input({ proposals, allProposals: proposals, checks, view: "admin" }));
+    expect(admin.admin!.reveal_total).toBeLessThan(clean.admin!.reveal_total);
+  });
 });
 
 describe("the admin view", () => {

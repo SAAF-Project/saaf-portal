@@ -17,7 +17,11 @@ type DemoState = {
   secondsPerTeam: number;
   teams: Entry[];
   schedule: Slot[] | null;
+  /** The organiser before the opening: the page then offers both views. */
+  organiser?: boolean;
 };
+/** Before the assignment opens the sign-up answers with this instead. */
+type NotOpen = { notOpen: true; opens: string; organiser: boolean; session: { id: string; label: string } };
 
 const kindLabel = (kind: DemoKind | ""): string => {
   const track = trackOfKind(kind);
@@ -27,6 +31,10 @@ const field = "bg-bg border border-border rounded-lg px-3 py-2 text-sm";
 
 export default function DemoPage() {
   const [state, setState] = useState<DemoState | null>(null);
+  const [closed, setClosed] = useState<NotOpen | null>(null);
+  // ?view=member: the organiser looks at the page the way a member sees it.
+  const [asMember] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("view") === "member");
+  const api = asMember ? "/api/demo?view=member" : "/api/demo";
   const [kind, setKind] = useState<DemoKind | "">("");
   const [team, setTeam] = useState("");
   const [title, setTitle] = useState("");
@@ -37,7 +45,9 @@ export default function DemoPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  function apply(data: DemoState) {
+  function apply(data: DemoState | NotOpen) {
+    if ("notOpen" in data) return setClosed(data);
+    setClosed(null);
     setState(data);
     const mine = data.teams.find((t) => t.mine);
     if (mine) {
@@ -52,15 +62,15 @@ export default function DemoPage() {
   }
 
   async function reload() {
-    const res = await fetch("/api/demo");
+    const res = await fetch(api);
     if (res.ok) apply(await res.json());
   }
 
   useEffect(() => {
     let active = true;
-    fetch("/api/demo")
+    fetch(api)
       .then((res) => (res.ok ? res.json() : null))
-      .then((data: DemoState | null) => {
+      .then((data: DemoState | NotOpen | null) => {
         if (active && data) apply(data);
       });
     return () => {
@@ -101,8 +111,38 @@ export default function DemoPage() {
   const mine = state?.teams.find((t) => t.mine);
   const closes = state ? new Date(state.session.lockAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) : "16:00";
 
+  const organiserNote = (state?.organiser || closed?.organiser) && (
+    <p className="mb-6 px-4 py-3 rounded-lg border border-dashed border-border text-sm flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+      <span>{asMember ? "Participant view: this is what members see until 09:00 on 17 November." : "Organiser view: members see this page from 09:00 on 17 November."}</span>
+      <a href={asMember ? "/demo" : "/demo?view=member"} className="text-accent hover:underline whitespace-nowrap">
+        {asMember ? "Back to the organiser view" : "View as participant"}
+      </a>
+    </p>
+  );
+
+  if (closed) {
+    return (
+      <div className="max-w-[640px] mx-auto py-8">
+        {organiserNote}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/brand/saaf-lockup-ink.png" alt="SAAF, Shared Audit Agents Framework" className="h-6 w-auto mb-8 dark:invert" />
+        <p className="text-xs font-mono text-muted mb-2">{closed.session.label}</p>
+        <h1 className="text-2xl font-medium mb-3">Demo sign-up opens at {closed.opens}.</h1>
+        <p className="text-sm text-muted leading-relaxed">It opens together with the assignment of the day, on Tuesday 17 November.</p>
+      </div>
+    );
+  }
+  if (!state) {
+    return (
+      <div className="max-w-[640px] mx-auto py-8">
+        <p className="text-sm text-muted">Loading the demo sign-up.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-[640px] mx-auto py-8">
+      {organiserNote}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/brand/saaf-lockup-ink.png" alt="SAAF, Shared Audit Agents Framework" className="h-6 w-auto mb-8 dark:invert" />
       <p className="text-xs font-mono text-muted mb-2">{state?.session.label ?? "Hardening day · 17 November 2026"}</p>
@@ -162,9 +202,9 @@ export default function DemoPage() {
             </label>
             <input id="repo" value={repo} onChange={(e) => setRepo(e.target.value)} maxLength={200} required={kind === "checks"} placeholder="SAAF-Project/my-agent" className={`${field} font-mono`} disabled={state?.locked} />
             <label className="text-sm font-medium" htmlFor="link">
-              Pull request <span className="text-muted font-normal">{kind === "standard" ? "(your proposal, required)" : "(optional)"}</span>
+              Pull requests <span className="text-muted font-normal">{kind === "standard" ? "(your proposal first, required; one per line)" : "(optional; one per line)"}</span>
             </label>
-            <input id="link" value={link} onChange={(e) => setLink(e.target.value)} maxLength={200} required={kind === "standard"}
+            <textarea id="link" value={link} onChange={(e) => setLink(e.target.value)} maxLength={700} required={kind === "standard"} rows={2}
               placeholder="https://github.com/SAAF-Project/agent-template/pull/12" className={`${field} font-mono`} disabled={state?.locked} />
             <p className="text-xs text-muted">The organisers read the lesson and the pitch; others see only your team and title.</p>
             {!state?.locked && (
