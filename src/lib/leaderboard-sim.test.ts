@@ -1,3 +1,4 @@
+import { writeFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { LEVEL_MAX, POINTS, pointsAt, scoreDay, type DayStep, type Levels, type RepoDay } from "./leaderboard";
 
@@ -23,7 +24,6 @@ function rng(seed: number) {
   };
 }
 type Rand = ReturnType<typeof rng>;
-const pick = <T,>(r: Rand, xs: T[]): T => xs[Math.floor(r() * xs.length)];
 const draw = (r: Rand, dist: number[]): number => {
   let x = r();
   for (let i = 0; i < dist.length; i++) if ((x -= dist[i]) < 0) return i;
@@ -304,7 +304,7 @@ describe("simulation: 100 kinds of participant", () => {
       average_margin_points: margins / DAYS,
       points: POINTS,
     };
-    if (process.env.SIM_REPORT) require("node:fs").writeFileSync(process.env.SIM_REPORT, JSON.stringify(report, null, 1));
+    if (process.env.SIM_REPORT) writeFileSync(process.env.SIM_REPORT, JSON.stringify(report, null, 1));
 
     // fair: care wins, speed and tricks do not
     expect(careful).toBeGreaterThanOrEqual(0.8);

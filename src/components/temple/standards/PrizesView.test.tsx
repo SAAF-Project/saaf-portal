@@ -1,104 +1,93 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import type { PrizeRow, PrizesPayload } from "../../../lib/standards-prizes";
+import type { LeaderboardPayload, PersonRow, RepoRow } from "../../../lib/leaderboard-day";
 import PrizesView, { RULES } from "./PrizesView";
-import { STANDARDS } from "./standards";
 
-const IDS = STANDARDS.map((s) => s.id);
-const base: PrizesPayload = {
+const base: LeaderboardPayload = {
   phase: "during",
+  view: "public",
   start: "2026-11-17T08:00:00Z",
   end: "2026-11-17T15:15:00Z",
+  freeze: "2026-11-17T14:15:00Z",
   computed_at: "2026-11-17T11:00:00Z",
-  first_nine: [],
-  closest: [],
-  biggest_jump: [],
-  people: [],
-  people_total: 0,
-  finished: 0,
-  new_repos: [],
-  standards: { start: 196, now: 212 },
+  frozen: false,
+  reveal: null,
+  best_agent: [],
+  most_improved: [],
+  top_contributor: [],
+  feed: [],
   fresh: {},
+  totals: { start: 100, now: 130, max: 500 },
+  graded: { states: 10, pending: 2, last_at: "2026-11-17T12:30:00Z" },
   unread: 0,
 };
-const row = (name: string, before: number, after: number, by: string[] = [], reached_at: string | null = null): PrizeRow => ({
+const repo = (name: string, before: number, after: number, by: string[] = [], masked = false): RepoRow => ({
   name,
   url: `https://github.com/SAAF-Project/${name}`,
+  made_today: false,
   before,
   after,
-  jump: after - before,
-  reached_at,
-  settled_at: reached_at,
+  gain: after - before,
   by,
-  had: IDS.slice(0, before),
-  added: IDS.slice(before, after),
+  levels: { readme: 3, tests: 2 },
+  masked,
 });
-const html = (p: PrizesPayload | null) => renderToStaticMarkup(<PrizesView payload={p} />);
-const text = (p: PrizesPayload | null) => html(p).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+const person = (login: string, points: number, masked = false): PersonRow => ({
+  login,
+  points,
+  capped: 0,
+  repos: ["sample-service"],
+  contributions: [{ login, repo: "sample-service", standard: "readme", from: 1, to: 3, points: 8, at: "2026-11-17T10:42:00Z", url: "https://github.com/SAAF-Project/sample-service/pull/7" }],
+  masked,
+});
+const html = (p: LeaderboardPayload | null) => renderToStaticMarkup(<PrizesView payload={p} />);
+const text = (p: LeaderboardPayload | null) => html(p).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 
 describe("the day's leaderboard", () => {
   it("draws nothing without data", () => {
     expect(html(null)).toBe("");
   });
 
-  it("before the day: says when counting starts, and shows the rules", () => {
-    const t = text({ ...base, phase: "before", standards: null });
-    expect(t).toContain("Counting starts at");
+  it("before the day: the three prizes and the rules", () => {
+    const t = text({ ...base, phase: "before", totals: null });
+    expect(t).toContain("best agent, most improved and top contributor");
     expect(t).toContain("How you get on the leaderboard.");
-    for (const rule of RULES) expect(t).toContain(rule.replace(/'/g, "&#x27;").slice(0, 40));
-    expect(t).not.toContain("Biggest jump");
+    expect(RULES).toHaveLength(9);
   });
 
-  it("during the day: the first prize large, with the second it was reached and who did it", () => {
+  it("during the day: best agent large, most improved, people with what they added, and the feed", () => {
     const t = text({
       ...base,
-      first_nine: [row("sample-service", 3, 9, ["alice", "bob"], "2026-11-17T10:42:07Z"), row("example-agent", 5, 9, [], "2026-11-17T11:00:00Z")],
-      finished: 2,
+      best_agent: [repo("sample-service", 10, 30, ["alice"]), repo("example-agent", 8, 20)],
+      most_improved: [repo("sample-service", 10, 30, ["alice"])],
+      top_contributor: [person("alice", 12)],
+      feed: [{ at: "2026-11-17T10:42:00Z", login: "alice", repo: "sample-service", changes: [{ standard: "readme", from: 1, to: 3 }], pending: false, url: null }],
     });
-    expect(t).toContain("First prize");
+    expect(t).toContain("Best agent");
     expect(t).toContain("sample-service");
-    expect(t).toMatch(/All nine at \d\d:42:07 · \+6 since/);
-    expect(t).toContain("@alice");
-    expect(t).toContain("@bob");
-    expect(t).toMatch(/02 example-agent \d\d:00:00/);
-    expect(t).toContain("2 agents reached all nine today");
+    expect(t).toContain("30 points · +20 today");
+    expect(t).toContain("@alice in 1 repo");
+    expect(t).toContain("sample-service · README.md 1 → 3");
+    expect(t).toContain("+30 points added since");
+    expect(t).toContain("@alice in sample-service README.md 1 → 3");
   });
 
-  it("before anyone has all nine: names the closest repos", () => {
-    const t = text({ ...base, closest: [row("example-agent", 2, 8), row("sample-service", 1, 7)] });
-    expect(t).toContain("Nobody has all nine yet.");
-    expect(t).toContain("Closest now: example-agent , 8 of 9.");
-    expect(t).toContain("sample-service · 7 of 9");
-  });
-
-  it("the biggest jumps, the people who added most, and the new repos", () => {
-    const p: PrizesPayload = {
+  it("frozen: hidden places say when they are revealed, the feed waits", () => {
+    const t = text({
       ...base,
-      biggest_jump: [row("sample-service", 3, 9, ["alice", "bob"]), row("example-agent", 2, 5)],
-      people: [
-        { login: "alice", added: 7, repos: ["sample-service", "example-agent"], last_at: "2026-11-17T10:00:00Z" },
-        { login: "bob", added: 1, repos: ["sample-service"], last_at: "2026-11-17T10:00:00Z" },
-      ],
-      people_total: 2,
-      new_repos: [{ name: "fresh-agent", url: "https://github.com/SAAF-Project/fresh-agent", met: 9 }],
-    };
-    const t = text(p);
-    expect(t).toContain("+16 standards added since");
-    expect(t).toContain("2 people on the board");
-    expect(t).toContain("@alice · @bob");
-    expect(t).toContain("+6 3 → 9");
-    expect(t).toContain("+3 2 → 5");
-    expect(t).toContain("@alice in 2 repos 7");
-    expect(t).toContain("@bob in 1 repo 1");
-    expect(t).toContain("fresh-agent 9/9");
-    // what came in today glows in the small faces: six for sample-service, three for example-agent
-    expect(html(p).match(/std-glow/g)).toHaveLength(9);
+      frozen: true,
+      best_agent: [repo("?", 0, 0, [], true)],
+      top_contributor: [person("?", 0, true), person("bob", 3)],
+      feed: [{ at: "2026-11-17T14:40:00Z", login: "carol", repo: "sample-service", changes: [], pending: true, url: null }],
+    });
+    expect(t).toContain("Frozen at");
+    expect(t).toContain("Revealed at the prize-giving.");
+    expect(t).toContain("Landed. Judged at the reveal.");
+    expect(t).toContain("@bob");
   });
 
-  it("after the day: marked final, and says when a repo could not be read", () => {
-    const t = text({ ...base, phase: "after", unread: 2 });
-    expect(t).toContain("Final, counted at");
-    expect(t).toContain("2 repos not read yet");
-    expect(t).toContain("Nobody reached all nine.");
+  it("the reveal: says how far it is", () => {
+    const t = text({ ...base, phase: "after", reveal: { step: 3, total: 13 } });
+    expect(t).toContain("The reveal: 3 of 13 places");
   });
 });

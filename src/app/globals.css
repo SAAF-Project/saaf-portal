@@ -158,3 +158,11 @@ input[type="range"]::-webkit-slider-thumb {
 @keyframes std-glow-in {
   from { box-shadow: 0 0 0 0 transparent; }
 }
+
+/* The reveal on the big screen: a place that is revealed fades in once. */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal-once { animation: reveal-once 1.1s ease-out 1 both; }
+}
+@keyframes reveal-once {
+  from { opacity: 0; transform: translateY(4px); }
+}

@@ -1,128 +1,106 @@
-import type { PersonRow, PrizeRow, PrizesPayload } from "../../../lib/standards-prizes";
+import type { FeedItem } from "../../../lib/leaderboard";
+import type { LeaderboardPayload, PersonRow, RepoRow } from "../../../lib/leaderboard-day";
 import { STANDARDS } from "./standards";
 import { clock } from "./StandardsView";
 
-// The day's leaderboard above the standards board: the first prize large, then the biggest jumps, the people who added
-// the most standards, the new repos, and the rules. Pure: it draws the payload it is given (StandardsBoard.tsx fetches
-// it), so it can be rendered in a test. The portal works it all out from GitHub's history (src/lib/standards-prizes.ts).
+// The day's leaderboard above the standards board: best agent large, then most improved, top contributor (who added
+// what, per person) and the live feed, with the rules. Pure: it draws the payload it is given (StandardsBoard.tsx
+// fetches it), so it can be rendered in a test. The scores come from a review agent that grades the content of every
+// standard (src/lib/leaderboard.ts); from 15:15 the top places are hidden until the organisers reveal them.
 
-/** Time of day to the second, in the viewer's own time zone: "11:47:12". The first prize is decided by seconds. */
-const exact = (iso: string): string => new Date(iso).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+const LABEL: Record<string, string> = Object.fromEntries(STANDARDS.map((s) => [s.id, s.label]));
+const SCORED = ["readme", "agent-yaml", "audit-criteria", "tests", "ci", "dependencies", "licence", "codeowners"];
+const MAX: Record<string, number> = { readme: 3, "agent-yaml": 3, "audit-criteria": 3, tests: 3, ci: 3, dependencies: 2, licence: 1, codeowners: 1 };
 
 export const RULES: string[] = [
-  "Fix a standard in an agent repo that existed before 09:00. It counts once it lands on the default branch between 09:00 and 16:15.",
-  "Work on as many repos as you like. Every standard you add counts towards your own score, across all repos.",
-  "A merged pull request counts for the person who opened it, whoever presses merge. A direct push counts for whoever pushed.",
-  "Two people fix the same standard in the same repo: the first to land counts and the second adds nothing new. Split the work before you start.",
-  "A standard must still be in place at 16:15. Removed and put back, it stays with whoever added it first.",
-  "Times are GitHub's own push and merge times, to the second. Commit dates do not count. A tie goes to whoever got there first.",
-  "Bots do not count. New repos made today, and empty or placeholder files, are judged by the organisers.",
+  "Improve an agent repo. A standard counts once it lands on the default branch between 09:00 and 16:15; a pull request opened before 16:15 still counts if it is merged by 16:45.",
+  "A review agent scores the content of every standard at 13:30, 15:00 and 16:15. It must quote your files as evidence; a level without a real quote does not stand.",
+  "Points rise with each level and the last step counts most: one README taken to level 3 beats four READMEs at level 1.",
+  "You get the points you add: the rise of a level, by as much as it still stands at 16:15. Improving someone else's file counts for what you improved; removing a file and putting it back counts for nothing.",
+  "Licence, dependencies, CODEOWNERS and CI count for at most 6 points per person, so copying them into many repos does not win.",
+  "Copied, empty or nonsense files score 0. Text that tries to steer the review agent disqualifies you.",
+  "SECURITY.md is arranged by Stichting SAAF for every repo and counts for nobody.",
+  "A merged pull request counts for its author, a direct push for whoever pushed. Bots do not count. Times are GitHub's own; a tie goes to whoever got there first.",
+  "From 15:15 the top places are hidden. The result is revealed at the prize-giving.",
 ];
 
-/** A repo as one face of nine: what it had at the start, what came in today (glowing), and what is still missing. */
-function Face({ had, added, size, onPanel = false }: { had: string[]; added: string[]; size: "sm" | "lg"; onPanel?: boolean }) {
-  const cell = size === "lg" ? "w-7 h-7 sm:w-9 sm:h-9 rounded-md" : "w-2.5 h-2.5 rounded-[2px]";
-  const gap = size === "lg" ? "gap-1.5 sm:gap-2" : "gap-[3px]";
-  return (
-    <span role="img" aria-label={`${had.length + added.length} of ${STANDARDS.length} standards, ${added.length} added today`} className={`inline-grid grid-cols-3 ${gap} shrink-0`}>
-      {STANDARDS.map((s) => {
-        const state = added.includes(s.id) ? "added" : had.includes(s.id) ? "had" : "missing";
-        const look =
-          state === "added"
-            ? "std-glow border"
-            : state === "had"
-              ? onPanel
-                ? "bg-[color-mix(in_srgb,var(--on-panel)_45%,transparent)]"
-                : "bg-accent/40"
-              : onPanel
-                ? "border border-[color-mix(in_srgb,var(--on-panel)_25%,transparent)]"
-                : "border border-muted/60";
-        return <span key={s.id} title={`${s.label}: ${state === "added" ? "added today" : state === "had" ? "in place" : "missing"}`} className={`${cell} ${look}`} />;
-      })}
-    </span>
-  );
-}
-
 function Avatar({ login, size = 28 }: { login: string; size?: number }) {
+  if (login === "?") return <span className="inline-block rounded-md bg-surface2 shrink-0" style={{ width: size, height: size }} />;
   return (
     // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={`https://github.com/${encodeURIComponent(login)}.png?size=${size * 2}`}
-      alt=""
-      width={size}
-      height={size}
-      loading="lazy"
-      className="rounded-md bg-surface2 shrink-0"
-      style={{ width: size, height: size }}
-    />
+    <img src={`https://github.com/${encodeURIComponent(login)}.png?size=${size * 2}`} alt="" width={size} height={size} loading="lazy" className="rounded-md bg-surface2 shrink-0" style={{ width: size, height: size }} />
   );
 }
 
-/** Who did it, as faces and handles. */
-function People({ logins, onPanel = false }: { logins: string[]; onPanel?: boolean }) {
-  if (logins.length === 0) return null;
+/** The eight scored standards of a repo as small bars: how far each one is. */
+function Levels({ levels, onPanel = false }: { levels: Record<string, number | undefined>; onPanel?: boolean }) {
   return (
-    <ul className="flex flex-wrap gap-x-4 gap-y-2 mt-4" aria-label="Credited">
-      {logins.map((l) => (
-        <li key={l} className={`flex items-center gap-2 text-sm font-mono ${onPanel ? "" : "text-muted"}`}>
-          <Avatar login={l} size={onPanel ? 28 : 20} />@{l}
-        </li>
-      ))}
+    <ul className="grid grid-cols-4 gap-1.5 w-[184px] shrink-0" aria-label="Levels per standard">
+      {SCORED.map((id) => {
+        const lv = levels[id] ?? 0;
+        return (
+          <li key={id} title={`${LABEL[id] ?? id}: ${lv} of ${MAX[id]}`} className="flex gap-[2px] h-3">
+            {Array.from({ length: MAX[id] }, (_, i) => (
+              <span
+                key={i}
+                className={`flex-1 rounded-[2px] ${i < lv ? "std-glow" : onPanel ? "bg-[color-mix(in_srgb,var(--on-panel)_18%,transparent)]" : "bg-border"}`}
+              />
+            ))}
+          </li>
+        );
+      })}
     </ul>
   );
 }
 
-function FirstPrize({ payload }: { payload: PrizesPayload }) {
-  const [winner, ...next] = payload.first_nine;
-  const lead = winner ?? payload.closest[0] ?? null;
-  const final = payload.phase === "after";
+function Hidden({ label }: { label: string }) {
+  return <span className="font-mono text-muted">? · {label}</span>;
+}
+
+function BestAgent({ p }: { p: LeaderboardPayload }) {
+  const [lead, ...rest] = p.best_agent;
+  const final = p.phase === "after" && (!p.reveal || p.reveal.step >= p.reveal.total) && !p.frozen;
   return (
     <div className="rounded-2xl p-6 sm:p-8 mb-8" style={{ background: "var(--panel)", color: "var(--on-panel)" }}>
       <div className="grid gap-6 md:grid-cols-[1fr_auto] items-center">
         <div className="min-w-0">
-          <p className="font-mono text-xs opacity-70 mb-3">
-            First prize · {final ? "winner" : "first existing agent to meet all nine standards"}
-          </p>
-          {winner ? (
+          <p className="font-mono text-xs opacity-70 mb-3">Best agent · highest score at 16:15{final ? " · winner" : ""}</p>
+          {!lead ? (
+            <p className="text-3xl sm:text-4xl font-medium leading-tight">No agent has gained enough yet.</p>
+          ) : lead.masked ? (
             <>
-              <a href={winner.url} target="_blank" rel="noopener noreferrer" style={{ color: "inherit" }} className="block text-4xl sm:text-5xl font-medium leading-[1.05] [overflow-wrap:anywhere]">
-                {winner.name}
-              </a>
-              <p className="mt-3 text-base opacity-80">
-                All nine at <span className="font-mono">{winner.reached_at ? exact(winner.reached_at) : ""}</span> · +{winner.jump} since {clock(payload.start)}
-              </p>
-              <People logins={winner.by} onPanel />
+              <p className="text-5xl sm:text-6xl font-medium leading-none">?</p>
+              <p className="mt-3 text-base opacity-80">Revealed at the prize-giving.</p>
             </>
           ) : (
-            <>
-              <p className="text-3xl sm:text-4xl font-medium leading-tight">{final ? "Nobody reached all nine." : "Nobody has all nine yet."}</p>
-              {lead && (
-                <p className="mt-3 text-base opacity-80">
-                  Closest {final ? "at the end" : "now"}: <span className="font-medium">{lead.name}</span>, {lead.after} of {STANDARDS.length}.
-                  {!final && " The first to get there wins."}
-                </p>
-              )}
-              {payload.closest.length > 1 && (
-                <ul className="mt-3 text-sm opacity-70 font-mono">
-                  {payload.closest.slice(1).map((r) => (
-                    <li key={r.name}>
-                      {r.name} · {r.after} of {STANDARDS.length}
+            <div key={lead.name} className="reveal-once">
+              <a href={lead.url} target="_blank" rel="noopener noreferrer" style={{ color: "inherit" }} className="block text-4xl sm:text-5xl font-medium leading-[1.05] [overflow-wrap:anywhere]">
+                {lead.name}
+              </a>
+              <p className="mt-3 text-base opacity-80">
+                <span className="font-mono">{lead.after}</span> points · +{lead.gain} today
+              </p>
+              {lead.by.length > 0 && (
+                <ul className="flex flex-wrap gap-x-4 gap-y-2 mt-4">
+                  {lead.by.map((l) => (
+                    <li key={l} className="flex items-center gap-2 text-sm font-mono">
+                      <Avatar login={l} />@{l}
                     </li>
                   ))}
                 </ul>
               )}
-            </>
+            </div>
           )}
         </div>
-        {lead && <Face had={lead.had} added={lead.added} size="lg" onPanel />}
+        {lead && !lead.masked && <Levels levels={lead.levels} onPanel />}
       </div>
-      {next.length > 0 && (
+      {rest.length > 0 && (
         <ol className="mt-6 border-t border-[color-mix(in_srgb,var(--on-panel)_16%,transparent)]">
-          {next.map((r, i) => (
-            <li key={r.name} className="flex items-baseline gap-4 py-2 border-b border-[color-mix(in_srgb,var(--on-panel)_16%,transparent)] text-sm">
+          {rest.map((r, i) => (
+            <li key={`${r.name}-${i}`} className="flex items-baseline gap-4 py-2 border-b border-[color-mix(in_srgb,var(--on-panel)_16%,transparent)] text-sm">
               <span className="font-mono text-xs opacity-60">{String(i + 2).padStart(2, "0")}</span>
-              <span className="font-medium flex-1 min-w-0 [overflow-wrap:anywhere]">{r.name}</span>
-              <span className="font-mono tabular-nums opacity-80">{r.reached_at ? exact(r.reached_at) : ""}</span>
+              <span className="font-medium flex-1 min-w-0 [overflow-wrap:anywhere]">{r.masked ? "?" : r.name}</span>
+              <span className="font-mono tabular-nums opacity-80">{r.masked ? "" : `${r.after} pts`}</span>
             </li>
           ))}
         </ol>
@@ -131,25 +109,32 @@ function FirstPrize({ payload }: { payload: PrizesPayload }) {
   );
 }
 
-function Jumps({ rows }: { rows: PrizeRow[] }) {
-  if (rows.length === 0) return <p className="text-sm text-muted py-3 border-t border-border">No standards added yet.</p>;
+function Improved({ rows }: { rows: RepoRow[] }) {
+  if (rows.length === 0) return <p className="text-sm text-muted py-3 border-t border-border">No repo has gained points yet.</p>;
   return (
     <ol className="border-t border-border">
       {rows.map((r, i) => (
-        <li key={r.name} className="grid grid-cols-[1.5rem_1fr_auto_auto] gap-x-4 items-center py-3 border-b border-border">
+        <li key={`${r.name}-${i}`} className="grid grid-cols-[1.5rem_1fr_auto] gap-x-4 items-center py-3 border-b border-border">
           <span className="font-mono text-xs text-muted">{String(i + 1).padStart(2, "0")}</span>
-          <span className="min-w-0">
-            <a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: "inherit" }} className="font-medium [overflow-wrap:anywhere]">
-              {r.name}
-            </a>
-            {r.by.length > 0 && <span className="block text-xs font-mono text-muted [overflow-wrap:anywhere]">{r.by.map((l) => `@${l}`).join(" · ")}</span>}
-          </span>
-          <Face had={r.had} added={r.added} size="sm" />
-          <span className="text-right">
-            <span className="block text-2xl font-medium tabular-nums leading-none">+{r.jump}</span>
-            <span className="block text-xs font-mono text-muted mt-1">
-              {r.before} → {r.after}
+          {r.masked ? (
+            <Hidden label="revealed at the prize-giving" />
+          ) : (
+            <span className="min-w-0 reveal-once">
+              <a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: "inherit" }} className="font-medium [overflow-wrap:anywhere]">
+                {r.name}
+              </a>
+              {r.by.length > 0 && <span className="block text-xs font-mono text-muted [overflow-wrap:anywhere]">{r.by.map((l) => `@${l}`).join(" · ")}</span>}
             </span>
+          )}
+          <span className="text-right">
+            {!r.masked && (
+              <>
+                <span className="block text-2xl font-medium tabular-nums leading-none">+{r.gain}</span>
+                <span className="block text-xs font-mono text-muted mt-1">
+                  {r.before} → {r.after}
+                </span>
+              </>
+            )}
           </span>
         </li>
       ))}
@@ -157,21 +142,79 @@ function Jumps({ rows }: { rows: PrizeRow[] }) {
   );
 }
 
-function Leaders({ people }: { people: PersonRow[] }) {
-  if (people.length === 0) return <p className="text-sm text-muted py-3 border-t border-border">Nobody has added a standard yet.</p>;
+function People({ rows }: { rows: PersonRow[] }) {
+  if (rows.length === 0) return <p className="text-sm text-muted py-3 border-t border-border">Nobody has added points yet.</p>;
   return (
     <ol className="border-t border-border">
-      {people.map((p, i) => (
-        <li key={p.login} className="grid grid-cols-[1.5rem_auto_1fr_auto] gap-x-3 items-center py-3 border-b border-border">
-          <span className="font-mono text-xs text-muted">{String(i + 1).padStart(2, "0")}</span>
-          <Avatar login={p.login} size={32} />
-          <span className="min-w-0">
-            <span className="block font-medium [overflow-wrap:anywhere]">@{p.login}</span>
-            <span className="block text-xs font-mono text-muted">
-              in {p.repos.length} {p.repos.length === 1 ? "repo" : "repos"}
+      {rows.map((p, i) =>
+        p.masked ? (
+          <li key={`masked-${i}`} className="grid grid-cols-[1.5rem_auto_1fr] gap-x-3 items-center py-3 border-b border-border">
+            <span className="font-mono text-xs text-muted">{String(i + 1).padStart(2, "0")}</span>
+            <Avatar login="?" size={32} />
+            <Hidden label="revealed at the prize-giving" />
+          </li>
+        ) : (
+          <li key={p.login} className="border-b border-border reveal-once">
+            <details className="group">
+              <summary className="grid grid-cols-[1.5rem_auto_1fr_auto] gap-x-3 items-center py-3 cursor-pointer list-none">
+                <span className="font-mono text-xs text-muted">{String(i + 1).padStart(2, "0")}</span>
+                <Avatar login={p.login} size={32} />
+                <span className="min-w-0">
+                  <span className="block font-medium [overflow-wrap:anywhere]">@{p.login}</span>
+                  <span className="block text-xs font-mono text-muted">
+                    in {p.repos.length} {p.repos.length === 1 ? "repo" : "repos"} · <span className="group-open:hidden">show what</span>
+                    <span className="hidden group-open:inline">hide</span>
+                  </span>
+                </span>
+                <span className="text-2xl font-medium tabular-nums leading-none">{p.points}</span>
+              </summary>
+              <ul className="mb-3 ml-[calc(1.5rem+0.75rem)] text-xs font-mono text-muted">
+                {p.contributions.map((c, j) => (
+                  <li key={j} className="grid grid-cols-[3rem_1fr_auto] gap-x-3 py-1 border-t border-border">
+                    <span>{clock(c.at)}</span>
+                    <span className="[overflow-wrap:anywhere]">
+                      {c.repo} · {LABEL[c.standard] ?? c.standard} {c.from} → {c.to}
+                      {c.url && (
+                        <>
+                          {" · "}
+                          <a href={c.url} target="_blank" rel="noopener noreferrer" className="text-accent">
+                            PR
+                          </a>
+                        </>
+                      )}
+                    </span>
+                    <span className="tabular-nums">+{c.points}</span>
+                  </li>
+                ))}
+                {p.capped > 0 && <li className="py-1 border-t border-border">{p.capped} points from licence, dependencies, CODEOWNERS and CI fell above the cap of 6.</li>}
+              </ul>
+            </details>
+          </li>
+        ),
+      )}
+    </ol>
+  );
+}
+
+function Feed({ items, frozen }: { items: FeedItem[]; frozen: boolean }) {
+  if (items.length === 0) return <p className="text-sm text-muted py-3 border-t border-border">Nothing has landed yet.</p>;
+  return (
+    <ol className="border-t border-border text-sm max-h-[420px] overflow-y-auto">
+      {items.map((f, i) => (
+        <li key={`${f.at}-${f.repo}-${i}`} className="grid grid-cols-[3rem_1fr] gap-x-3 py-2 border-b border-border">
+          <span className="font-mono text-xs text-muted pt-0.5">{clock(f.at)}</span>
+          <span className="min-w-0 [overflow-wrap:anywhere]">
+            {f.login ? <span className="font-mono">@{f.login}</span> : "Someone"} in <span className="font-medium">{f.repo}</span>
+            <span className="block text-xs text-muted">
+              {f.pending
+                ? frozen
+                  ? "Landed. Judged at the reveal."
+                  : "Landed. Waiting for the next review."
+                : f.changes.length === 0
+                  ? "No level changed."
+                  : f.changes.map((c) => `${LABEL[c.standard] ?? c.standard} ${c.from} → ${c.to}`).join(" · ")}
             </span>
           </span>
-          <span className="text-2xl font-medium tabular-nums leading-none">{p.added}</span>
         </li>
       ))}
     </ol>
@@ -184,7 +227,7 @@ function Rules() {
       <summary className="cursor-pointer list-none text-sm font-medium mb-2">
         How you get on the leaderboard. <span className="font-mono text-xs text-muted group-open:hidden">show</span>
       </summary>
-      <ol className="border-t border-border max-w-[760px]">
+      <ol className="border-t border-border max-w-[820px]">
         {RULES.map((r, i) => (
           <li key={i} className="grid grid-cols-[1.5rem_1fr] gap-x-3 py-2 border-b border-border text-sm text-muted leading-relaxed">
             <span className="font-mono text-xs pt-0.5">{i + 1}</span>
@@ -205,7 +248,7 @@ function Stat({ value, label }: { value: string; label: string }) {
   );
 }
 
-export default function PrizesView({ payload }: { payload: PrizesPayload | null }) {
+export default function PrizesView({ payload }: { payload: LeaderboardPayload | null }) {
   if (!payload) return null;
   const startsAt = clock(payload.start);
   const endsAt = clock(payload.end);
@@ -214,63 +257,60 @@ export default function PrizesView({ payload }: { payload: PrizesPayload | null 
     return (
       <section aria-labelledby="prizes-title" className="mb-10">
         <h2 id="prizes-title" className="text-2xl font-medium mb-2">The day&apos;s leaderboard.</h2>
-        <p className="text-sm text-muted leading-relaxed max-w-[680px]">
-          Counting starts at {startsAt} on 17 November and closes at {endsAt}. The portal reads every push and merge from
-          GitHub and keeps the score itself. Standards that come in during the day glow on the board below.
+        <p className="text-sm text-muted leading-relaxed max-w-[720px]">
+          Three prizes: best agent, most improved and top contributor. Counting starts at {startsAt} on 17 November and closes
+          at {endsAt}. A review agent scores the quality of every standard, not only whether the file is there. Standards that come
+          in during the day glow on the board below.
         </p>
         <Rules />
       </section>
     );
   }
 
-  const final = payload.phase === "after";
-  const notes = [final ? `Final, counted at ${endsAt}` : `Live since ${startsAt}${payload.computed_at ? `, counted ${clock(payload.computed_at)}` : ""}, closes at ${endsAt}`];
-  if (payload.unread > 0) notes.push(`${payload.unread} ${payload.unread === 1 ? "repo" : "repos"} not read yet`);
-  const gained = payload.standards ? payload.standards.now - payload.standards.start : 0;
+  const status: string[] = [];
+  if (payload.reveal) status.push(`The reveal: ${payload.reveal.step} of ${payload.reveal.total} places`);
+  else if (payload.frozen) status.push(`Frozen at ${clock(payload.freeze)}, the result is revealed at the prize-giving`);
+  else if (payload.phase === "after") status.push(`Closed at ${endsAt}`);
+  else status.push(`Live since ${startsAt}, closes at ${endsAt}`);
+  if (payload.graded.last_at && !payload.frozen) status.push(`last review ${clock(payload.graded.last_at)}`);
+  if (payload.unread > 0) status.push(`${payload.unread} ${payload.unread === 1 ? "repo" : "repos"} not read yet`);
+  const gained = payload.totals ? payload.totals.now - payload.totals.start : 0;
 
   return (
     <section aria-labelledby="prizes-title" className="mb-10">
       <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 mb-4">
         <h2 id="prizes-title" className="text-2xl font-medium">The day&apos;s leaderboard.</h2>
-        <p className="text-xs font-mono text-muted">{notes.join(" · ")}</p>
+        <p className="text-xs font-mono text-muted">{status.join(" · ")}</p>
       </div>
 
-      <div className="grid sm:grid-cols-3 mb-8 border-y border-border">
-        <Stat value={`${gained >= 0 ? "+" : ""}${gained}`} label={`standards added since ${startsAt}`} />
-        <Stat value={String(payload.people_total)} label={payload.people_total === 1 ? "person on the board" : "people on the board"} />
-        <Stat value={String(payload.finished)} label={payload.finished === 1 ? "agent reached all nine today" : "agents reached all nine today"} />
-      </div>
+      {payload.totals && (
+        <div className="grid sm:grid-cols-3 mb-8 border-y border-border">
+          <Stat value={`${gained >= 0 ? "+" : ""}${gained}`} label={`points added since ${startsAt}`} />
+          <Stat value={String(payload.totals.now)} label={`of ${payload.totals.max} points in place`} />
+          <Stat value={payload.graded.last_at ? clock(payload.graded.last_at) : "–"} label="last review (13:30, 15:00, 16:15)" />
+        </div>
+      )}
 
-      <FirstPrize payload={payload} />
+      <BestAgent p={payload} />
 
       <div className="grid gap-8 lg:grid-cols-2">
         <div>
-          <h3 className="text-base font-medium mb-1">Biggest jump since {startsAt}.</h3>
-          <p className="text-xs text-muted mb-3">Second prize. Standards in place now, minus those at {startsAt}.</p>
-          <Jumps rows={payload.biggest_jump} />
+          <h3 className="text-base font-medium mb-1">Most improved.</h3>
+          <p className="text-xs text-muted mb-3">Points gained since {startsAt} by a repo that existed then.</p>
+          <Improved rows={payload.most_improved} />
         </div>
         <div>
-          <h3 className="text-base font-medium mb-1">Most standards added.</h3>
-          <p className="text-xs text-muted mb-3">Per person, over every repo they worked on.</p>
-          <Leaders people={payload.people} />
+          <h3 className="text-base font-medium mb-1">Top contributor.</h3>
+          <p className="text-xs text-muted mb-3">Points added per person, over every repo. Open a name to see what.</p>
+          <People rows={payload.top_contributor} />
         </div>
       </div>
 
-      {payload.new_repos.length > 0 && (
-        <div className="mt-8">
-          <h3 className="text-base font-medium mb-1">New today.</h3>
-          <p className="text-xs text-muted mb-3">Made during the day, so outside the count. The organisers judge these.</p>
-          <ul className="flex flex-wrap gap-2">
-            {payload.new_repos.map((r) => (
-              <li key={r.name}>
-                <a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: "inherit" }} className="inline-flex items-center gap-3 rounded-lg border border-border px-3 py-2 text-sm">
-                  {r.name} <span className="font-mono text-xs text-muted">{r.met}/9</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <div className="mt-8">
+        <h3 className="text-base font-medium mb-1">Just landed.</h3>
+        <p className="text-xs text-muted mb-3">Every merge and push on a default branch today, with the levels from the last review.</p>
+        <Feed items={payload.feed} frozen={payload.frozen} />
+      </div>
 
       <Rules />
     </section>

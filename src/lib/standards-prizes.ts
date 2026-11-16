@@ -110,44 +110,66 @@ const IDS = STANDARDS.map((s) => s.id);
 const metIds = (c: Checks): string[] => IDS.filter((id) => c[id] === true);
 
 /** One state of the default branch during the day: when GitHub put it there, who gets the credit, what was in place. */
-interface Step {
+export interface Step {
   at: string;
   login: string | null;
   checks: Checks;
+  /** The tree SHA of this state: the grader's levels are kept per tree. */
+  tree: string | null;
+  /** For a merged pull request: when it was opened, and its page. */
+  opened_at: string | null;
+  url: string | null;
 }
 
 /** The default branch at the start, and every state it went through after the start, oldest first. */
-interface History {
+export interface History {
   start: Checks;
+  startTree: string | null;
   steps: Step[];
 }
 
-// The nine answers per tree or commit SHA. A SHA never changes, so an answer is kept once it is complete.
-const shaChecks = new Map<string, Checks>();
+interface Seen {
+  checks: Checks;
+  tree: string | null;
+}
 
-/** The nine answers for one commit or tree SHA. `null` = no answer, or an answer with a standard that cannot be told. */
-async function checksOf(name: string, sha: string, token: string, fetchImpl: Fetch): Promise<Checks | null> {
-  if (ZERO_SHA.test(sha)) return NOTHING;
+// The nine answers and the tree SHA per commit or tree SHA. A SHA never changes, so an answer is kept once complete.
+const shaChecks = new Map<string, Seen>();
+
+/** The nine answers for one commit or tree SHA, and its tree SHA. `null` = no answer, or a standard that cannot be told. */
+async function checksOf(name: string, sha: string, token: string, fetchImpl: Fetch): Promise<Seen | null> {
+  if (ZERO_SHA.test(sha)) return { checks: NOTHING, tree: null };
   const kept = shaChecks.get(sha);
   if (kept) return kept;
   const res = await get(repoUrl(name, `git/trees/${sha}?recursive=1`), token, fetchImpl);
-  const body = res.body as { tree?: { path: string; type: string; size?: number }[]; truncated?: boolean } | null;
+  const body = res.body as { sha?: string; tree?: { path: string; type: string; size?: number }[]; truncated?: boolean } | null;
   if (!body || !Array.isArray(body.tree)) return null;
   const files: TreeFile[] = body.tree.filter((e) => e.type === "blob").map((e) => ({ path: e.path, size: typeof e.size === "number" ? e.size : 0 }));
   const checks = evaluateStandards(files, !!body.truncated);
   if (!Object.values(checks).every((v) => v !== null)) return null;
-  shaChecks.set(sha, checks);
-  return checks;
+  const seen = { checks, tree: typeof body.sha === "string" ? body.sha : sha };
+  shaChecks.set(sha, seen);
+  return seen;
 }
 
-/** Pull requests merged into the repo: the SHA GitHub merged them as, and their author. */
-async function mergedPulls(name: string, token: string, fetchImpl: Fetch): Promise<Map<string, string>> {
+interface Pull {
+  login: string;
+  opened_at: string | null;
+  url: string | null;
+}
+
+/** Pull requests merged into the repo, by the SHA GitHub merged them as: author, when opened, its page. */
+async function mergedPulls(name: string, token: string, fetchImpl: Fetch): Promise<Map<string, Pull>> {
   const res = await get(repoUrl(name, `pulls?state=closed&sort=updated&direction=desc&per_page=${PAGE}`), token, fetchImpl);
-  const out = new Map<string, string>();
+  const out = new Map<string, Pull>();
   if (!Array.isArray(res.body)) return out;
-  for (const pr of res.body as { merged_at?: unknown; merge_commit_sha?: unknown; user?: { login?: unknown } }[]) {
+  for (const pr of res.body as { merged_at?: unknown; merge_commit_sha?: unknown; created_at?: unknown; html_url?: unknown; user?: { login?: unknown } }[]) {
     if (typeof pr.merged_at === "string" && typeof pr.merge_commit_sha === "string" && typeof pr.user?.login === "string") {
-      out.set(pr.merge_commit_sha, pr.user.login);
+      out.set(pr.merge_commit_sha, {
+        login: pr.user.login,
+        opened_at: typeof pr.created_at === "string" ? pr.created_at : null,
+        url: typeof pr.html_url === "string" ? pr.html_url : null,
+      });
     }
   }
   return out;
@@ -188,19 +210,19 @@ async function activityHistory(repo: RepoStandards, branch: string, start: strin
   // a full page that does not reach back to the start may miss the first pushes of the day
   if (res.body.length >= PAGE && day.length === all.length) return null;
   if (day.length === 0) {
-    return tally(repo.checks).unknown === 0 ? { start: repo.checks, steps: [] } : null;
+    return tally(repo.checks).unknown === 0 ? { start: repo.checks, startTree: repo.tree_sha ?? null, steps: [] } : null;
   }
-  const pulls = day.some((a) => a.activity_type === "pr_merge") ? await mergedPulls(repo.name, token, fetchImpl) : new Map<string, string>();
-  const startChecks = await checksOf(repo.name, day[0].before, token, fetchImpl);
-  if (!startChecks) return null;
+  const pulls = day.some((a) => a.activity_type === "pr_merge") ? await mergedPulls(repo.name, token, fetchImpl) : new Map<string, Pull>();
+  const first = await checksOf(repo.name, day[0].before, token, fetchImpl);
+  if (!first) return null;
   const steps: Step[] = [];
   for (const a of day) {
-    const checks = await checksOf(repo.name, a.after, token, fetchImpl);
-    if (!checks) return null;
-    const login = a.activity_type === "pr_merge" ? (pulls.get(a.after) ?? a.actor) : a.actor;
-    steps.push({ at: a.timestamp, login, checks });
+    const seen = await checksOf(repo.name, a.after, token, fetchImpl);
+    if (!seen) return null;
+    const pr = a.activity_type === "pr_merge" ? pulls.get(a.after) : undefined;
+    steps.push({ at: a.timestamp, login: pr?.login ?? a.actor, checks: seen.checks, tree: seen.tree, opened_at: pr?.opened_at ?? null, url: pr?.url ?? null });
   }
-  return { start: startChecks, steps };
+  return { start: first.checks, startTree: first.tree, steps };
 }
 
 interface Commit {
@@ -232,7 +254,7 @@ function toCommit(c: unknown): Commit | null {
  */
 async function commitHistory(repo: RepoStandards, start: string, token: string, fetchImpl: Fetch): Promise<History | null> {
   const page = await get(repoUrl(repo.name, `commits?per_page=${PAGE}`), token, fetchImpl);
-  if (page.status === EMPTY_REPO_STATUS) return { start: NOTHING, steps: [] };
+  if (page.status === EMPTY_REPO_STATUS) return { start: NOTHING, startTree: null, steps: [] };
   if (!Array.isArray(page.body) || page.body.length === 0) return null;
   const known = new Map<string, Commit>();
   for (const raw of page.body) {
@@ -254,26 +276,27 @@ async function commitHistory(repo: RepoStandards, start: string, token: string, 
     at = next;
   }
   const oldest = chain[chain.length - 1];
-  const startChecks = oldest && oldest.date <= start ? await checksOf(repo.name, oldest.tree, token, fetchImpl) : NOTHING;
-  if (!startChecks) return null;
+  const first: Seen | null = oldest && oldest.date <= start ? await checksOf(repo.name, oldest.tree, token, fetchImpl) : { checks: NOTHING, tree: null };
+  if (!first) return null;
   const day = chain.filter((c) => c.date > start).reverse();
-  const pulls = day.length > 0 ? await mergedPulls(repo.name, token, fetchImpl) : new Map<string, string>();
+  const pulls = day.length > 0 ? await mergedPulls(repo.name, token, fetchImpl) : new Map<string, Pull>();
   const steps: Step[] = [];
   for (const c of day) {
-    const checks = await checksOf(repo.name, c.tree, token, fetchImpl);
-    if (!checks) return null;
-    steps.push({ at: c.date, login: pulls.get(c.sha) ?? c.author, checks });
+    const seen = await checksOf(repo.name, c.tree, token, fetchImpl);
+    if (!seen) return null;
+    const pr = pulls.get(c.sha);
+    steps.push({ at: c.date, login: pr?.login ?? c.author, checks: seen.checks, tree: seen.tree, opened_at: pr?.opened_at ?? null, url: pr?.url ?? null });
   }
-  return { start: startChecks, steps };
+  return { start: first.checks, startTree: first.tree, steps };
 }
 
 // The history of a repo is kept until it is pushed again.
 const histories = new Map<string, { pushed_at: string | null; history: History }>();
 
 /** The default branch from the start onwards. A repo nobody pushed to since the start costs no call. `null` = not readable. */
-async function historyOf(repo: RepoStandards, start: string, token: string, fetchImpl: Fetch): Promise<History | null> {
+export async function historyOf(repo: RepoStandards, start: string, token: string, fetchImpl: Fetch): Promise<History | null> {
   if (repo.pushed_at && repo.pushed_at <= start) {
-    return tally(repo.checks).unknown === 0 ? { start: repo.checks, steps: [] } : null;
+    return tally(repo.checks).unknown === 0 ? { start: repo.checks, startTree: repo.tree_sha ?? null, steps: [] } : null;
   }
   const kept = histories.get(repo.name);
   if (kept && kept.pushed_at === repo.pushed_at) return kept.history;
@@ -389,7 +412,8 @@ async function compute(board: StandardsPayload, token: string, fetchImpl: Fetch,
   // The board shows the repos as they are now; what is in place now and was not at the start glows.
   const fresh: Record<string, string[]> = {};
   for (const j of read) {
-    const ids = IDS.filter((id) => j.repo.checks[id] === true && j.h.start[id] !== true);
+    // SECURITY.md met by the foundation's policy is nobody's work today: it does not glow.
+    const ids = IDS.filter((id) => j.repo.checks[id] === true && j.h.start[id] !== true && !(id === "security" && j.repo.security_by_org));
     if (ids.length > 0) fresh[j.repo.name] = ids;
   }
   for (const r of made) {

@@ -220,7 +220,8 @@ describe("loadRevived", () => {
       }
       return json(404);
     }) as unknown as typeof fetch;
-    const contentCalls = () => calls.filter((c) => c.includes("/contents/"));
+    // CODEOWNERS reads; the board's one look at the foundation's security policy is not one of them
+    const contentCalls = () => calls.filter((c) => c.includes("/contents/") && !c.includes("/.github/contents/"));
     return { fetchImpl, calls, state, contentCalls };
   }
   const MINUTE = 60_000;
@@ -241,8 +242,8 @@ describe("loadRevived", () => {
     await loadRevived("bob", gh.fetchImpl, "t", () => 40_000, quiet);
     expect(gh.calls.length).toBe(before);
 
-    await loadRevived("ann", gh.fetchImpl, "t", () => 2 * MINUTE, quiet); // the board refreshes: one list call, nothing else
-    expect(gh.calls.length).toBe(before + 1);
+    await loadRevived("ann", gh.fetchImpl, "t", () => 2 * MINUTE, quiet); // the board refreshes: the repo list and the org's security policy, nothing else
+    expect(gh.calls.length).toBe(before + 2);
 
     gh.state.pushed["quiet-agent"] = "2026-11-17T12:00:00Z";
     gh.state.owners["quiet-agent"] = "* @bob\n";

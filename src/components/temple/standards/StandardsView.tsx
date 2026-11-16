@@ -7,7 +7,7 @@ import { summarise, summaryNotes, summaryParts } from "./summary";
 // On the hardening day a standard that came in since 09:00 glows (`fresh`, from the leaderboard); the ones that were
 // already there step back a little, so the day's work is what the eye finds first.
 
-type State = "added today" | "in place" | "missing" | "not checked";
+type State = "added today" | "in place" | "arranged by SAAF" | "missing" | "not checked";
 
 const stateOf = (value: boolean | null | undefined, isFresh = false): State =>
   value === true ? (isFresh ? "added today" : "in place") : value === false ? "missing" : "not checked";
@@ -15,6 +15,7 @@ const stateOf = (value: boolean | null | undefined, isFresh = false): State =>
 const MARK: Record<State, string> = {
   "added today": "std-glow",
   "in place": "bg-accent border-accent",
+  "arranged by SAAF": "border-accent border-dotted bg-accent/15",
   missing: "border-muted",
   "not checked": "border-dashed border-muted",
 };
@@ -58,7 +59,8 @@ export default function StandardsView({
   if (payload.stale) notes.push("GitHub did not answer the last check, so this may be behind");
   const glowing = Object.values(fresh).reduce((n, ids) => n + ids.length, 0);
   const calm = glowing > 0;
-  const key: State[] = calm ? ["added today", "in place", "missing", "not checked"] : ["in place", "missing", "not checked"];
+  const byOrg = repos.some((r) => r.security_by_org);
+  const key: State[] = [...(calm ? (["added today"] as State[]) : []), "in place", ...(byOrg ? (["arranged by SAAF"] as State[]) : []), "missing", "not checked"];
 
   return (
     <>
@@ -126,7 +128,11 @@ export default function StandardsView({
                 </th>
                 {STANDARDS.map((s) => (
                   <td key={s.id} className="text-center py-2">
-                    <Mark state={stateOf(r.checks[s.id], fresh[r.name]?.includes(s.id))} label={s.label} calm={calm} />
+                    <Mark
+                      state={s.id === "security" && r.security_by_org ? "arranged by SAAF" : stateOf(r.checks[s.id], fresh[r.name]?.includes(s.id))}
+                      label={s.label}
+                      calm={calm}
+                    />
                   </td>
                 ))}
                 <td className="hidden sm:table-cell text-right font-mono tabular-nums text-muted py-2">

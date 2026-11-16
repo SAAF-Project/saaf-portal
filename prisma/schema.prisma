@@ -94,3 +94,33 @@ model RepoClaimMember {
 
   @@unique([claimId, userId])
 }
+
+// Hardening day (Session 11, 17 November 2026): the private grader's level for one standard of one state of a repo's
+// default branch, kept per tree SHA. The portal creates this table itself (src/lib/leaderboard-store.ts) with the
+// same columns, so it exists without a migration; keep both in step.
+model ContentGrade {
+  id       String   @id @default(cuid())
+  repo     String
+  tree     String
+  standard String
+  level    Int
+  evidence Json?
+  feedback String?
+  flags    Json?
+  runId    String
+  gradedAt DateTime @default(now())
+  override Int?
+  note     String?
+
+  @@unique([repo, tree, standard])
+}
+
+// The organisers' controls of the day's leaderboard: freeze, the reveal and disqualified logins.
+model LeaderboardState {
+  id           String    @id
+  frozen       Boolean   @default(false)
+  freezeAt     DateTime?
+  revealStep   Int       @default(0)
+  disqualified Json?
+  updatedAt    DateTime  @default(now())
+}

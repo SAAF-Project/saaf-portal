@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import LeaderboardTab from "@/components/admin/LeaderboardTab";
 
 interface SignupRequest {
   id: string;
@@ -41,7 +42,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 export default function AdminPage() {
   const { data: session } = useSession();
   const router = useRouter();
-  const [tab, setTab] = useState<"signups" | "feedback" | "quiz" | "demos" | "pizza">("signups");
+  const [tab, setTab] = useState<"signups" | "feedback" | "quiz" | "demos" | "pizza" | "leaderboard">("signups");
   const [requests, setRequests] = useState<SignupRequest[]>([]);
   const [feedback, setFeedback] = useState<FeedbackItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -141,11 +142,20 @@ export default function AdminPage() {
         >
           Pizza
         </button>
+        <button
+          onClick={() => setTab("leaderboard")}
+          className={`px-4 py-2 text-sm font-semibold cursor-pointer transition-colors border-b-2 ${
+            tab === "leaderboard" ? "text-accent border-accent" : "text-muted border-transparent hover:text-text"
+          }`}
+        >
+          Leaderboard
+        </button>
       </div>
 
       {tab === "quiz" && <QuizTab />}
       {tab === "demos" && <DemosTab />}
       {tab === "pizza" && <PizzaTab />}
+      {tab === "leaderboard" && <LeaderboardTab />}
 
       {tab === "signups" && (
         <SignupsTab requests={requests} pendingCount={pendingSignups.length} />

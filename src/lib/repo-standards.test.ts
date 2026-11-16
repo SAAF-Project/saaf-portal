@@ -32,6 +32,7 @@ function fakeGitHub() {
   const state = {
     failList: false,
     throwAll: false,
+    orgPolicy: false,
     repos: [
       repo("sample-service", { private: true }),
       repo("example-agent"),
@@ -56,6 +57,7 @@ function fakeGitHub() {
     if (state.throwAll) throw new Error("network down");
     const answer = (status: number, body: unknown = null) => ({ ok: status === 200, status, json: async () => body }) as Response;
     if (url.includes("/orgs/SAAF-Project/repos")) return state.failList ? answer(500) : answer(200, state.repos);
+    if (url.endsWith("/repos/SAAF-Project/.github/contents/SECURITY.md")) return state.orgPolicy ? answer(200, { name: "SECURITY.md" }) : answer(404);
     const name = /\/repos\/SAAF-Project\/([^/]+)\/git\/trees\/HEAD\?recursive=1$/.exec(url)?.[1];
     const tree = name ? state.trees[decodeURIComponent(name)] : undefined;
     if (tree === undefined) return answer(404);
@@ -85,6 +87,7 @@ describe("loadRepoStandards", () => {
       pushed_at: "2026-11-01T00:00:00Z",
       created_at: "2026-10-01T00:00:00Z",
       default_branch: "main",
+      tree_sha: null,
       checks: all(true),
     });
     expect(p.repos?.[2]).toMatchObject({ private: true, checks: { ...all(false), readme: true, licence: true } });
@@ -108,10 +111,21 @@ describe("loadRepoStandards", () => {
     const [a, b] = await Promise.all([loadRepoStandards(gh.fetchImpl, "t", () => t), loadRepoStandards(gh.fetchImpl, "t", () => t)]);
     expect(b).toBe(a);
     const first = gh.calls.length;
-    expect(first).toBe(4);
+    expect(first).toBe(5); // the repo list, three file lists and the foundation's security policy
     t = MINUTE - 1;
     expect(await loadRepoStandards(gh.fetchImpl, "t", () => t)).toBe(a);
     expect(gh.calls.length).toBe(first);
+  });
+
+  it("counts SECURITY.md as arranged by the foundation for repos without their own, when the org policy exists", async () => {
+    const gh = fakeGitHub();
+    gh.state.orgPolicy = true;
+    const p = await loadRepoStandards(gh.fetchImpl, "t", () => 0);
+    const sample = p.repos?.find((r) => r.name === "sample-service");
+    const example = p.repos?.find((r) => r.name === "example-agent");
+    expect(sample?.checks.security).toBe(true);
+    expect(sample?.security_by_org).toBe(true);
+    expect(example?.security_by_org).toBeUndefined(); // it has its own SECURITY.md
   });
 
   it("after the minute asks only for the repo list when nothing was pushed", async () => {
