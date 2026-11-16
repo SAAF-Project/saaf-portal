@@ -67,18 +67,62 @@ describe("the public view", () => {
     expect(JSON.stringify(p.top_contributor)).not.toContain("person-4\""); // its late work is not visible, nor its name on top
   });
 
-  it("the reveal shows places from the bottom up, top contributor first and best agent last", () => {
-    expect(revealed(0, [5, 4, 3])).toEqual([0, 0, 0]);
-    expect(revealed(6, [5, 4, 3])).toEqual([5, 1, 0]);
-    expect(revealed(99, [5, 4, 3])).toEqual([5, 4, 3]);
-    const one = buildLeaderboard(input({ now: at("15:40"), state: { ...STATE, revealStep: 1 } }));
-    expect(one.reveal).toEqual({ step: 1, total: one.reveal!.total });
-    const shown = one.top_contributor.filter((r) => !r.masked);
-    expect(shown).toHaveLength(1);
-    expect(one.top_contributor[one.top_contributor.length - 1].masked).toBeFalsy(); // the lowest place comes first
-    const all = buildLeaderboard(input({ now: at("15:40"), state: { ...STATE, revealStep: 99 } }));
+  it("the prize-giving: the two mentions first, then track 3, track 2 and track 1 from the third place up", () => {
+    expect(revealed(0, [1, 1, 3, 3, 3])).toEqual([0, 0, 0, 0, 0]);
+    expect(revealed(3, [1, 1, 3, 3, 3])).toEqual([1, 1, 1, 0, 0]);
+    expect(revealed(99, [1, 1, 2, 0, 3])).toEqual([1, 1, 2, 0, 3]);
+
+    const candidate = (repo: string, llm: number, login: string) => ({ repo, authors: [login], title: repo, llm, code: 1, score: 0, feedback: null, flags: [], firstAt: at("12:00") });
+    const checks = { candidates: [candidate("example-agent", 3, "person-0"), candidate("sample-service", 5, "person-1"), candidate("quiet-agent", 9, "person-3")], places: { "example-agent": 1, "sample-service": 2 }, updatedAt: at("15:20") };
+    const at_step = (revealStep: number, prize?: DayInput["prize"]) => buildLeaderboard(input({ now: at("15:40"), checks, state: { ...STATE, revealStep }, prize }));
+
+    const all = at_step(99);
+    const total = 1 + 1 + 2 + 0 + Math.min(all.most_improved.length, 3);
+    expect(all.reveal).toEqual({ step: total, total });
+    expect(all.prize).toBe("most_improved");
     expect(all.top_contributor[0].login).toBe("person-4"); // the final result counts the late work
-    expect([...all.best_agent, ...all.most_improved, ...all.top_contributor].some((r) => r.masked)).toBe(false);
+    expect(all.most_improved[0].name).toBe("late-agent");
+    expect([...all.best_agent, ...all.most_improved, ...all.top_contributor, ...all.checks].some((r) => r.masked)).toBe(false);
+    expect(all.checks.map((c) => [c.repo, c.place])).toEqual([["example-agent", 1], ["sample-service", 2], ["quiet-agent", null]]); // the jury's places first
+
+    const one = at_step(1); // the top contributors, all at once
+    expect(one.reveal).toEqual({ step: 1, total });
+    expect(one.top_contributor.some((r) => r.masked)).toBe(false);
+    expect(one.best_agent.slice(0, 3).every((r) => r.masked)).toBe(true);
+
+    const two = at_step(2); // the repo list without a prize
+    expect(two.best_agent.some((r) => r.masked)).toBe(false);
+    expect(two.checks.filter((c) => c.masked)).toHaveLength(2);
+
+    const three = at_step(3); // track 3 from the bottom: second place before the winner
+    expect(three.checks[0].masked).toBe(true);
+    expect(three.checks[1]).toMatchObject({ repo: "sample-service", place: 2 });
+    expect(at_step(4).checks[0]).toMatchObject({ repo: "example-agent", place: 1 });
+    expect(at_step(4).most_improved.slice(0, 3).every((r) => r.masked)).toBe(true);
+
+    const five = at_step(5); // track 1: third place first, the winner last
+    expect(five.most_improved[2].masked).toBeFalsy();
+    expect(five.most_improved[0].masked).toBe(true);
+    expect(at_step(total).most_improved[0].masked).toBeFalsy();
+
+    // The switch: with best agent as the prize of track 1, most improved becomes the mention.
+    const switched = at_step(2, "best_agent");
+    expect(switched.prize).toBe("best_agent");
+    expect(switched.most_improved.some((r) => r.masked)).toBe(false);
+    expect(switched.best_agent.slice(0, 3).every((r) => r.masked)).toBe(true);
+  });
+
+  it("track 3: the public sees the repos with checks, most first, and no place before the reveal", () => {
+    const candidate = (repo: string, llm: number) => ({ repo, authors: ["person-1"], title: repo, llm, code: 0, score: 0, feedback: "sharp", flags: ["flag"], firstAt: at("12:00") });
+    const checks = { candidates: [candidate("example-agent", 2), candidate("sample-service", 6), candidate("quiet-agent", 0)], places: { "example-agent": 1 }, updatedAt: at("13:00") };
+    const pub = buildLeaderboard(input({ checks }));
+    expect(pub.checks_total).toBe(2);
+    expect(pub.checks.map((c) => c.repo)).toEqual(["sample-service", "example-agent"]);
+    expect(JSON.stringify(pub.checks)).not.toMatch(/place|feedback|flags|score/);
+    const admin = buildLeaderboard(input({ checks, view: "admin" }));
+    expect(admin.checks.map((c) => [c.repo, c.place])).toEqual([["example-agent", 1], ["sample-service", null], ["quiet-agent", null]]);
+    expect(admin.checks[0].feedback).toBe("sharp");
+    expect(admin.admin?.reveal_total).toBe(1 + 1 + 1 + 0 + Math.min(admin.most_improved.length, 3));
   });
 
   it("disqualified people are left out of the people list", () => {

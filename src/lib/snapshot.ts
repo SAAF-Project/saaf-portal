@@ -33,10 +33,15 @@ export interface SnapshotOptions<T> {
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
+/** Where the last answer on this instance came from, for a response header. */
+export type SnapshotSource = "none" | "shared" | "built" | "not-mine" | "not-usable" | "build-failed" | "waited" | "local";
+
 export interface Snapshot<T> {
   get(): Promise<T>;
   /** Per instance: read the row again on the next call. */
   forget(): void;
+  /** Per instance: how the last value was obtained and how old the shared value was when it was read. */
+  info(): { source: SnapshotSource; ageMs: number | null };
 }
 
 /**
@@ -56,6 +61,10 @@ export function snapshot<T>(
   const waitMs = opts.waitMs ?? 9_000;
   let memo: { at: number; value: Promise<T> } | null = null;
   let own: { at: number; value: T } | null = null;
+  let outcome: { source: SnapshotSource; ageMs: number | null } = { source: "none", ageMs: null };
+  const done = (source: SnapshotSource, ageMs: number | null): void => {
+    outcome = { source, ageMs };
+  };
 
   // Without the store: one build per instance per ttl, never stored for the others.
   async function local(previous: T | null): Promise<T> {
@@ -70,18 +79,25 @@ export function snapshot<T>(
     try {
       row = await store.read<T>(key);
     } catch {
+      done("local", null);
       return local(null);
     }
     const last = row?.value ?? null;
-    if (last !== null && row!.ageMs < opts.ttlMs) return last;
+    const age = row ? row.ageMs : null;
+    if (last !== null && row!.ageMs < opts.ttlMs) {
+      done("shared", age);
+      return last;
+    }
 
     let mine: boolean;
     try {
       mine = await store.claim(key, opts.ttlMs, claimMs);
     } catch {
+      done("local", age);
       return local(last);
     }
     if (!mine) {
+      done(last !== null ? "not-mine" : "waited", age);
       if (last !== null) return last; // someone else is building: serve the last value meanwhile
       // Nothing yet and another instance is building the first value: wait for it instead of doing the same work.
       for (let waited = 0; waited < waitMs; waited += 1_500) {
@@ -96,11 +112,16 @@ export function snapshot<T>(
     try {
       built = await build(last);
     } catch (e) {
+      done("build-failed", age);
       if (last !== null) return last;
       throw e;
     }
-    if (!opts.usable(built)) return last ?? built; // the claim lapses by itself; the next try comes after claimMs
+    if (!opts.usable(built)) {
+      done("not-usable", age);
+      return last ?? built; // the claim lapses by itself; the next try comes after claimMs
+    }
     await store.write(key, built).catch(() => undefined);
+    done("built", 0);
     return built;
   }
 
@@ -117,5 +138,6 @@ export function snapshot<T>(
     forget(): void {
       memo = null;
     },
+    info: () => outcome,
   };
 }

@@ -1,63 +1,32 @@
 import Link from "next/link";
 import AccessRequest from "@/components/AccessRequest";
-import StandardsChecklist from "@/components/temple/standards/StandardsChecklist";
+import CopyPrompt from "@/components/CopyPrompt";
 import ExternalReferences, { type ExternalReference } from "@/components/ExternalReferences";
+import StandardsChecklist from "@/components/temple/standards/StandardsChecklist";
+import { DATA_RULE, DAY_TRACKS, DEMO_LINE, PRIZE_LINE, SHORT_RULES, TRACKS_SUB } from "@/lib/day-tracks";
 
-// The hardening day handout (Session 11, 17 November 2026) as a page. The nine standards come from
-// src/components/temple/standards/standards.ts, the same list the board at /standards checks.
+// The hardening day (Session 11, 17 November 2026) on one screen: pick one of three tracks, start it with one copied
+// prompt, and see how you win. The tracks come from src/lib/day-tracks.ts, the nine standards from
+// src/components/temple/standards/standards.ts (the same list the board at /standards checks). Everything else is
+// folded away. Keep the text in step with the handout PDF.
 
-// The printable handout. Set this to "/hardening/saaf-hardening-day-handout.pdf" once that file is in public/hardening/;
-// until then the page shows no download button. Keep the text below in step with the PDF.
 const HANDOUT_PDF: string | null = "/hardening/saaf-hardening-day-handout.pdf";
 
-const routes = [
-  { name: "Harden", text: "Take an existing agent and add what is missing from the nine." },
-  { name: "Build", text: "Start an open plan from the starter template, with all nine built in." },
-  { name: "Merge or revive", text: "Fold duplicate repos into one: the builders of both decide which one stays. Or revive a quiet agent and become its owner." },
+const day = [
+  { t: "09:00", v: "Welcome and the three tracks" },
+  { t: "09:30", v: "Guests from BDO: Adriaan Heijstek, Faissal Assakkach (10:00), Sjoerd de Vries and Thijs Modderman (11:00)" },
+  { t: "11:45", v: "Bauke Brenninkmeijer, Orq.ai: observe and evaluate your agents" },
+  { t: "12:15", v: "Start hacking, then lunch. In the afternoon: Gülnur Orpak, ABN AMRO, a 15-minute talk" },
+  { t: "15:15", v: "The leaderboard freezes" },
+  { t: "16:00", v: "Last pull request opened; demo sign-up closes" },
+  { t: "16:15", v: "Last merge, final review", accent: true },
+  { t: "16:30", v: "Six demos, two per track. The reveal at 17:00, drinks at 17:10" },
 ];
 
 const layers = [
   { k: "Always on", v: "Secret scanning with push protection, Dependabot, private vulnerability reporting." },
   { k: "Every pull request", v: "The standards check and a guard from Session 10 run in the pipeline." },
-  { k: "Every quarter", v: "The owner takes the agent or service through the car wash again." },
-];
-
-const tile = [
-  {
-    k: "1",
-    v: (
-      <>
-        Run the <code className="font-mono text-xs">harden-agent-repo</code> skill in your repo.{" "}
-        <Link href="/open-source" className="text-accent hover:underline">Open-Source Readiness</Link> shows how.
-      </>
-    ),
-  },
-  { k: "2", v: "Open a pull request." },
-  {
-    k: "3",
-    v: (
-      <>
-        After a maintainer merges it to the default branch (for example main or master), the board at{" "}
-        <Link href="/standards" className="text-accent hover:underline">/standards</Link> marks the standard as met within two minutes, and it glows for the rest of the day.
-      </>
-    ),
-  },
-];
-
-const day = [
-  { t: "09:00", v: "Welcome and the assignment" },
-  { t: "09:30", v: "Adriaan Heijstek, BDO" },
-  { t: "10:00", v: "Faissal Assakkach, BDO" },
-  { t: "11:00", v: "Sjoerd de Vries and Thijs Modderman, BDO" },
-  { t: "11:45", v: "Orq.ai workshop, Bauke Brenninkmeijer" },
-  { t: "12:15", v: "Start hacking, then lunch" },
-  { t: "14:00", v: "Gülnur Orpak, ABN AMRO: a 15-minute talk" },
-  { t: "15:15", v: "The leaderboard freezes" },
-  { t: "16:00", v: "Last pull request opened; demo sign-up closes" },
-  { t: "16:15", v: "Last merge, final review", accent: true },
-  { t: "16:30", v: "Six demos of five minutes: lessons learned and better standards" },
-  { t: "17:00", v: "The reveal and the prizes" },
-  { t: "17:10", v: "Drinks" },
+  { k: "Every quarter", v: "The owner takes the agent or service through the nine standards again." },
 ];
 
 // Tools our guests brought. Each one is an external site: the list shows a notice before it opens.
@@ -65,17 +34,17 @@ const references: ExternalReference[] = [
   {
     name: "Orq.ai onboarding",
     url: "https://saaf-project.orq.ai",
-    text: "Get your own project in the shared SAAF workspace on Orq.ai. The passcode is shared in the room.",
+    text: "Get your own project in the shared SAAF workspace on Orq.ai. Get started copies one prompt that installs the two skills. The passcode is shared in the room.",
   },
   {
     name: "Orq.ai guide",
     url: "https://saaf-project.orq.ai/guide",
-    text: "Send traces from your agent to see what it does, use the framework integrations, and red team your agent.",
+    text: "Trace what your agent does and score its runs against your own audit criteria, with the skills /orq-otel-tracing and /orq-criteria-to-evals.",
   },
   {
     name: "evaluatorq",
     url: "https://github.com/orq-ai/evaluatorq",
-    text: "The open-source package by Orq.ai for red teaming an agent.",
+    text: "The open-source package by Orq.ai for running checks on test cases you choose.",
   },
   {
     name: "Is It Dead Yet",
@@ -84,22 +53,22 @@ const references: ExternalReference[] = [
   },
 ];
 
-function Rows({ rows, mono = false }: { rows: { k: string; v: React.ReactNode }[]; mono?: boolean }) {
+function Fold({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <dl className="border-t border-border">
-      {rows.map((r) => (
-        <div key={r.k} className={`grid ${mono ? "grid-cols-[28px_1fr]" : "grid-cols-[112px_1fr]"} gap-3 py-2 border-b border-border text-sm`}>
-          <dt className={mono ? "font-mono text-muted" : "font-medium"}>{r.k}</dt>
-          <dd className="text-muted leading-relaxed">{r.v}</dd>
-        </div>
-      ))}
-    </dl>
+    <details className="group border-t border-border">
+      <summary className="cursor-pointer list-none py-3 flex items-baseline justify-between gap-4">
+        <span className="text-base font-medium">{title}</span>
+        <span className="font-mono text-xs text-muted group-open:hidden">show</span>
+        <span className="font-mono text-xs text-muted hidden group-open:inline">hide</span>
+      </summary>
+      <div className="pb-6">{children}</div>
+    </details>
   );
 }
 
 export default function HardeningPage() {
   return (
-    <div className="max-w-[880px] mx-auto py-8">
+    <div className="max-w-[1040px] mx-auto py-8">
       <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/brand/saaf-lockup-ink.png" alt="SAAF, Shared Audit Agents Framework" className="h-6 w-auto dark:invert" />
@@ -113,94 +82,105 @@ export default function HardeningPage() {
       <p className="text-xs font-mono text-muted mb-1">Session #11 · Hackathon #10 · 17 November 2026 · TAG, The Stack, Amsterdam</p>
       <p className="text-xs font-mono text-muted mb-2">Sponsors of the day · BDO, title sponsor · TAG, venue and developer community</p>
       <h1 className="text-3xl font-medium leading-tight mb-3">
-        Take one agent through <span className="text-accent">the car wash.</span>
+        Pick <span className="text-accent">one track.</span>
       </h1>
-      <p className="text-muted leading-relaxed mb-8 max-w-[680px]">
-        Every agent and every shared service goes through the same nine standards. Pick one route with your team. Every
-        route ends in a merged pull request.
-      </p>
+      <p className="text-muted leading-relaxed mb-8 max-w-[680px]">{TRACKS_SUB}</p>
 
-      <div className="grid gap-6 sm:grid-cols-3 mb-10">
-        {routes.map((r) => (
-          <div key={r.name} className="border-t border-border pt-3">
-            <div className="font-medium mb-1">{r.name}</div>
-            <p className="text-sm text-muted leading-relaxed">{r.text}</p>
-          </div>
-        ))}
-      </div>
-
-      <AccessRequest />
-
-      <section className="mb-10">
-        <h2 className="text-lg font-medium mb-3">The nine standards.</h2>
-        <StandardsChecklist />
-      </section>
-
-      <div className="grid gap-x-6 gap-y-10 md:grid-cols-2 mb-10">
-        <section className="min-w-0">
-          <h2 className="text-lg font-medium mb-3">Three layers keep it that way.</h2>
-          <Rows rows={layers} />
-          <p className="text-xs text-muted leading-relaxed mt-3">Proposed by Tony Barratt in his security review.</p>
-        </section>
-
-        <section className="min-w-0">
-          <h2 className="text-lg font-medium mb-3">How a standard gets on the board.</h2>
-          <Rows rows={tile} mono />
-          <p className="text-xs text-muted leading-relaxed mt-3">The board reads the default branch only.</p>
-        </section>
-      </div>
-
-      <div className="grid gap-x-6 gap-y-10 md:grid-cols-2 mb-10">
-        <section className="min-w-0">
-          <h2 className="text-lg font-medium mb-3">Demo your lesson.</h2>
-          <p className="text-sm text-muted leading-relaxed">
-            Six demos from 16:30, five minutes each: one to connect, three to tell, one for questions. Show an improvement to a
-            standard, or how you made an agent better and what others can learn from it.
-          </p>
-          <Link href="/demo" className="inline-block mt-3 text-sm px-4 py-2 rounded-lg border border-border hover:border-accent">
-            Sign up by 16:00
-          </Link>
-        </section>
-
-        <section className="min-w-0">
-          <h2 className="text-lg font-medium mb-3">Improve a standard.</h2>
-          <p className="text-sm text-muted leading-relaxed">
-            Open a pull request with the form <code className="font-mono text-xs">standard-proposal</code> on{" "}
-            <code className="font-mono text-xs">agent-template</code> or <code className="font-mono text-xs">docs/conventions</code>{" "}
-            (add <code className="font-mono text-xs">?template=standard-proposal.md</code> to the address). Nothing is merged
-            today; the best proposals go into the next version of the standards.
-          </p>
-          <p className="text-xs text-muted leading-relaxed mt-3">
-            Judged on evidence, checkability, simplicity, fit and reach. Too complicated scores 0; a new standard replaces one.
-          </p>
-        </section>
-      </div>
-
-      <section className="mb-10">
-        <h2 className="text-lg font-medium mb-3">Tools from our guests.</h2>
-        <p className="text-sm text-muted leading-relaxed mb-3">Select a tool to open it. Each one is an external site.</p>
-        <ExternalReferences references={references} />
-        <p className="text-xs text-muted leading-relaxed mt-3">
-          Keep keys in environment variables, never in your repository. Use synthetic data when you try a tool.
-        </p>
-      </section>
-
-      <section className="max-w-[560px]">
-        <h2 className="text-lg font-medium mb-3">The day.</h2>
-        <dl className="border-t border-border">
-          {day.map((r) => (
-            <div key={r.t} className="grid grid-cols-[88px_1fr] gap-3 py-2 border-b border-border text-sm">
-              <dt className={`font-mono ${r.accent ? "text-accent" : ""}`}>{r.t}</dt>
-              <dd className="text-muted leading-relaxed">{r.v}</dd>
+      <ol className="grid gap-4 md:grid-cols-3 mb-6">
+        {DAY_TRACKS.map((t) => (
+          <li key={t.id} className="rounded-xl border border-border p-5 flex flex-col">
+            <p className="font-mono text-xs text-muted mb-2">Track {t.number}</p>
+            <h2 className="text-xl font-medium leading-tight mb-2">{t.name}</h2>
+            <p className="text-sm text-muted leading-relaxed mb-4">{t.what}</p>
+            <div className="mb-4">
+              <CopyPrompt text={t.prompt} />
+              {t.link && (
+                <a href={t.link.href} target="_blank" rel="noopener noreferrer" className="inline-block mt-3 text-sm text-accent hover:underline">
+                  {t.link.label} ↗
+                </a>
+              )}
             </div>
-          ))}
-        </dl>
-        <div className="mt-6">
-          <Link href="/standards" className="inline-block text-sm px-4 py-2 rounded-lg border border-border hover:border-accent">
-            Open the standards board
+            <div className="mt-auto pt-4 border-t border-border">
+              <p className="font-mono text-xs text-muted mb-1">How you win</p>
+              <p className="text-sm leading-relaxed">{t.win}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+
+      <div className="rounded-xl bg-surface2 px-5 py-4 mb-10 flex flex-wrap items-center justify-between gap-x-8 gap-y-3">
+        <p className="text-sm leading-relaxed max-w-[560px]">
+          {PRIZE_LINE} {DEMO_LINE}
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/standards" className="text-sm px-4 py-2 rounded-lg border border-border bg-bg hover:border-accent">
+            Open the board
+          </Link>
+          <Link href="/demo" className="text-sm px-4 py-2 rounded-lg border border-border bg-bg hover:border-accent">
+            Sign up for a demo
           </Link>
         </div>
-      </section>
+      </div>
+
+      <div className="grid gap-x-10 gap-y-10 md:grid-cols-2 mb-10">
+        <section className="min-w-0">
+          <h2 className="text-lg font-medium mb-3">Five rules.</h2>
+          <ol className="border-t border-border">
+            {SHORT_RULES.map((r, i) => (
+              <li key={i} className="grid grid-cols-[1.5rem_1fr] gap-x-3 py-2 border-b border-border text-sm text-muted leading-relaxed">
+                <span className="font-mono text-xs pt-0.5">{i + 1}</span>
+                <span>{r}</span>
+              </li>
+            ))}
+          </ol>
+          <p className="text-sm text-muted leading-relaxed mt-3">{DATA_RULE}</p>
+          <p className="text-xs text-muted leading-relaxed mt-2">
+            All rules are on the <Link href="/standards#rules" className="text-accent hover:underline">board</Link>.
+          </p>
+        </section>
+
+        <section className="min-w-0">
+          <h2 className="text-lg font-medium mb-3">The day.</h2>
+          <dl className="border-t border-border">
+            {day.map((r) => (
+              <div key={r.t} className="grid grid-cols-[64px_1fr] gap-3 py-2 border-b border-border text-sm">
+                <dt className={`font-mono ${r.accent ? "text-accent" : ""}`}>{r.t}</dt>
+                <dd className="text-muted leading-relaxed">{r.v}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      </div>
+
+      <div className="border-b border-border">
+        <Fold title="The nine standards.">
+          <StandardsChecklist />
+          <p className="text-sm text-muted leading-relaxed mt-4 max-w-[720px]">
+            A standard counts once a pull request is merged into the default branch (for example main or master). The board at{" "}
+            <Link href="/standards" className="text-accent hover:underline">/standards</Link> marks it as met within two minutes, and it glows for the rest
+            of the day. The <code className="font-mono text-xs">harden-agent-repo</code> skill walks through all nine;{" "}
+            <Link href="/open-source" className="text-accent hover:underline">Open-Source Readiness</Link> shows how to install it for good.
+          </p>
+          <h3 className="text-sm font-medium mt-6 mb-2">Three layers keep it that way.</h3>
+          <dl className="border-t border-border max-w-[720px]">
+            {layers.map((r) => (
+              <div key={r.k} className="grid grid-cols-[150px_1fr] gap-3 py-2 border-b border-border text-sm">
+                <dt className="font-medium">{r.k}</dt>
+                <dd className="text-muted leading-relaxed">{r.v}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="text-xs text-muted leading-relaxed mt-2">Proposed by Tony Barratt in his security review.</p>
+        </Fold>
+        <Fold title="Work on a repo that is not yours.">
+          <AccessRequest />
+        </Fold>
+        <Fold title="Tools from our guests.">
+          <p className="text-sm text-muted leading-relaxed mb-3">Select a tool to open it. Each one is an external site.</p>
+          <ExternalReferences references={references} />
+          <p className="text-xs text-muted leading-relaxed mt-3">Keep keys in environment variables, never in your repository. Use synthetic data when you try a tool.</p>
+        </Fold>
+      </div>
     </div>
   );
 }

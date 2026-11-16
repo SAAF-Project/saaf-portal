@@ -5,9 +5,9 @@ import type { LeaderboardPayload } from "../../lib/leaderboard-day";
 import { STANDARDS } from "../temple/standards/standards";
 import { clock } from "../temple/standards/StandardsView";
 
-// The organisers' view of the day's leaderboard (Session 11): always the full, unfrozen standings, the review agent's
-// flags, and the controls for the freeze, the reveal, disqualifying a login and overriding a level. MSACC only; the
-// route checks that too.
+// The organisers' view of the day's leaderboard (Session 11): always the full, unfrozen standings per track, the review
+// agent's flags, and the controls for the freeze, the reveal, the jury's places for track 3, disqualifying a login and
+// overriding a level. MSACC only; the routes check that too.
 
 const LABEL: Record<string, string> = Object.fromEntries(STANDARDS.map((s) => [s.id, s.label]));
 const SCORED = ["readme", "agent-yaml", "audit-criteria", "tests", "ci", "dependencies", "licence", "codeowners"];
@@ -51,7 +51,16 @@ export default function LeaderboardTab() {
 
   if (!p) return <p className="text-muted">{error ?? "Loading the leaderboard."}</p>;
   const a = p.admin!;
-  const total = Math.min(p.top_contributor.length, 5) + p.most_improved.length + Math.min(p.proposals.length, 3) + p.best_agent.length;
+  const total = a.reveal_total;
+  const byRise = p.prize === "most_improved";
+  const place = async (repo: string, value: number | null) => {
+    setBusy(true);
+    const res = await fetch("/api/admin/checks", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ place: { repo, place: value } }) });
+    setBusy(false);
+    if (!res.ok) return setError(`Could not set the place (${res.status})`);
+    setError(null);
+    setTick((n) => n + 1);
+  };
 
   return (
     <div className="space-y-8">
@@ -61,7 +70,7 @@ export default function LeaderboardTab() {
         <div className="rounded-xl border border-border p-4">
           <p className="text-xs font-mono text-muted mb-2">Public board</p>
           <p className="text-sm mb-3">
-            {a.state.revealStep > 0 ? `Revealing: ${a.state.revealStep} of ${total} places` : a.state.frozen ? `Frozen since ${a.state.freezeAt ? clock(a.state.freezeAt) : "now"}` : "Live (freezes by itself at 15:15)"}
+            {a.state.revealStep > 0 ? `Revealing: step ${Math.min(a.state.revealStep, total)} of ${total}` : a.state.frozen ? `Frozen since ${a.state.freezeAt ? clock(a.state.freezeAt) : "now"}` : "Live (freezes by itself at 15:15)"}
           </p>
           <div className="flex flex-wrap gap-2">
             <button className={btn} disabled={busy} onClick={() => act({ action: a.state.frozen ? "unfreeze" : "freeze" })}>
@@ -71,13 +80,16 @@ export default function LeaderboardTab() {
         </div>
         <div className="rounded-xl border border-border p-4">
           <p className="text-xs font-mono text-muted mb-2">Prize-giving</p>
-          <p className="text-sm mb-3">From the bottom: top contributor, most improved, additions to the standards, then best agent.</p>
+          <p className="text-sm mb-3">
+            First the two mentions (top contributor, {byRise ? "best agent" : "most improved"}), one step each. Then track 3, track 2 and track 1, each from
+            the third place up to the winner. Enter the jury&apos;s places for track 3 below before you start.
+          </p>
           <div className="flex flex-wrap gap-2">
             <button className={btn} disabled={busy} onClick={() => act({ action: "reveal-back" })}>
               Back
             </button>
             <button className={`${btn} border-accent text-accent`} disabled={busy || a.state.revealStep >= total} onClick={() => act({ action: "reveal-next" })}>
-              Reveal next place
+              Reveal next step
             </button>
             <button className={btn} disabled={busy} onClick={() => act({ action: "reveal-reset" })}>
               Reset
@@ -95,15 +107,58 @@ export default function LeaderboardTab() {
       </section>
 
       <section className="grid gap-8 lg:grid-cols-3">
-        <List title="Best agent" rows={p.best_agent.map((r) => [r.name, `${r.after} pts (+${r.gain})`, r.by.join(", ")])} />
-        <List title="Most improved" rows={p.most_improved.map((r) => [r.name, `+${r.gain} (${r.before} → ${r.after})`, r.by.join(", ")])} />
-        <List title="Top contributor" rows={p.top_contributor.slice(0, 10).map((x) => [`@${x.login}`, `${x.points} pts`, `${x.repos.length} repos${x.capped ? `, ${x.capped} capped` : ""}`])} />
+        <List title={`Track 1 · Most improved${byRise ? " (the prize)" : ""}`} rows={p.most_improved.map((r) => [r.name, `+${r.gain} (${r.before} → ${r.after})`, r.by.join(", ")])} />
+        <List title={`Best agent${byRise ? " (mention)" : " (the prize of track 1)"}`} rows={p.best_agent.map((r) => [r.name, `${r.after} pts (+${r.gain})`, r.by.join(", ")])} />
+        <List title="Top contributor (mention)" rows={p.top_contributor.slice(0, 10).map((x) => [`@${x.login}`, `${x.points} pts`, `${x.repos.length} repos${x.capped ? `, ${x.capped} capped` : ""}`])} />
       </section>
 
       <section>
-        <h3 className="text-base font-medium mb-2">Additions to the standards.</h3>
+        <h3 className="text-base font-medium mb-2">Track 2 · Additions to the standards.</h3>
         <p className="text-xs text-muted mb-2">Advice from the standards review. Nothing is merged today; the sweep comes after.</p>
         <List title="" rows={p.proposals.map((x) => [x.title, `${x.score}/15`, `@${x.author} · ${x.repo} · ${x.kind} · ${x.verdict ?? ""}${x.feedback ? ` · ${x.feedback}` : ""}`])} />
+      </section>
+
+      <section>
+        <h3 className="text-base font-medium mb-2">Track 3 · LLM checks.</h3>
+        <p className="text-xs text-muted mb-2">
+          The repos with an llm_checks.yaml, sent in by the facts script. The jury (Orq.ai and an auditor) picks the places at 16:15: click 1, 2 or 3. The public
+          sees places only in the reveal.
+        </p>
+        {p.checks.length === 0 ? (
+          <p className="text-sm text-muted">No repo has been sent in yet.</p>
+        ) : (
+          <ol className="border-t border-border text-sm">
+            {p.checks.map((c) => (
+              <li key={c.repo} className="grid grid-cols-[auto_1fr_auto] gap-x-3 items-center py-2 border-b border-border">
+                <span className="inline-flex gap-1">
+                  {[1, 2, 3].map((n) => (
+                    <button
+                      key={n}
+                      className={`w-7 h-7 text-xs font-mono rounded-md border ${c.place === n ? "border-accent text-accent" : "border-border text-muted hover:border-accent"}`}
+                      disabled={busy}
+                      onClick={() => place(c.repo, c.place === n ? null : n)}
+                      aria-label={`Place ${n} for ${c.repo}`}
+                      aria-pressed={c.place === n}
+                    >
+                      {n}
+                    </button>
+                  ))}
+                </span>
+                <span className="min-w-0 [overflow-wrap:anywhere]">
+                  <span className="font-medium">{c.repo}</span>
+                  <span className="block text-xs text-muted">
+                    {c.authors.map((l) => `@${l}`).join(" ")}
+                    {c.feedback ? ` · ${c.feedback}` : ""}
+                    {c.flags && c.flags.length > 0 ? ` · ${c.flags.join("; ")}` : ""}
+                  </span>
+                </span>
+                <span className="font-mono tabular-nums text-muted">
+                  {c.llm} llm · {c.code} code
+                </span>
+              </li>
+            ))}
+          </ol>
+        )}
       </section>
 
       <section>

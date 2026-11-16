@@ -11,7 +11,7 @@ export default function StandardsPage() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/brand/saaf-lockup-ink.png" alt="SAAF, Shared Audit Agents Framework" className="h-6 w-auto dark:invert" />
         <Link href="/hardening" className="text-sm px-4 py-2 rounded-lg border border-border hover:border-accent">
-          Read the handout
+          The three tracks and how to start
         </Link>
       </div>
 
@@ -20,7 +20,13 @@ export default function StandardsPage() {
 
       <StandardsBoard />
 
-      <AccessRequest />
+      <details className="group my-6">
+        <summary className="cursor-pointer list-none text-sm font-medium">
+          Work on a repo that is not yours. <span className="font-mono text-xs text-muted group-open:hidden">show</span>
+          <span className="font-mono text-xs text-muted hidden group-open:inline">hide</span>
+        </summary>
+        <AccessRequest />
+      </details>
 
       <p className="text-xs text-muted leading-relaxed mt-6 max-w-[680px]">
         The board reads the default branch of every repo in the SAAF-Project organisation that is not archived, once a

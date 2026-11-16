@@ -2,7 +2,13 @@
 // its own close and its own way of choosing: a random draw that splits the window (10 November), or a selection by the
 // organisers of at most `maxSlots` fixed slots (17 November). Old sessions stay readable in the admin.
 
-export type DemoKind = "standard" | "journey";
+/**
+ * What a demo is about, one kind per track of the hardening day (src/lib/day-tracks.ts): the journey of one agent
+ * (track 1), a better standard (track 2), or LLM checks (track 3).
+ */
+export const DEMO_KINDS = ["journey", "standard", "checks"] as const;
+export type DemoKind = (typeof DEMO_KINDS)[number];
+export const isDemoKind = (value: unknown): value is DemoKind => typeof value === "string" && (DEMO_KINDS as readonly string[]).includes(value);
 
 export interface DemoSession {
   id: string;
@@ -18,8 +24,10 @@ export interface DemoSession {
   mode: "draw" | "select";
   slotSeconds: number;
   maxSlots: number;
-  /** Entries choose a kind: an improvement to the standards, or the journey and lessons learned of improving an agent. */
+  /** Entries choose a kind, one per track of the day. */
   kinds: boolean;
+  /** With kinds: at most this many selected demos per kind, unless the organisers say the split may be uneven. */
+  maxPerKind?: number;
 }
 
 export const DEMO_SESSIONS: DemoSession[] = [
@@ -48,6 +56,7 @@ export const DEMO_SESSIONS: DemoSession[] = [
     slotSeconds: 300, // 1 min to connect, 3 min to tell, 1 min for questions
     maxSlots: 6,
     kinds: true,
+    maxPerKind: 2, // six demos, two per track
   },
 ];
 
@@ -55,6 +64,12 @@ export const CURRENT_DEMO_SESSION = "2026-11-17";
 
 export function demoSession(id: string | null | undefined): DemoSession | null {
   return DEMO_SESSIONS.find((s) => s.id === (id || CURRENT_DEMO_SESSION)) ?? null;
+}
+
+/** The kinds that have more selected demos than the session allows per kind. Empty = the split is fine. */
+export function overKind(kinds: (DemoKind | "")[], maxPerKind: number | undefined): DemoKind[] {
+  if (!maxPerKind) return [];
+  return DEMO_KINDS.filter((k) => kinds.filter((x) => x === k).length > maxPerKind);
 }
 
 /** A link to a pull request or repo in the SAAF-Project org, or "" when empty; null when it points elsewhere. */
