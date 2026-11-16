@@ -371,6 +371,7 @@ export default function PrizesView({ payload, clockNow }: { payload: Leaderboard
   }
   if (payload.graded.last_at && !payload.frozen) status.push(`last review ${clock(payload.graded.last_at)}`);
   if (payload.unread > 0) status.push(`${payload.unread} ${payload.unread === 1 ? "repo" : "repos"} not read yet`);
+  if (payload.disqualified > 0) status.push(`${payload.disqualified} ${payload.disqualified === 1 ? "participant" : "participants"} disqualified`);
   const { prize, mention } = track1(payload);
   const byRise = payload.prize === "most_improved";
   // The first row of a list has won once the prize-giving shows it, or after the close when nothing is hidden.

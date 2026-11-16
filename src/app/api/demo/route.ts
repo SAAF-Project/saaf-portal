@@ -2,8 +2,9 @@ import { randomInt } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { isAdminRequest, sessionLogin } from "@/lib/admin";
 import { trackOfKind } from "@/lib/day-tracks";
-import { demoSession, isDemoKind, normaliseLink, overKind, type DemoKind, type DemoSession } from "@/lib/demo-sessions";
+import { demoSession, isDemoKind, normaliseLinks, overKind, type DemoKind, type DemoSession } from "@/lib/demo-sessions";
 import { normaliseRepo, schedule, secondsPerTeam, shuffle } from "@/lib/demoDraw";
+import { ASSIGNMENT_OPENS_CLOCK, assignmentOpen, previewing } from "@/lib/day-gate";
 import { getPrisma } from "@/lib/prisma";
 
 // Demo sign-up per session (src/lib/demo-sessions.ts). Teams register until the session's close; then the organisers
@@ -84,12 +85,22 @@ function csvCell(value: unknown): string {
 
 const locked = (s: DemoSession, order: string[] | null) => Date.now() >= Date.parse(s.lockAt) || order !== null;
 
+/**
+ * The sign-up of the hardening day opens with the assignment (src/lib/day-gate.ts). Before that only the organisers get
+ * in: MSACC or the admin token, unless MSACC looks at it as a member (?view=member).
+ */
+const notOpenYet = (s: DemoSession, isAdmin: boolean, request: NextRequest): boolean =>
+  s.kinds && !assignmentOpen() && !(isAdmin && request.nextUrl.searchParams.get("view") !== "member");
+
 export async function GET(request: NextRequest) {
   const s = demoSession(request.nextUrl.searchParams.get("session"));
   if (!s) return NextResponse.json({ error: "Unknown session" }, { status: 404 });
   const isAdmin = await isAdminRequest(request);
   const username = await sessionLogin();
   if (!username && !isAdmin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (notOpenYet(s, isAdmin, request)) {
+    return NextResponse.json({ notOpen: true, opens: ASSIGNMENT_OPENS_CLOCK, organiser: previewing(username), session: { id: s.id, label: s.label } });
+  }
   const { teams, order, orderedAt } = await load(s);
 
   const view = (t: (typeof teams)[number]) => {
@@ -148,6 +159,7 @@ export async function GET(request: NextRequest) {
     secondsPerTeam: plan ? plan.seconds : s.mode === "select" ? s.slotSeconds : secondsPerTeam(teams.length),
     teams: teams.map(view),
     schedule: plan ? plan.slots.map((x) => ({ start: x.start, end: x.end, ...view(x.item) })) : null,
+    organiser: previewing(username),
   });
 }
 
@@ -190,6 +202,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (!username) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (notOpenYet(s, isAdmin, request)) return NextResponse.json({ error: `Demo sign-up opens at ${ASSIGNMENT_OPENS_CLOCK}` }, { status: 403 });
   const user = await prisma.user.findUnique({ where: { githubUsername: username } });
   if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
   if (order !== null) return NextResponse.json({ error: "The demos have been chosen. Ask an organiser." }, { status: 400 });
@@ -200,14 +213,14 @@ export async function POST(request: NextRequest) {
   const what = clean(body.what, 600);
   const why = clean(body.why, 400);
   const repo = normaliseRepo(body.repo);
-  const link = normaliseLink(body.link);
+  const link = normaliseLinks(body.link);
   const kind: DemoKind | "" = isDemoKind(body.kind) ? body.kind : "";
   if (team.length < 2 || title.length < 3) return NextResponse.json({ error: "Enter your team or name and a title" }, { status: 400 });
   if (s.kinds && !kind) return NextResponse.json({ error: "Choose what you want to demo" }, { status: 400 });
   if (what.length < 20) return NextResponse.json({ error: "Describe in a sentence or two what you will show" }, { status: 400 });
   if (why.length < 10) return NextResponse.json({ error: "Tell us why others should hear it" }, { status: 400 });
   if (repo === null) return NextResponse.json({ error: "The repository must be in the SAAF-Project org, e.g. SAAF-Project/my-agent" }, { status: 400 });
-  if (link === null) return NextResponse.json({ error: "The link must be a pull request or repo in the SAAF-Project org" }, { status: 400 });
+  if (link === null) return NextResponse.json({ error: "Every link must be a pull request or repo in the SAAF-Project org: at most five, one per line" }, { status: 400 });
   if (kind === "standard" && !link) return NextResponse.json({ error: "Link the pull request with your proposal" }, { status: 400 });
   if (kind === "checks" && !repo) return NextResponse.json({ error: "Name the repository that holds your llm_checks.yaml" }, { status: 400 });
   const taken = teams.find((t) => sameTeam(t.entry.team, team) && t.userId !== user.id);

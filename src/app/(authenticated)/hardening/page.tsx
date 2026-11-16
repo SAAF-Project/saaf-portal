@@ -2,8 +2,11 @@ import Link from "next/link";
 import AccessRequest from "@/components/AccessRequest";
 import CopyPrompt from "@/components/CopyPrompt";
 import DayCountdown from "@/components/DayCountdown";
+import OrganiserView from "@/components/OrganiserView";
 import ExternalReferences, { type ExternalReference } from "@/components/ExternalReferences";
 import StandardsChecklist from "@/components/temple/standards/StandardsChecklist";
+import { sessionLogin } from "@/lib/admin";
+import { ASSIGNMENT_OPENS_CLOCK, previewing, seesAssignment } from "@/lib/day-gate";
 import { DATA_RULE, DAY_TRACKS, DEMO_LINE, PRIZE_LINE, SHORT_RULES, TRACKS_SUB } from "@/lib/day-tracks";
 
 // The hardening day (Session 11, 17 November 2026) on one screen: pick one of three tracks, start it with one copied
@@ -67,9 +70,64 @@ function Fold({ title, children }: { title: string; children: React.ReactNode })
   );
 }
 
-export default function HardeningPage() {
+/** Before the assignment opens: the programme, the countdown and how to get access. Nothing about the tracks. */
+function NotOpenYet() {
+  return (
+    <>
+      <p className="text-xs font-mono text-muted mb-1">Session #11 · Hackathon #10 · 17 November 2026 · TAG, The Stack, Amsterdam</p>
+      <p className="text-xs font-mono text-muted mb-2">Sponsors of the day · BDO, title sponsor · TAG, venue and developer community</p>
+      <h1 className="text-3xl font-medium leading-tight mb-3">
+        The assignment opens at <span className="text-accent">{ASSIGNMENT_OPENS_CLOCK}.</span>
+      </h1>
+      <p className="text-muted leading-relaxed mb-8 max-w-[680px]">
+        The hardening day is on Tuesday 17 November. This page shows the assignment from {ASSIGNMENT_OPENS_CLOCK}. Until then: the programme, and how to get
+        access.
+      </p>
+      <DayCountdown />
+      <section className="max-w-[680px] mb-10 mt-4">
+        <h2 className="text-lg font-medium mb-3">The day.</h2>
+        <dl className="border-t border-border">
+          {day.slice(0, 4).map((r) => (
+            <div key={r.t} className="grid grid-cols-[64px_1fr] gap-3 py-2 border-b border-border text-sm">
+              <dt className="font-mono">{r.t}</dt>
+              <dd className="text-muted leading-relaxed">{r.t === "12:15" ? "The assignment. Lunch at 12:30, then build. In the afternoon: Gülnur Orpak, ABN AMRO, a 15-minute talk" : r.v}</dd>
+            </div>
+          ))}
+          <div className="grid grid-cols-[64px_1fr] gap-3 py-2 border-b border-border text-sm">
+            <dt className="font-mono">16:30</dt>
+            <dd className="text-muted leading-relaxed">Demos, then the reveal at 17:00 and drinks at 17:10</dd>
+          </div>
+        </dl>
+      </section>
+      <section className="max-w-[680px]">
+        <h2 className="text-lg font-medium mb-3">Get ready.</h2>
+        <p className="text-sm text-muted leading-relaxed">
+          Bring a laptop with git, the GitHub CLI (<span className="font-mono text-xs">gh auth login</span>) and a coding assistant. You are signed in, so you
+          are a member of the SAAF-Project organisation on GitHub: that is all the access you need to start.
+        </p>
+      </section>
+    </>
+  );
+}
+
+export default async function HardeningPage({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
+  const login = await sessionLogin();
+  const asMember = (await searchParams).view === "member";
+  const open = seesAssignment(login, asMember);
+  const organiser = previewing(login);
+  if (!open) {
+    return (
+      <div className="max-w-[1040px] mx-auto py-8">
+        {organiser && <OrganiserView path="/hardening" asMember={asMember} />}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/brand/saaf-lockup-ink.png" alt="SAAF, Shared Audit Agents Framework" className="h-6 w-auto mb-8 dark:invert" />
+        <NotOpenYet />
+      </div>
+    );
+  }
   return (
     <div className="max-w-[1040px] mx-auto py-8">
+      {organiser && <OrganiserView path="/hardening" asMember={asMember} />}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/brand/saaf-lockup-ink.png" alt="SAAF, Shared Audit Agents Framework" className="h-6 w-auto dark:invert" />

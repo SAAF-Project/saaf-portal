@@ -53,6 +53,9 @@ export default function LeaderboardTab() {
   const a = p.admin!;
   const total = a.reveal_total;
   const byRise = p.prize === "most_improved";
+  // The admin keeps seeing a disqualified login, marked: on the public board it has no proposal and no place.
+  const outSet = new Set(a.state.disqualified.map((l) => l.toLowerCase()));
+  const tag = (l: string) => (outSet.has(l.toLowerCase()) ? `@${l} (disqualified)` : `@${l}`);
   const place = async (repo: string, value: number | null) => {
     setBusy(true);
     const res = await fetch("/api/admin/checks", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ place: { repo, place: value } }) });
@@ -115,7 +118,7 @@ export default function LeaderboardTab() {
       <section>
         <h3 className="text-base font-medium mb-2">Track 2 · Additions to the standards.</h3>
         <p className="text-xs text-muted mb-2">Advice from the standards review. Nothing is merged today; the sweep comes after.</p>
-        <List title="" rows={p.proposals.map((x) => [x.title, `${x.score}/15`, `@${x.author} · ${x.repo} · ${x.kind} · ${x.verdict ?? ""}${x.feedback ? ` · ${x.feedback}` : ""}`])} />
+        <List title="" rows={p.proposals.map((x) => [x.title, `${x.score}/15`, `${tag(x.author)} · ${x.repo} · ${x.kind} · ${x.verdict ?? ""}${x.feedback ? ` · ${x.feedback}` : ""}`])} />
       </section>
 
       <section>
@@ -147,7 +150,7 @@ export default function LeaderboardTab() {
                 <span className="min-w-0 [overflow-wrap:anywhere]">
                   <span className="font-medium">{c.repo}</span>
                   <span className="block text-xs text-muted">
-                    {c.authors.map((l) => `@${l}`).join(" ")}
+                    {c.authors.map(tag).join(" ")}
                     {c.feedback ? ` · ${c.feedback}` : ""}
                     {c.flags && c.flags.length > 0 ? ` · ${c.flags.join("; ")}` : ""}
                   </span>

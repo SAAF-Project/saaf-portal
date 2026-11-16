@@ -165,6 +165,8 @@ export function scoreDay(repos: RepoDay[], w: Window, shown = 5, disqualified: S
   const scores: RepoScore[] = [];
   const contributions: Contribution[] = [];
   const feed: FeedItem[] = [];
+  // GitHub logins do not depend on capitals, so a disqualification does not either.
+  const out = new Set([...disqualified].map((login) => login.toLowerCase()));
 
   for (const r of repos) {
     const steps = r.steps.filter((s) => counts(s, w));
@@ -189,7 +191,7 @@ export function scoreDay(repos: RepoDay[], w: Window, shown = 5, disqualified: S
         const lv = Math.min(s.levels![id] ?? 0, top);
         if (lv > best) {
           const gained = pointsAt(id, lv) - pointsAt(id, best);
-          if (isBot(s.login) || disqualified.has(s.login!)) uncredited += gained;
+          if (isBot(s.login) || out.has(s.login!.toLowerCase())) uncredited += gained;
           else {
             contributions.push({ login: s.login!, repo: r.name, standard: id, from: best, to: lv, points: gained, at: s.at, url: s.url ?? null });
             by.set(s.login!, (by.get(s.login!) ?? 0) + gained);
