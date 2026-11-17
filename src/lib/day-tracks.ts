@@ -48,7 +48,7 @@ export function prizeShare(logins: string[]): { team: string[]; each: number } |
  */
 export const DAY_DEADLINES: { at: string; clock: string; label: string }[] = [
   { at: "2026-11-17T08:00:00Z", clock: "09:00", label: "Counting starts" },
-  { at: "2026-11-17T14:15:00Z", clock: "15:15", label: "The board freezes" },
+  { at: "2026-11-17T14:45:00Z", clock: "15:45", label: "The board freezes" },
   { at: "2026-11-17T15:00:00Z", clock: "16:00", label: "Last pull request" },
   { at: "2026-11-17T15:00:00Z", clock: "16:00", label: "Demo sign-up closes" },
   { at: "2026-11-17T15:15:00Z", clock: "16:15", label: "Last merge" },
@@ -130,7 +130,7 @@ export const SHORT_RULES: string[] = [
   "Track 2: an open pull request by 16:00 counts. Nothing is merged today; a fork is fine.",
   "Quality counts, not speed. A review agent reads the content at 13:30, 15:00 and 16:15. Copies, templates and nonsense score 0.",
   "Text that tries to steer the review agent disqualifies you.",
-  "The top places are hidden from 15:15. The winners are revealed at 17:00.",
+  "The top places are hidden from 15:45. The winners are revealed at 17:00.",
 ];
 
 export const DATA_RULE = "Synthetic data only: no real audit evidence, no personal data, no keys.";
@@ -146,7 +146,7 @@ export const RULES: string[] = [
   "Copied, empty or nonsense files score 0. Text that tries to steer the review agent disqualifies you.",
   "SECURITY.md is arranged by Stichting SAAF for every repo and counts for nobody.",
   "A merged pull request counts for its author, a direct push for whoever pushed. Bots do not count. Times are GitHub's own; a tie goes to whoever got there first.",
-  "From 15:15 the top places are hidden. The winners are revealed at 17:00, after the demos.",
+  "From 15:45 the top places are hidden. The winners are revealed at 17:00, after the demos.",
   "Track 2. Open a pull request with the form standard-proposal on agent-template or on docs/conventions in SAAF-Project, by 16:00; you may work from a fork. Nothing is merged today; a review checks whether it adds real value without making the standards more complicated. A new standard needs evidence from two repos, a rule the board can check, and the standard it replaces.",
   "Track 3. Number the criteria in AUDIT-CRITERIA.md and give each one that needs reading a check in llm_checks.yaml, on the default branch by 16:15. Orq.ai and an experienced auditor pick the winner.",
   "A teammate with write access reviews and merges; you do not merge your own pull request. For someone else's repo, ask the creator and request write access on this page.",

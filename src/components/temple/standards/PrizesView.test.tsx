@@ -153,9 +153,9 @@ describe("the day's leaderboard", () => {
 
   it("puts the countdown of the day on top, with every deadline", () => {
     const t = renderToStaticMarkup(<PrizesView payload={base} clockNow="2026-11-17T14:00:00Z" />).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
-    expect(t).toContain("Next deadline · 15:15");
+    expect(t).toContain("Next deadline · 15:45");
     expect(t).toContain("The board freezes.");
-    expect(t).toContain("15:00"); // a quarter of an hour left
+    expect(t).toContain("45:00"); // three quarters of an hour left
     for (const label of ["Last pull request", "Demo sign-up closes", "Last merge", "Demos", "The reveal"]) expect(t).toContain(label);
     expect(t).toContain("passed"); // counting started at 09:00
   });

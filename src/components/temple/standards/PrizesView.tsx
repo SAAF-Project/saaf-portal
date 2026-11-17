@@ -10,7 +10,7 @@ import { clock } from "./StandardsView";
 // you win each and who leads; below one list per track; then, folded away, the lists without a prize, the live feed
 // and the rules. Pure: it draws the payload it is given (StandardsBoard.tsx fetches it), so it can be rendered in a
 // test. Track 1 is scored by a review agent that grades the content of every standard (src/lib/leaderboard.ts); from
-// 15:15 the top places are hidden until the organisers reveal them.
+// 15:45 the top places are hidden until the organisers reveal them.
 
 export { RULES, SHORT_RULES };
 
