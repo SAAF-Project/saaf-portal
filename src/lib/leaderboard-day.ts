@@ -8,15 +8,15 @@ import type { RepoStandards, StandardsPayload } from "./repo-standards";
 import type { History } from "./standards-prizes";
 
 // The day's leaderboard as the portal shows it: the board, the history of every repo, the grader's levels and the
-// organisers' controls, turned into the public view (frozen from 15:15, then revealed place by place) or the full view
+// organisers' controls, turned into the public view (frozen from 15:45, then revealed place by place) or the full view
 // for the admin. Pure: everything comes in as arguments, so it is tested without GitHub or a database.
 //
 // The day has three tracks (src/lib/day-tracks.ts), each with one prize: track 1 is one of the two repo lists (see
 // TRACK1_PRIZE), track 2 the proposals, track 3 the LLM checks. The other repo list and the top contributors are
 // honourable mentions.
 
-/** The day, in UTC: 09:00 to 16:15 in Amsterdam, frozen for the public from 15:15. */
-export const DAY = { start: "2026-11-17T08:00:00Z", end: "2026-11-17T15:15:00Z", freeze: "2026-11-17T14:15:00Z" } as const;
+/** The day, in UTC: 09:00 to 16:15 in Amsterdam, frozen for the public from 15:45. */
+export const DAY = { start: "2026-11-17T08:00:00Z", end: "2026-11-17T15:15:00Z", freeze: "2026-11-17T14:45:00Z" } as const;
 export type Day = { start: string; end: string; freeze: string };
 
 const SHOWN = 5;

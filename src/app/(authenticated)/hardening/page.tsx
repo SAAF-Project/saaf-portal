@@ -22,7 +22,7 @@ const day = [
   { t: "09:45", v: "Guests from BDO: Adriaan Heijstek, Faissal Assakkach (10:15), Sjoerd de Vries and Thijs Modderman (11:00). Coffee at 10:45" },
   { t: "11:45", v: "Bauke Brenninkmeijer, Orq.ai: observe and evaluate your agents" },
   { t: "12:15", v: "The assignment: three tracks. Lunch at 12:30, then build. In the afternoon: Gülnur Orpak, ABN AMRO, a 15-minute talk" },
-  { t: "15:15", v: "The leaderboard freezes" },
+  { t: "15:45", v: "The leaderboard freezes" },
   { t: "16:00", v: "Last pull request opened; demo sign-up closes" },
   { t: "16:15", v: "Last merge, final review", accent: true },
   { t: "16:30", v: "Six demos, two per track. The reveal at 17:00, drinks at 17:10" },
