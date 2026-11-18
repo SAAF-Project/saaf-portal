@@ -18,21 +18,30 @@ function LoginForm() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [signupError, setSignupError] = useState("");
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!username.trim() && !email.trim()) return;
     setSubmitting(true);
+    setSignupError("");
     try {
       const res = await fetch("/api/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          githubUsername: username.replace("@", "").trim(),
+          githubUsername: username.trim().replace(/^@/, ""),
           email: email.trim() || undefined,
         }),
       });
-      if (res.ok) setSubmitted(true);
+      if (res.ok) {
+        setSubmitted(true);
+      } else {
+        const answer = await res.json().catch(() => null);
+        setSignupError(typeof answer?.error === "string" ? answer.error : "Your request could not be sent. Please try again.");
+      }
+    } catch {
+      setSignupError("Your request could not be sent. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -215,6 +224,11 @@ function LoginForm() {
                   The email linked to your GitHub account — we&apos;ll look up your username
                 </p>
               </div>
+              {signupError && (
+                <p role="alert" className="mb-4 p-3 bg-saaf-red/10 border border-saaf-red/30 rounded-lg text-sm text-saaf-red">
+                  {signupError}
+                </p>
+              )}
               <button
                 type="submit"
                 disabled={submitting || (!username.trim() && !email.trim())}

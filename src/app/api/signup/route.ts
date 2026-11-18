@@ -1,19 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPrisma } from "@/lib/prisma";
+import { readSignup } from "@/lib/signup";
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
-  const rawUsername = body.githubUsername
-    ? String(body.githubUsername).replace("@", "").trim()
-    : "";
-  const rawEmail = body.email ? String(body.email).trim() : "";
-
-  if (!rawUsername && !rawEmail) {
-    return NextResponse.json(
-      { error: "Please provide a GitHub username or email address" },
-      { status: 400 }
-    );
+  // The form is public. Only a real GitHub username or an email address is stored.
+  const input = readSignup(await request.json().catch(() => null));
+  if (!input.ok) {
+    return NextResponse.json({ error: input.error }, { status: 400 });
   }
+  const { githubUsername: rawUsername, email: rawEmail } = input;
 
   const identifier = rawUsername || rawEmail;
 
