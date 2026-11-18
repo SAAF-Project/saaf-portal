@@ -22,7 +22,8 @@ export async function POST(request: NextRequest) {
   });
 
   if (existing) {
-    return NextResponse.json({ message: "Request already pending" });
+    // The same answer as for a new request, so this route does not tell who already asked for access.
+    return NextResponse.json({ message: "Request submitted" });
   }
 
   await getPrisma().signupRequest.create({
